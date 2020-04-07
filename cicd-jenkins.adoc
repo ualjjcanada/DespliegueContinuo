@@ -1,0 +1,239 @@
+////
+Codificación, idioma, tabla de contenidos, tipo de documento
+////
+:encoding: utf-8
+:lang: es
+:toc: right
+:toc-title: Tabla de contenidos
+:keywords: CI/CD Jenkins Pipelines NodeJs Docker KeystoneJs
+:doctype: book
+:icons: font
+
+////
+/// activar btn:
+////
+:experimental:
+
+:source-highlighter: highlightjs
+:highlightjsdir: ./highlight
+
+:figure-caption: Fig.
+:imagesdir: images
+
+
+////
+Nombre y título del trabajo
+////
+= Despliegue continuo y entrega continua
+
+Computación en la nube servicios y aplicaciones.
+Version 1.0, Marzo-2020.
+Joaquín Cañadas <jjcanada@ual.es>
+
+// Entrar en modo no numerado de apartados
+:numbered!: 
+
+[abstract]
+////
+COLOCA A CONTINUACION EL RESUMEN
+////
+Tema 3. Despliegue Continuo
+
+////
+COLOCA A CONTINUACION LOS OBJETIVOS
+////
+.Objetivos
+* Crear una infraestructura de CI/CD en GCP
+* Diseñar proyectos Jenkins para la construcción y despliegue automatizado de aplicaciones en Java y NodeJs
+* Usar del framework KeystoneJs para el desarrollo rápido de un proyecto
+* Implementación de integración continua y despliegue continuo (CI/CD) de un proyecto NodeJs
+
+.Realización y entrega
+La realización de estas actividades se realizará de forma individual. Serán la base para actividades posteriores que ser harán en equipo. 
+La entrega será mediante el envío de un informe y el acceso al profesor a los servicios configurados, para la revisión y evaluación de los mismos. 
+
+// Entrar en modo numerado de apartados
+:numbered:
+
+== Prerequisitos
+
+Para comenzar a trabajar, será necesario tener instalados en la máquina local las siguientes herramientas: Terraform, gcloud CLI. Se presupone que ya se tiene instalado un entorno de desarrollo como Visual Studio Code.
+
+Además, se debe disponer de crédito en GCP, proporcionado por el profesor, y darse de alta en Github Student Education Pack.
+
+=== Cupones educativos GCP
+
+Si ya dispones de crédito en GCP, estupendo porque podrás usarlo ahora. En cualquier caso, para esta asignatura disponemos de un nuevo cupón educativo de 50$ por estudiante, que no necesita tarjeta de crédito para su activación. Activaló en la siguiente dirección, usando tu email @inlumine.ual.es.
+
+
+=== Terraform
+
+=== GCloud CLI para  GCP
+
+=== Github Student Education Pack
+
+Alta en Github Student Education Pack: https://education.github.com/pack
+
+
+== Creación de la infraestructura de VMs en GCP
+
+Vamos a crear 2 VM:
+
+. Máquina virtual con Jenkins con Docker instalado.
+. Máquina virtual de despliegue (VM Deploy) con Docker y Docker Compose instalados
+
+Para ello, vamos a usar la plantilla de terraform disponible en el repositorio https://github.com/ualcnsa/terraformGoogleCloudSample.
+
+
+== Cloud DNS
+
+Vamos a asignar nombres de DNS a las máquinas virtuales con Cloud DNS y xxxx. 
+
+=== Alta de nombres de dominio
+
+
+
+=== Asignación en Cloud DNS
+
+
+== Puesta en marcha de Jenkins
+
+Vamos a usar la primera VM para instalar Jenkins como contenedor docker. 
+
+=== Construcción de la imagen del contenedor Jenkins
+
+La imagen de Jenkins en DockerHub necesita instalarle el propio Docker, para permitir que Jenkins ejecute tareas de docker, como docker build, para construir contenedores. 
+
+Por tanto, vamos a crear una imagen personalizada del contenedor de Jenkins basándonos en la imagen pública, pero instalándole Docker  usando el siguiente Dockerfile (referencia medium).
+
+.Dockerfile
+[source, docker]
+----
+FROM python:3.7-alpine
+WORKDIR /code
+ENV FLASK_APP app.py
+ENV FLASK_RUN_HOST 0.0.0.0
+RUN apk add --no-cache gcc musl-dev linux-headers
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["flask", "run"]
+----
+
+Construimos la imagen con docker build
+
+[source,bash]
+----
+docker build ... 
+----
+
+=== Publicación en Google Container Registry
+
+Opcionalmente podemos publicar nuestra imagen personalizada en DockerHub, o alternativamente el Google Container Registry.
+
+=== Ejecución del contenedor de Jenkins
+
+Ejecutamos el contenedor a partir de la imagen creada previamente. 
+
+[source,bash]
+----
+docker run ... 
+----
+
+
+=== Configuración básica de Jenkins 
+
+A continuación se muestran los pasos para realizar la la configuración básica y la instalación de algunos plugins adicionales.
+
+Configuramos las tools en Jenkins.
+
+
+=== Creación del primer proyecto Jenkins
+
+Creamos el primer pipeline de Jenkins. 
+
+=== Conexión con la máquina de despliegue
+
+Para que la máquina de Jenkins pueda realizar el despluiegue de nuestros proyectos sobre otra máquina virtual, debemos configurar ambas máquinas para que puedan tener comunicación via SSH. 
+
+Aquí va el rollo ya documentado en las prácitcas de 3º HMIS: 
+. Creación de la pareja de claves ssh desde el usuario jenkins
+. Prueba de conexión ssh desde la terminal
+. Proyecto Jenkins que ejecuta comandos en la máquna de despliegue
+
+
+
+
+== Ejemplo 1: Aplicación web Java. 
+
+Una vez que todo fuciona correctamente, vamos a estudiar varios ejemplos, tanto en Java como en NodeJs.
+
+En este primer ejemplo, nos vamos a basar en el proyecto PetClinic con Spring Boot, disponible en https....
+
+=== Creación de proyecto Jenkins con pipelines
+
+Configuramos el Pipeline.
+
+=== Despliegue en la VM
+
+=== Deploy en un Docker container
+
+=== Deploy con Docker Compose ¿?
+
+== Ejemplo 2. Hola mundo en NodeJs
+
+Nos vamos a basar en el proyecto HelloWorld en NodeJs, disponible en https....
+
+=== Creación de proyecto Jenkins con pipelines
+
+Configuramos el Pipeline.
+
+=== Despliegue en la VM
+
+=== Deploy en un Docker container
+
+=== Deploy con Docker Compose ¿?
+
+
+== Ejemplo 3. Web App en NodeJs
+
+Nos vamos a basar en el proyecto ...  en NodeJs, disponible en https....
+
+=== Creación de proyecto Jenkins con pipelines
+
+Configuramos el Pipeline.
+
+=== Despliegue en la VM
+
+=== Deploy en un Docker container
+
+=== Deploy con Docker Compose ¿?
+
+
+== Proyecto NodeJs con KeystoneJS 
+
+Vamos a crear un proyecto de aplicacion web completa con Keystone 5 (https://www.keystonejs.com/), una framewor para escalable, extensible y de código abierto para la construcción de apliaciones NodeJs.
+
+=== Primeros pasos
+
+=== Ejecución en local
+
+
+== CI/CD de proyecto creado con KeystoneJs 
+
+Vamos a usar Jenkins para construir y desplegar el proyecto de webapp creada con Keystone.
+
+=== Creación de proyecto Jenkins con pipelines
+
+Configuramos el Pipeline.
+
+=== Despliegue en la VM
+
+=== Deploy en un Docker container
+
+=== Deploy con Docker Compose ¿?
+
+== Evolución del proyecto
+
+El objetivo es implementar nuevas características en nuestro proyecto, y que cuando subimos nuevo código al repositorio, el proyecto se construye en Jenkins y si todo va bien, y se despliega automáticamente.
+
