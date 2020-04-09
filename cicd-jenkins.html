@@ -438,7 +438,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-<body class="article toc2 toc-right data-line-1">
+<body class="book toc2 toc-right">
 <div id="header">
 <h1>Despliegue continuo y entrega continua</h1>
 <div id="toc" class="toc2">
@@ -446,20 +446,25 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel1">
 <li><a href="#_prerequisitos">1. Prerequisitos</a>
 <ul class="sectlevel2">
-<li><a href="#_cupones_educativos_gcp">1.1. Cupones educativos GCP</a></li>
+<li><a href="#_cupones_educativos_google_cloud">1.1. Cupones educativos Google Cloud</a></li>
 <li><a href="#_terraform">1.2. Terraform</a></li>
 <li><a href="#_gcloud_cli_para_gcp">1.3. GCloud CLI para  GCP</a></li>
 <li><a href="#_github_student_education_pack">1.4. Github Student Education Pack</a></li>
 </ul>
 </li>
-<li><a href="#_creación_de_la_infraestructura_de_vms_en_gcp">2. Creación de la infraestructura de VMs en GCP</a></li>
-<li><a href="#_cloud_dns">3. Cloud DNS</a>
+<li><a href="#_creación_de_la_infraestructura_de_vms_en_gcp">2. Creación de la infraestructura de VMs en GCP</a>
 <ul class="sectlevel2">
-<li><a href="#_alta_de_nombres_de_dominio">3.1. Alta de nombres de dominio</a></li>
-<li><a href="#_asignación_en_cloud_dns">3.2. Asignación en Cloud DNS</a></li>
+<li><a href="#_estructura_del_proyecto_terraform">2.1. Estructura del proyecto terraform</a></li>
+<li><a href="#_ejecución_de_terraform">2.2. Ejecución de terraform</a></li>
 </ul>
 </li>
-<li><a href="#_puesta_en_marcha_de_jenkins">4. Puesta en marcha de Jenkins</a>
+<li><a href="#_cloud_dns">3. Cloud DNS</a>
+<ul class="sectlevel2">
+<li><a href="#_alta_de_nombre_de_dominio">3.1. Alta de nombre de dominio</a></li>
+<li><a href="#_configuración_de_nombres_de_dominio">3.2. Configuración de nombres de dominio</a></li>
+</ul>
+</li>
+<li><a href="#_instalación_de_jenkins">4. Instalación de Jenkins</a>
 <ul class="sectlevel2">
 <li><a href="#_construcción_de_la_imagen_del_contenedor_jenkins">4.1. Construcción de la imagen del contenedor Jenkins</a></li>
 <li><a href="#_publicación_en_google_container_registry">4.2. Publicación en Google Container Registry</a></li>
@@ -482,7 +487,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_creación_de_proyecto_jenkins_con_pipelines_2">6.1. Creación de proyecto Jenkins con pipelines</a></li>
 <li><a href="#_despliegue_en_la_vm_2">6.2. Despliegue en la VM</a></li>
 <li><a href="#_deploy_en_un_docker_container_2">6.3. Deploy en un Docker container</a></li>
-<li><a href="#_deploy_con_docker_compose_2">6.4. Deploy con Docker Compose ¿?</a></li>
 </ul>
 </li>
 <li><a href="#_ejemplo_3_web_app_en_nodejs">7. Ejemplo 3. Web App en NodeJs</a>
@@ -490,207 +494,555 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_creación_de_proyecto_jenkins_con_pipelines_3">7.1. Creación de proyecto Jenkins con pipelines</a></li>
 <li><a href="#_despliegue_en_la_vm_3">7.2. Despliegue en la VM</a></li>
 <li><a href="#_deploy_en_un_docker_container_3">7.3. Deploy en un Docker container</a></li>
-<li><a href="#_deploy_con_docker_compose_3">7.4. Deploy con Docker Compose ¿?</a></li>
+<li><a href="#_deploy_con_docker_compose_2">7.4. Deploy con Docker Compose ¿?</a></li>
 </ul>
 </li>
-<li><a href="#_proyecto_nodejs_con_keystonejs">8. Proyecto NodeJs con KeystoneJS</a>
-<ul class="sectlevel2">
-<li><a href="#_primeros_pasos">8.1. Primeros pasos</a></li>
-<li><a href="#_ejecución_en_local">8.2. Ejecución en local</a></li>
-</ul>
-</li>
-<li><a href="#_cicd_de_proyecto_creado_con_keystonejs">9. CI/CD de proyecto creado con KeystoneJs</a>
-<ul class="sectlevel2">
-<li><a href="#_creación_de_proyecto_jenkins_con_pipelines_4">9.1. Creación de proyecto Jenkins con pipelines</a></li>
-<li><a href="#_despliegue_en_la_vm_4">9.2. Despliegue en la VM</a></li>
-<li><a href="#_deploy_en_un_docker_container_4">9.3. Deploy en un Docker container</a></li>
-<li><a href="#_deploy_con_docker_compose_4">9.4. Deploy con Docker Compose ¿?</a></li>
-</ul>
-</li>
-<li><a href="#_evolución_del_proyecto">10. Evolución del proyecto</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph data-line-29">
+<div class="paragraph">
 <p>Computación en la nube servicios y aplicaciones.
 Version 1.0, Marzo-2020.
 Joaquín Cañadas &lt;<a href="mailto:jjcanada@ual.es">jjcanada@ual.es</a>&gt;</p>
 </div>
-<div class="quoteblock abstract data-line-40">
+<div class="quoteblock abstract">
 <blockquote>
 Tema 3. Despliegue Continuo
 </blockquote>
 </div>
-<div class="ulist data-line-46">
+<div class="ulist">
 <div class="title">Objetivos</div>
 <ul>
-<li class="data-line-46">
+<li>
 <p>Crear una infraestructura de CI/CD en GCP</p>
 </li>
-<li class="data-line-47">
+<li>
 <p>Diseñar proyectos Jenkins para la construcción y despliegue automatizado de aplicaciones en Java y NodeJs</p>
-</li>
-<li class="data-line-48">
-<p>Usar del framework KeystoneJs para el desarrollo rápido de un proyecto</p>
-</li>
-<li class="data-line-49">
-<p>Implementación de integración continua y despliegue continuo (CI/CD) de un proyecto NodeJs</p>
 </li>
 </ul>
 </div>
-<div class="paragraph data-line-52">
+<div class="sidebarblock">
+<div class="content">
 <div class="title">Realización y entrega</div>
+<div class="paragraph">
 <p>La realización de estas actividades se realizará de forma individual. Serán la base para actividades posteriores que ser harán en equipo.
 La entrega será mediante el envío de un informe y el acceso al profesor a los servicios configurados, para la revisión y evaluación de los mismos.</p>
 </div>
 </div>
 </div>
-<div class="sect1 data-line-58">
+</div>
+</div>
+<div class="sect1">
 <h2 id="_prerequisitos">1. Prerequisitos</h2>
 <div class="sectionbody">
-<div class="paragraph data-line-60">
-<p>Para comenzar a trabajar, será necesario tener instalados en la máquina local las siguientes herramientas: Terraform, gcloud CLI. Se presupone que ya se tiene instalado un entorno de desarrollo como Visual Studio Code.</p>
+<div class="paragraph">
+<p>Para comenzar a trabajar, será necesario tener instalados en la máquina local las siguientes herramientas: Terraform, Google Cloud CLI. Se presupone que ya se tiene instalado un entorno de desarrollo como Visual Studio Code, y una pareja de claves SSH personal en la carpeta <code>HOME</code> del usuario (<code>~</code>).</p>
 </div>
-<div class="paragraph data-line-62">
-<p>Además, se debe disponer de crédito en GCP, proporcionado por el profesor, y darse de alta en Github Student Education Pack.</p>
-</div>
-<div class="sect2 data-line-64">
-<h3 id="_cupones_educativos_gcp">1.1. Cupones educativos GCP</h3>
-<div class="paragraph data-line-66">
-<p>Si ya dispones de crédito en GCP, estupendo porque podrás usarlo ahora. En cualquier caso, para esta asignatura disponemos de un nuevo cupón educativo de 50$ por estudiante, que no necesita tarjeta de crédito para su activación. Activaló en la siguiente dirección, usando tu email @inlumine.ual.es.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>~/.ssh/
+├── id_rsa <i class="conum" data-value="1"></i><b>(1)</b>
+└── id_rsa.pub <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
 </div>
 </div>
-<div class="sect2 data-line-69">
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>clave privada</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>clave pública</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Además, se debe disponer de crédito en GCP, proporcionado por el profesor, y darse de alta en Github Student Education Pack. A continuación se describen en detalle estos requisitos previos.</p>
+</div>
+<div class="sect2">
+<h3 id="_cupones_educativos_google_cloud">1.1. Cupones educativos Google Cloud</h3>
+<div class="paragraph">
+<p>Si ya dispones de crédito en GCP, podrás usarlo ahora. En cualquier caso, para esta asignatura disponemos de un nuevo cupón educativo de 50$ por estudiante, que no necesita tarjeta de crédito para su activación. Actívalo en la dirección que habrá recibido en tu email, usando tu email <em>@inlumine.ual.es</em>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Crea un nuevo proyecto</strong> GCP con el nombre <strong>cnsa2020-<em>abc123</em></strong> (sustituyendo <em>abc123</em> por tu nombre de usuario), y dale permisos al profesor. Para ello, revisa las instrucciones que vimos en la asignatura del primer cuatrimestre. El crédito del cada cupón dura 12 meses, así que este nuevo proyecto asígnalo a la cuenta de facturación de la asignatura del primer cuatrimestre, ya que es mejor consumir ese crédito porque caduca antes. Si se consume el crédito del primer cupón, simplemente tendrás que cambiar tu proyecto <strong>cnsa2020-<em>abc123</em></strong> a la nueva cuenta de facturación del nuevo cupón.</p>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_terraform">1.2. Terraform</h3>
-
+<div class="paragraph">
+<p>Terraform es una aplicación que se distribuye en un único archivo ejecutable. Las instrucciones de instalación de Terraform está disponibles <a href="https://learn.hashicorp.com/terraform/getting-started/install.html">aquí</a>.</p>
 </div>
-<div class="sect2 data-line-71">
+<div class="paragraph">
+<p>En Windows se recomienda instalarlo con <a href="https://chocolatey.org/docs/installation">Chocolatey</a>. Así que si previamente has instalado Chocolatey, simplemente abre una ventana de comandos (cmd) con <strong>permiso de administrador</strong> y ejecuta:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">choco <span class="nb">install </span>terraform <span class="nt">-y</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_gcloud_cli_para_gcp">1.3. GCloud CLI para  GCP</h3>
-
+<div class="paragraph">
+<p>Google Cloud Command Line Interface está disponible para su instalación <a href="https://cloud.google.com/sdk/install">aquí</a>.</p>
 </div>
-<div class="sect2 data-line-73">
+<div class="paragraph">
+<p>En Windows se recomienda instalarlo con Chocolatey: abre una ventana de comandos (cmd) con <strong>permiso de administrador</strong> y ejecuta:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">choco <span class="nb">install </span>gcloudsdk <span class="nt">-y</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_github_student_education_pack">1.4. Github Student Education Pack</h3>
-<div class="paragraph data-line-75">
-<p>Alta en Github Student Education Pack: <a href="https://education.github.com/pack" class="bare">https://education.github.com/pack</a></p>
+<div class="paragraph">
+<p>Para poder usar servicios adicionales, como DNS gratuito, debes darte de alta en <a href="https://education.github.com/pack">Github Student Education Pack</a>.</p>
+</div>
+<div class="paragraph">
+<p>Si ya dispones de una cuenta de GitHub, y no quieres crear una cuenta nueva, simplemente debes añadir tu email <em>@inlumine.ual.es</em> a la lista de emails de tu cuenta actual. Para ello, sique las <a href="https://help.github.com/en/github/setting-up-and-managing-your-github-user-account/adding-an-email-address-to-your-github-account">instrucciones</a>. Tras añadir tu email, haz clic en el enlace <a href="https://education.github.com/benefits">Get the pack</a>.</p>
 </div>
 </div>
 </div>
 </div>
-<div class="sect1 data-line-78">
+<div class="sect1">
 <h2 id="_creación_de_la_infraestructura_de_vms_en_gcp">2. Creación de la infraestructura de VMs en GCP</h2>
 <div class="sectionbody">
-<div class="paragraph data-line-80">
-<p>Vamos a crear 2 VM:</p>
+<div class="paragraph">
+<p>Utilizando una plantila de terraform crea 2 instancias de máquina virtuale en tu proyecto en Google Cloud:</p>
 </div>
-<div class="olist arabic data-line-82">
+<div class="olist arabic">
 <ol class="arabic">
-<li class="data-line-82">
-<p>Máquina virtual con Jenkins con Docker instalado.</p>
+<li>
+<p>Instancia para instalar Jenkins mendiante un contenedor Docker.</p>
 </li>
-<li class="data-line-83">
-<p>Máquina virtual de despliegue (VM Deploy) con Docker y Docker Compose instalados</p>
+<li>
+<p>Instancia de despliegue (VM Deploy) con Docker y Docker Composer instalados.</p>
 </li>
 </ol>
 </div>
-<div class="paragraph data-line-85">
-<p>Para ello, vamos a usar la plantilla de terraform disponible en el repositorio <a href="https://github.com/ualcnsa/terraformGoogleCloudSample" class="bare">https://github.com/ualcnsa/terraformGoogleCloudSample</a>.</p>
+<div class="paragraph">
+<p>Utiliza la plantilla de terraform disponible en el repositorio <a href="https://github.com/ualcnsa/terraformGoogleCloudSample" class="bare">https://github.com/ualcnsa/terraformGoogleCloudSample</a>.</p>
+</div>
+<div class="paragraph">
+<p>En primer lugar realiza un <em>fork</em> del repositorio, para hacer las modificaciones al mismo que sean necesarias. Despues modifica las variables correspondientes para usar tu proyecto en la plantilla.</p>
+</div>
+<div class="sect2">
+<h3 id="_estructura_del_proyecto_terraform">2.1. Estructura del proyecto terraform</h3>
+<div class="paragraph">
+<p>El repositorio consta de tres archivos con extension .tf, y una carpeta con un template para la creación de instancias.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>terraformGoogleCloudSample
+├── instance
+│   └── <strong>main.tf</strong> <i class="conum" data-value="4"></i><b>(4)</b>
+├── .gitignore
+├── README.md
+├── <strong>mynetwork.tf</strong> <i class="conum" data-value="2"></i><b>(2)</b>
+├── <strong>output.tf</strong> <i class="conum" data-value="3"></i><b>(3)</b>
+└── <strong>provider.tf</strong> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Descripción del proveedor sobre el que ejecutar la plantilla, en nuestro caso Google Cloud.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Plantilla principal. Crea la red, las reglas de firewall, las 2 instancias llamando al <em>módulo</em> <code>main.tf</code> de la carpeta <code>instance</code>, y por último realiza la inicialización de cada instancia.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Plantilla con los valores que se muestran de salida al finalizar la ejecución</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Módilo genérico para crear una instancia. Es llamado desde <code>network.tf</code> pasándole las variables que necesita para crear la instancia.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>El archivo <code><strong>provider.tf</strong></code> deberás modificarlo:</p>
+</div>
+<div class="listingblock">
+<div class="title">provider.tf</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="tf"><span class="c1"># Descargar json con credenciales de aquí:</span>
+<span class="c1"># https://console.cloud.google.com/apis/credentials/serviceaccountkey</span>
+<span class="c1"># Tras ello definir la variable de entorno apuntando a el json</span>
+<span class="c1"># export GOOGLE_CLOUD_KEYFILE_JSON=path/file.json</span>
+
+<span class="k">variable</span> <span class="s2">"gcp_project"</span> <span class="p">{</span>
+  <span class="c1"># Configurar el nombre del proyecto en GCP</span>
+  <span class="nx">default</span> <span class="p">=</span> <span class="s2">"cnsa-2020"</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="p">}</span>
+
+<span class="k">provider</span> <span class="s2">"google"</span> <span class="p">{</span>
+  <span class="nx">project</span>     <span class="p">=</span> <span class="s2">"</span><span class="k">${</span><span class="kd">var</span><span class="p">.</span><span class="nx">gcp_project</span><span class="k">}</span><span class="s2">"</span>
+  <span class="nx">region</span>      <span class="p">=</span> <span class="s2">"us-central1"</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Sustituye este valor por el nombre de tu proyecto (<em>cnsa2020-abc123</em>)</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Para que terraform pueda conectar al <em>provider</em> Google Cloud desde tu máquina local, debes proporcionar un archivo con credenciales. Descarga el archivo <code>.json</code> de aquí: <a href="https://console.cloud.google.com/apis/credentials/serviceaccountkey" class="bare">https://console.cloud.google.com/apis/credentials/serviceaccountkey</a></p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/crear-clave-cuenta-servicio.png" alt="crear clave cuenta servicio">
+</div>
+<div class="title">Fig. 1. Descarga de archivo de credenciales Google Cloud</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Selecciona el proyecto</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Selecciona la opción <em>Compute engine</em>, y pulsa <em>Crear</em></td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Guarda el archivo .json en tu proyecto. A continuación, en tu terminal define la variable de entorno apuntando a el archivo recién descargado, sustituyendo <code>path/file.json</code> por la ruta relativa y el nombre del archivo de credenciales:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">GOOGLE_CLOUD_KEYFILE_JSON</span><span class="o">=</span><span class="k"><strong></span>path/file.json<span class="k"></strong></span></code></pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Recuerda <strong>no subir nunca tu archivo json de credenciales</strong> a un repositorio público como GitHub. Para ello, añade el nombre el archivo de credenciales  al <code>.gitignore</code>. En ese archivo va tu clave privada que sustituye a tu usuario y contraseña para crear recursos en GCP. Hay robots que continuamente buscan PRIVATE KEYS y API TOKENS en repositorios públicos como GitHub. Si un <em>hacker</em> accede a ese archivo, lo usará para crear servicios hasta gastar tu crédito por completo, fundamentalmente para minar bitcoins.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ejecución_de_terraform">2.2. Ejecución de terraform</h3>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Videotutorial</div>
+<div class="paragraph">
+<p>Accede al <a href="https://drive.google.com/file/d/1_ku2LnVbMmWgns-s8_23ATAQ3nrQEJo2/view?usp=sharing">videotutorial</a> explicativo de esta sección.</p>
 </div>
 </div>
 </div>
-<div class="sect1 data-line-88">
+<div class="sect3">
+<h4 id="_terraform_init">2.2.1. <code>terraform init</code></h4>
+<div class="paragraph">
+<p>Una vez configurado el <em>provider</em> comprueba que la conexión es correcta: en tu terminal, ejecuta el comando <code>terraform init</code> para inicializar el proyecto como un proyecto terraform. Si todo es correcto aparecerá un mensaje de éxito.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/terraform-init-ok.png" alt="terraform init ok">
+</div>
+<div class="title">Fig. 2. <code>terraform init</code> correcto</div>
+</div>
+<div class="paragraph">
+<p>Si por el contrario recibes algún mensaje de error, revisa el motivo del error:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Terraform puede que no esté accesible. Debería estar en el <code>PATH</code></p>
+</li>
+<li>
+<p>Revisa si la variable de entorno si se ha guardado correctamente, ejecuta <code>echo $GOOGLE_CLOUD_KEYFILE_JSON</code> y comprueba que es la ruta y nombre de archivo correctos.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_terraform_plan">2.2.2. <code>terraform plan</code></h4>
+<div class="paragraph">
+<p>Ejecuta el comando <code>terraform plan</code> para ver el resultado de elementos que se crearán o eliminarán al ejecutar la plantilla. Debe aparecer que se crearán 7 elementos.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/terraform-plan-ok.png" alt="terraform plan ok">
+</div>
+<div class="title">Fig. 3. <code>terraform plan</code> correcto</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_terraform_apply">2.2.3. <code>terraform apply</code></h4>
+<div class="paragraph">
+<p>Ejecuta el comando <code>terraform apply --auto-approve</code> para ejecutar la plantilla. Comenzará a crear los 7 elementos definidos en la plantilla. Tardará unos <strong>5 minutos</strong> así que ten paciencia. Sobre todo tardará en ejecutar los bloques de inicialización de las instancias, en las que se actualizan los paquetes, se instala Docker y otros paquetes. En todo momento verás en pantalla el <code>log</code> de las operaciones que se están realizando.</p>
+</div>
+<div class="paragraph">
+<p>Comprueba que las instancias se han creado correctamente en tu proyecto Google Cloud.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>Apaga las instancias</strong> cuando dejes de usarlas, para evitar que consuman crédito.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_terraform_destroy">2.2.4. <code>terraform destroy</code></h4>
+<div class="paragraph">
+<p>Cuando desees eliminar todos los recursos que hemos creado con esta plantilla, simplemente ejecuta <code>terraform destroy</code>. Por ahora debes simplemente apagarlos cuando no los uses, porque los necesitaremos en el resto de la asignatura.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_cloud_dns">3. Cloud DNS</h2>
 <div class="sectionbody">
-<div class="paragraph data-line-90">
-<p>Vamos a asignar nombres de DNS a las máquinas virtuales con Cloud DNS y xxxx.</p>
+<div class="paragraph">
+<p>Google Cloud ha asignado una IP pública estática a cada una de tus instancias (la IP no cambiará al apagar la instancia y volver a encenderla). A continuación, vamos a asignar nombres de DNS a esas IPs con Cloud DNS y uno de los servicios de DNS disponibles en el Student Pack de GitHub.</p>
 </div>
-<div class="sect2 data-line-92">
-<h3 id="_alta_de_nombres_de_dominio">3.1. Alta de nombres de dominio</h3>
-
+<div class="sect2">
+<h3 id="_alta_de_nombre_de_dominio">3.1. Alta de nombre de dominio</h3>
+<div class="paragraph">
+<p>GitHub Student pack ofrece varios servicios de nombres dominios gratuitos durante 1 año. Puedes usar name.com, namecheap, o .tech domains. En uno de ellos vamos a dar de alta un nombre de dominio para nuestras instancias en Google Cloud. Voy a describir cómo hacerlo con <strong>.tech</strong>.</p>
 </div>
-<div class="sect2 data-line-96">
-<h3 id="_asignación_en_cloud_dns">3.2. Asignación en Cloud DNS</h3>
-
+<div class="paragraph">
+<p>Accede a <a href="https://get.tech/github-student-developer-pack">get.tech</a> y prueba un nombre de dominio que te guste y que esté disponible.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/tech-domain-disponible.png" alt="tech domain disponible">
+</div>
+<div class="title">Fig. 4. Comprobar si el dominio está disponible en get.tech</div>
+</div>
+<div class="paragraph">
+<p>A continuación, logueate con tu cuenta de github, y verás que tienes el descuento por un año. Procede a la compra gratuita. Además, tendrás que registrarte para poder acceder posteriormente a la configuración. Debes completar los datos de registro ya que te identifican como propietario del nombre de dominio. Si lo deseas, usa como dirección <em>Universidad de Almería, Ctra. Sacramento s/n, 04120, Almería, Spain</em>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_configuración_de_nombres_de_dominio">3.2. Configuración de nombres de dominio</h3>
+<div class="paragraph">
+<p>Para configurar el nombre de dominio que acabas de adquirir a las IPs reservadas, debes usar Cloud DNS en Google Cloud. Cloud DNS permite asignar los nombres de dominio a las direcciones IP públicas de las instancias. Recuerda comprobar que las IPs son estáticas.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>En el menú de la consola de Google Cloud, entra en <strong>Servicios de red</strong>, <strong>Cloud DNS</strong>.</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/cloud-dns.png" alt="cloud dns" width="360">
+</div>
+<div class="title">Fig. 5. Cloud DNS</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="2">
+<li>
+<p>Haz clic en <strong>Crear Zona</strong>.</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/cloud-dns-crear-zona.png" alt="cloud dns crear zona">
+</div>
+<div class="title">Fig. 6. Cloud DNS, crear zona</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="3">
+<li>
+<p>A continuación, haz clic en <strong>Añadir Conjunto de registros</strong>. Para cada instancia, crea un conjunto de registros.</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/cloud-dns-crear-conjunto-de-registros.png" alt="cloud dns crear conjunto de registros">
+</div>
+<div class="title">Fig. 7. Cloud DNS. Crear conjunto de registros, instancia Jenkins</div>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/cloud-dns-crear-conjunto-de-registros2.png" alt="cloud dns crear conjunto de registros2">
+</div>
+<div class="title">Fig. 8. Cloud DNS. Crear conjunto de registros, instancia de despligue de apps</div>
+</div>
+<div class="paragraph">
+<p>Tras la creación, debes tener un resultado similar a este:</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/cloud-dns-detalles-zona.png" alt="cloud dns detalles zona">
+</div>
+<div class="title">Fig. 9. Cloud DNS. Detalles de la Zona</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="4">
+<li>
+<p>El último paso será modificar los servidores de DNS de la configuración en la web .tech, para poner los valores de los servidores de Google Cloud. Para ello, logueate en get.tech. Entra en tu pedido.</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/get-tech-manage-orders.png" alt="get tech manage orders">
+</div>
+<div class="title">Fig. 10. get.tech. Acceso al pedido</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="5">
+<li>
+<p>Modifica los nombres de los servidores con los valores de tu zona en Cloud DNS</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/get-tech-manage-servers.png" alt="get tech manage servers">
+</div>
+<div class="title">Fig. 11. get.tech. Nombres de los servidores</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="6">
+<li>
+<p>Guarda los cambios. Hasta <strong>pasadas 24 horas</strong> no estarán disponibles.</p>
+</li>
+</ol>
 </div>
 </div>
 </div>
-<div class="sect1 data-line-99">
-<h2 id="_puesta_en_marcha_de_jenkins">4. Puesta en marcha de Jenkins</h2>
+</div>
+<div class="sect1">
+<h2 id="_instalación_de_jenkins">4. Instalación de Jenkins</h2>
 <div class="sectionbody">
-<div class="paragraph data-line-101">
-<p>Vamos a usar la primera VM para instalar Jenkins como contenedor docker.</p>
+<div class="paragraph">
+<p>Vamos a usar la primera instancia para instalar Jenkins. En lugar de realizar una <a href="https://github.com/ualhmis/Jenkins2Instalacion/blob/master/jenkins2_2019.adoc">instalación completa sobre el sistema operativo</a>, utilizando los paquetes de Ubuntu, tal como se hace en la asignatura Herramientas y Métodos de Ingeniería del Software, de 3º del Grado en Ingeniería Informática, aquí vas a desplegar Jenkins como un contenedor de  docker.</p>
 </div>
-<div class="sect2 data-line-103">
+<div class="sect2">
 <h3 id="_construcción_de_la_imagen_del_contenedor_jenkins">4.1. Construcción de la imagen del contenedor Jenkins</h3>
-<div class="paragraph data-line-105">
-<p>La imagen de Jenkins en DockerHub necesita instalarle el propio Docker, para permitir que Jenkins ejecute tareas de docker, como docker build, para construir contenedores.</p>
+<div class="paragraph">
+<p>La imagen pública del contenedor de Jenkins está disponible en <a href="https://hub.docker.com/_/jenkins/">DockerHub</a>. Esta imagen genérica necesita instalarle algunos plugins y herramientas. En concreto, hay que instalarle el propio Docker para permitir que Jenkins ejecute tareas de docker, como por ejemplo <code>docker build</code> para construir imágenes de contenedores.</p>
 </div>
-<div class="paragraph data-line-107">
-<p>Por tanto, vamos a crear una imagen personalizada del contenedor de Jenkins basándonos en la imagen pública, pero instalándole Docker  usando el siguiente Dockerfile (referencia medium).</p>
+<div class="paragraph">
+<p>Por tanto, vamos a crear una imagen personalizada del contenedor de Jenkins basándonos en la imagen pública e instalándo Docker dentro del contenedor.
+Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia máquina donde lo vamos a ejecutar, es decir en la instancia de jenkins.</p>
 </div>
-<div class="listingblock data-line-111">
+<div class="paragraph">
+<p>Conecta por ssh a la instancia. Crea una carpeta <code>jenkins-docker</code> y crea el archivo <code>Dockerfile</code>. Usa el siguiente Dockerfile (descrito en esta entrada de <em>medium.com</em>:  <a href="https://medium.com/@gustavo.guss/jenkins-building-docker-image-and-sending-to-registry-64b84ea45ee9">Jenkins Building Docker Image and Sending to Registry</a>).</p>
+</div>
+<div class="listingblock">
 <div class="title">Dockerfile</div>
 <div class="content">
-<pre class="highlightjs highlight"><code data-lang="docker" class="language-docker hljs">FROM python:3.7-alpine
-WORKDIR /code
-ENV FLASK_APP app.py
-ENV FLASK_RUN_HOST 0.0.0.0
-RUN apk add --no-cache gcc musl-dev linux-headers
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
-COPY . .
-CMD ["flask", "run"]</code></pre>
+<pre class="rouge highlight"><code data-lang="docker"><span class="k">FROM</span><span class="s"> jenkins/jenkins:lts</span>
+
+<span class="k">USER</span><span class="s"> root</span>
+
+<span class="k">RUN </span>apt-get update <span class="o">&amp;&amp;</span> <span class="se">\
+</span>apt-get <span class="nt">-y</span> <span class="nb">install </span>apt-transport-https <span class="se">\
+</span>    ca-certificates <span class="se">\
+</span>    curl <span class="se">\
+</span>    gnupg2 <span class="se">\
+</span>    software-properties-common <span class="o">&amp;&amp;</span> <span class="se">\
+</span>curl <span class="nt">-fsSL</span> https://download.docker.com/linux/<span class="si">$(</span><span class="nb">.</span> /etc/os-release<span class="p">;</span> <span class="nb">echo</span> <span class="s2">"</span><span class="nv">$ID</span><span class="s2">"</span><span class="si">)</span>/gpg <span class="o">&gt;</span> /tmp/dkey<span class="p">;</span> apt-key add /tmp/dkey <span class="o">&amp;&amp;</span> <span class="se">\
+</span>add-apt-repository <span class="se">\
+</span>    <span class="s2">"deb [arch=amd64] https://download.docker.com/linux/</span><span class="si">$(</span><span class="nb">.</span> /etc/os-release<span class="p">;</span> <span class="nb">echo</span> <span class="s2">"</span><span class="nv">$ID</span><span class="s2">"</span><span class="si">)</span><span class="s2"> </span><span class="se">\
+</span><span class="s2">    </span><span class="si">$(</span>lsb_release <span class="nt">-cs</span><span class="si">)</span><span class="s2"> </span><span class="se">\
+</span><span class="s2">    stable"</span> <span class="o">&amp;&amp;</span> <span class="se">\
+</span>  apt-get update <span class="o">&amp;&amp;</span> <span class="se">\
+</span>  apt-get <span class="nt">-y</span> <span class="nb">install </span>docker-ce
+
+<span class="k">RUN </span>apt-get <span class="nb">install</span> <span class="nt">-y</span> docker-ce
+
+<span class="k">RUN </span>usermod <span class="nt">-a</span> <span class="nt">-G</span> docker jenkins
+
+<span class="k">USER</span><span class="s"> jenkins</span></code></pre>
 </div>
 </div>
-<div class="paragraph data-line-123">
-<p>Construimos la imagen con docker build</p>
+<div class="paragraph">
+<p>Construimos la imagen a partir del Dockerfile:</p>
 </div>
-<div class="listingblock data-line-126">
+<div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">docker build ...</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker build <span class="nt">--tag</span> <span class="k">*</span>ualjjcanada<span class="k">*</span>/jenkins-docker:1.0 <span class="nb">.</span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Sustituye ualjjcanada por tu usuario</td>
+</tr>
+</table>
 </div>
-<div class="sect2 data-line-130">
+</div>
+<div class="sect2">
 <h3 id="_publicación_en_google_container_registry">4.2. Publicación en Google Container Registry</h3>
-<div class="paragraph data-line-132">
+<div class="paragraph">
 <p>Opcionalmente podemos publicar nuestra imagen personalizada en DockerHub, o alternativamente el Google Container Registry.</p>
 </div>
 </div>
-<div class="sect2 data-line-134">
+<div class="sect2">
 <h3 id="_ejecución_del_contenedor_de_jenkins">4.3. Ejecución del contenedor de Jenkins</h3>
-<div class="paragraph data-line-136">
+<div class="paragraph">
 <p>Ejecutamos el contenedor a partir de la imagen creada previamente.</p>
 </div>
-<div class="listingblock data-line-139">
+<div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">docker run ...</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker run ...</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2 data-line-144">
+<div class="sect2">
 <h3 id="_configuración_básica_de_jenkins">4.4. Configuración básica de Jenkins</h3>
-<div class="paragraph data-line-146">
+<div class="paragraph">
 <p>A continuación se muestran los pasos para realizar la la configuración básica y la instalación de algunos plugins adicionales.</p>
 </div>
-<div class="paragraph data-line-148">
+<div class="paragraph">
 <p>Configuramos las tools en Jenkins.</p>
 </div>
 </div>
-<div class="sect2 data-line-151">
+<div class="sect2">
 <h3 id="_creación_del_primer_proyecto_jenkins">4.5. Creación del primer proyecto Jenkins</h3>
-<div class="paragraph data-line-153">
+<div class="paragraph">
 <p>Creamos el primer pipeline de Jenkins.</p>
 </div>
 </div>
-<div class="sect2 data-line-155">
+<div class="sect2">
 <h3 id="_conexión_con_la_máquina_de_despliegue">4.6. Conexión con la máquina de despliegue</h3>
-<div class="paragraph data-line-157">
+<div class="paragraph">
 <p>Para que la máquina de Jenkins pueda realizar el despluiegue de nuestros proyectos sobre otra máquina virtual, debemos configurar ambas máquinas para que puedan tener comunicación via SSH.</p>
 </div>
-<div class="paragraph data-line-159">
+<div class="paragraph">
 <p>Aquí va el rollo ya documentado en las prácitcas de 3º HMIS:
 . Creación de la pareja de claves ssh desde el usuario jenkins
 . Prueba de conexión ssh desde la terminal
@@ -699,145 +1051,299 @@ CMD ["flask", "run"]</code></pre>
 </div>
 </div>
 </div>
-<div class="sect1 data-line-167">
+<div class="sect1">
 <h2 id="_ejemplo_1_aplicación_web_java">5. Ejemplo 1: Aplicación web Java.</h2>
 <div class="sectionbody">
-<div class="paragraph data-line-169">
+<div class="paragraph">
 <p>Una vez que todo fuciona correctamente, vamos a estudiar varios ejemplos, tanto en Java como en NodeJs.</p>
 </div>
-<div class="paragraph data-line-171">
+<div class="paragraph">
 <p>En este primer ejemplo, nos vamos a basar en el proyecto PetClinic con Spring Boot, disponible en https&#8230;&#8203;.</p>
 </div>
-<div class="sect2 data-line-173">
+<div class="sect2">
 <h3 id="_creación_de_proyecto_jenkins_con_pipelines">5.1. Creación de proyecto Jenkins con pipelines</h3>
-<div class="paragraph data-line-175">
+<div class="paragraph">
 <p>Configuramos el Pipeline.</p>
 </div>
 </div>
-<div class="sect2 data-line-177">
+<div class="sect2">
 <h3 id="_despliegue_en_la_vm">5.2. Despliegue en la VM</h3>
 
 </div>
-<div class="sect2 data-line-179">
+<div class="sect2">
 <h3 id="_deploy_en_un_docker_container">5.3. Deploy en un Docker container</h3>
 
 </div>
-<div class="sect2 data-line-181">
+<div class="sect2">
 <h3 id="_deploy_con_docker_compose">5.4. Deploy con Docker Compose ¿?</h3>
 
 </div>
 </div>
 </div>
-<div class="sect1 data-line-183">
+<div class="sect1">
 <h2 id="_ejemplo_2_hola_mundo_en_nodejs">6. Ejemplo 2. Hola mundo en NodeJs</h2>
 <div class="sectionbody">
-<div class="paragraph data-line-185">
+<div class="paragraph">
 <p>Nos vamos a basar en el proyecto HelloWorld en NodeJs, disponible en https&#8230;&#8203;.</p>
 </div>
-<div class="sect2 data-line-187">
+<div class="sect2">
 <h3 id="_creación_de_proyecto_jenkins_con_pipelines_2">6.1. Creación de proyecto Jenkins con pipelines</h3>
-<div class="paragraph data-line-189">
+<div class="paragraph">
 <p>Configuramos el Pipeline.</p>
 </div>
 </div>
-<div class="sect2 data-line-191">
+<div class="sect2">
 <h3 id="_despliegue_en_la_vm_2">6.2. Despliegue en la VM</h3>
 
 </div>
-<div class="sect2 data-line-193">
+<div class="sect2">
 <h3 id="_deploy_en_un_docker_container_2">6.3. Deploy en un Docker container</h3>
 
 </div>
-<div class="sect2 data-line-195">
-<h3 id="_deploy_con_docker_compose_2">6.4. Deploy con Docker Compose ¿?</h3>
-
 </div>
 </div>
-</div>
-<div class="sect1 data-line-198">
+<div class="sect1">
 <h2 id="_ejemplo_3_web_app_en_nodejs">7. Ejemplo 3. Web App en NodeJs</h2>
 <div class="sectionbody">
-<div class="paragraph data-line-200">
+<div class="paragraph">
 <p>Nos vamos a basar en el proyecto &#8230;&#8203;  en NodeJs, disponible en https&#8230;&#8203;.</p>
 </div>
-<div class="sect2 data-line-202">
+<div class="sect2">
 <h3 id="_creación_de_proyecto_jenkins_con_pipelines_3">7.1. Creación de proyecto Jenkins con pipelines</h3>
-<div class="paragraph data-line-204">
+<div class="paragraph">
 <p>Configuramos el Pipeline.</p>
 </div>
 </div>
-<div class="sect2 data-line-206">
+<div class="sect2">
 <h3 id="_despliegue_en_la_vm_3">7.2. Despliegue en la VM</h3>
 
 </div>
-<div class="sect2 data-line-208">
+<div class="sect2">
 <h3 id="_deploy_en_un_docker_container_3">7.3. Deploy en un Docker container</h3>
 
 </div>
-<div class="sect2 data-line-210">
-<h3 id="_deploy_con_docker_compose_3">7.4. Deploy con Docker Compose ¿?</h3>
+<div class="sect2">
+<h3 id="_deploy_con_docker_compose_2">7.4. Deploy con Docker Compose ¿?</h3>
 
-</div>
-</div>
-</div>
-<div class="sect1 data-line-213">
-<h2 id="_proyecto_nodejs_con_keystonejs">8. Proyecto NodeJs con KeystoneJS</h2>
-<div class="sectionbody">
-<div class="paragraph data-line-215">
-<p>Vamos a crear un proyecto de aplicacion web completa con Keystone 5 (<a href="https://www.keystonejs.com/" class="bare">https://www.keystonejs.com/</a>), una framewor para escalable, extensible y de código abierto para la construcción de apliaciones NodeJs.</p>
-</div>
-<div class="sect2 data-line-217">
-<h3 id="_primeros_pasos">8.1. Primeros pasos</h3>
-
-</div>
-<div class="sect2 data-line-219">
-<h3 id="_ejecución_en_local">8.2. Ejecución en local</h3>
-
-</div>
-</div>
-</div>
-<div class="sect1 data-line-222">
-<h2 id="_cicd_de_proyecto_creado_con_keystonejs">9. CI/CD de proyecto creado con KeystoneJs</h2>
-<div class="sectionbody">
-<div class="paragraph data-line-224">
-<p>Vamos a usar Jenkins para construir y desplegar el proyecto de webapp creada con Keystone.</p>
-</div>
-<div class="sect2 data-line-226">
-<h3 id="_creación_de_proyecto_jenkins_con_pipelines_4">9.1. Creación de proyecto Jenkins con pipelines</h3>
-<div class="paragraph data-line-228">
-<p>Configuramos el Pipeline.</p>
-</div>
-</div>
-<div class="sect2 data-line-230">
-<h3 id="_despliegue_en_la_vm_4">9.2. Despliegue en la VM</h3>
-
-</div>
-<div class="sect2 data-line-232">
-<h3 id="_deploy_en_un_docker_container_4">9.3. Deploy en un Docker container</h3>
-
-</div>
-<div class="sect2 data-line-234">
-<h3 id="_deploy_con_docker_compose_4">9.4. Deploy con Docker Compose ¿?</h3>
-
-</div>
-</div>
-</div>
-<div class="sect1 data-line-236">
-<h2 id="_evolución_del_proyecto">10. Evolución del proyecto</h2>
-<div class="sectionbody">
-<div class="paragraph data-line-238">
-<p>El objetivo es implementar nuevas características en nuestro proyecto, y que cuando subimos nuevo código al repositorio, el proyecto se construye en Jenkins y si todo va bien, y se despliega automáticamente.</p>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-07 20:46:39 +0200
+Last updated 2020-04-09 02:42:10 +0200
 </div>
 </div>
-<link rel="stylesheet" href="./highlight/styles/github.min.css">
-<script src="./highlight/highlight.min.js"></script>
-<script>hljs.initHighlighting()</script>
+<style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge .cm {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .cp {
+  color: #999999;
+  font-weight: bold;
+}
+pre.rouge .c1 {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .cs {
+  color: #999999;
+  font-weight: bold;
+  font-style: italic;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cpf {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+}
+pre.rouge .gd {
+  color: #000000;
+  background-color: #ffdddd;
+}
+pre.rouge .ge {
+  color: #000000;
+  font-style: italic;
+}
+pre.rouge .gr {
+  color: #aa0000;
+}
+pre.rouge .gh {
+  color: #999999;
+}
+pre.rouge .gi {
+  color: #000000;
+  background-color: #ddffdd;
+}
+pre.rouge .go {
+  color: #888888;
+}
+pre.rouge .gp {
+  color: #555555;
+}
+pre.rouge .gs {
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #aaaaaa;
+}
+pre.rouge .gt {
+  color: #aa0000;
+}
+pre.rouge .kc {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kd {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kn {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kp {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kr {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kt {
+  color: #445588;
+  font-weight: bold;
+}
+pre.rouge .k, pre.rouge .kv {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .mf {
+  color: #009999;
+}
+pre.rouge .mh {
+  color: #009999;
+}
+pre.rouge .il {
+  color: #009999;
+}
+pre.rouge .mi {
+  color: #009999;
+}
+pre.rouge .mo {
+  color: #009999;
+}
+pre.rouge .m, pre.rouge .mb, pre.rouge .mx {
+  color: #009999;
+}
+pre.rouge .sb {
+  color: #d14;
+}
+pre.rouge .sc {
+  color: #d14;
+}
+pre.rouge .sd {
+  color: #d14;
+}
+pre.rouge .s2 {
+  color: #d14;
+}
+pre.rouge .se {
+  color: #d14;
+}
+pre.rouge .sh {
+  color: #d14;
+}
+pre.rouge .si {
+  color: #d14;
+}
+pre.rouge .sx {
+  color: #d14;
+}
+pre.rouge .sr {
+  color: #009926;
+}
+pre.rouge .s1 {
+  color: #d14;
+}
+pre.rouge .ss {
+  color: #990073;
+}
+pre.rouge .s, pre.rouge .sa, pre.rouge .dl {
+  color: #d14;
+}
+pre.rouge .na {
+  color: #008080;
+}
+pre.rouge .bp {
+  color: #999999;
+}
+pre.rouge .nb {
+  color: #0086B3;
+}
+pre.rouge .nc {
+  color: #445588;
+  font-weight: bold;
+}
+pre.rouge .no {
+  color: #008080;
+}
+pre.rouge .nd {
+  color: #3c5d5d;
+  font-weight: bold;
+}
+pre.rouge .ni {
+  color: #800080;
+}
+pre.rouge .ne {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nl {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nn {
+  color: #555555;
+}
+pre.rouge .nt {
+  color: #000080;
+}
+pre.rouge .vc {
+  color: #008080;
+}
+pre.rouge .vg {
+  color: #008080;
+}
+pre.rouge .vi {
+  color: #008080;
+}
+pre.rouge .nv, pre.rouge .vm {
+  color: #008080;
+}
+pre.rouge .ow {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .o {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .w {
+  color: #bbbbbb;
+}
+pre.rouge {
+  background-color: #f8f8f8;
+}
+</style>
 </body>
 </html>

@@ -1,0 +1,93 @@
+////
+Codificación, idioma, tabla de contenidos, tipo de documento
+////
+:encoding: utf-8
+:lang: es
+:toc: right
+:toc-title: Tabla de contenidos
+:keywords: CI/CD Jenkins Pipelines NodeJs Docker KeystoneJs
+:doctype: book
+:icons: font
+
+////
+/// activar btn:
+////
+:experimental:
+
+:source-highlighter: highlightjs
+:highlightjsdir: ./highlight
+
+:figure-caption: Fig.
+:imagesdir: images
+
+
+////
+Nombre y título del trabajo
+////
+= Despliegue continuo y entrega continua. Proyecto
+
+Computación en la nube servicios y aplicaciones.
+Version 1.0, Marzo-2020.
+Joaquín Cañadas <jjcanada@ual.es>
+
+// Entrar en modo no numerado de apartados
+:numbered!: 
+
+[abstract]
+////
+COLOCA A CONTINUACION EL RESUMEN
+////
+Tema 3. Despliegue Continuo. Proyecto con KeystoneJs 5
+
+////
+COLOCA A CONTINUACION LOS OBJETIVOS
+////
+.Objetivos
+* Usar del framework KeystoneJs para el desarrollo rápido de un proyecto
+* Implementación de integración continua y despliegue continuo (CI/CD) de un proyecto NodeJs
+
+.Realización y entrega
+La realización de estas actividades se realizará de forma individual. Serán la base para actividades posteriores que ser harán en equipo. 
+La entrega será mediante el envío de un informe y el acceso al profesor a los servicios configurados, para la revisión y evaluación de los mismos. 
+
+// Entrar en modo numerado de apartados
+:numbered:
+
+== Prerequisitos
+
+Haber realizado las actividades de la primera parte del tema, y disponer de las máquinas virtuales en Google Cloud con Jenkins y el entorno de despliegue.
+
+
+== Proyecto NodeJs con KeystoneJS 
+
+Vamos a crear un proyecto de aplicacion web completa con Keystone 5 (https://www.keystonejs.com/), una framework escalable, extensible y de código abierto para la construcción de apliaciones NodeJs.
+
+=== Primeros pasos
+
+=== Ejecución en local
+
+
+== Pruebas automatizadas
+
+=== Pruebas unitarias con ...
+
+=== Pruebas end-to-end con Selenium / ...
+
+
+== CI/CD de proyecto creado con KeystoneJs 
+
+Vamos a usar Jenkins para construir y desplegar el proyecto de webapp creada con Keystone.
+
+=== Creación de proyecto Jenkins con pipelines
+
+Configuramos el Pipeline.
+
+=== Despliegue en la VM
+
+=== Deploy en un Docker container
+
+=== Deploy con Docker Compose ¿?
+
+== Evolución del proyecto
+
+El objetivo es implementar nuevas características en nuestro proyecto, y que cuando subimos nuevo código al repositorio, el proyecto se construye en Jenkins y si todo va bien, y se despliega automáticamente.

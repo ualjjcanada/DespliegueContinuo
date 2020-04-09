@@ -14,8 +14,10 @@ Codificación, idioma, tabla de contenidos, tipo de documento
 ////
 :experimental:
 
-:source-highlighter: highlightjs
-:highlightjsdir: ./highlight
+:source-highlighter: rouge
+:rouge-linenums-mode: inline
+
+// :highlightjsdir: ./highlight
 
 :figure-caption: Fig.
 :imagesdir: images
@@ -45,87 +47,297 @@ COLOCA A CONTINUACION LOS OBJETIVOS
 .Objetivos
 * Crear una infraestructura de CI/CD en GCP
 * Diseñar proyectos Jenkins para la construcción y despliegue automatizado de aplicaciones en Java y NodeJs
-* Usar del framework KeystoneJs para el desarrollo rápido de un proyecto
-* Implementación de integración continua y despliegue continuo (CI/CD) de un proyecto NodeJs
 
 .Realización y entrega
+****
 La realización de estas actividades se realizará de forma individual. Serán la base para actividades posteriores que ser harán en equipo. 
 La entrega será mediante el envío de un informe y el acceso al profesor a los servicios configurados, para la revisión y evaluación de los mismos. 
+****
 
 // Entrar en modo numerado de apartados
 :numbered:
 
 == Prerequisitos
 
-Para comenzar a trabajar, será necesario tener instalados en la máquina local las siguientes herramientas: Terraform, gcloud CLI. Se presupone que ya se tiene instalado un entorno de desarrollo como Visual Studio Code.
+Para comenzar a trabajar, será necesario tener instalados en la máquina local las siguientes herramientas: Terraform, Google Cloud CLI. Se presupone que ya se tiene instalado un entorno de desarrollo como Visual Studio Code, y una pareja de claves SSH personal en la carpeta `HOME` del usuario (`~`).
 
-Además, se debe disponer de crédito en GCP, proporcionado por el profesor, y darse de alta en Github Student Education Pack.
+[source,subs="verbatim,quotes"]
+----
+~/.ssh/
+├── id_rsa <1>
+└── id_rsa.pub <2>
+----
+<1> clave privada
+<2> clave pública
 
-=== Cupones educativos GCP
+Además, se debe disponer de crédito en GCP, proporcionado por el profesor, y darse de alta en Github Student Education Pack. A continuación se describen en detalle estos requisitos previos.
 
-Si ya dispones de crédito en GCP, estupendo porque podrás usarlo ahora. En cualquier caso, para esta asignatura disponemos de un nuevo cupón educativo de 50$ por estudiante, que no necesita tarjeta de crédito para su activación. Activaló en la siguiente dirección, usando tu email @inlumine.ual.es.
+=== Cupones educativos Google Cloud
 
+Si ya dispones de crédito en GCP, podrás usarlo ahora. En cualquier caso, para esta asignatura disponemos de un nuevo cupón educativo de 50$ por estudiante, que no necesita tarjeta de crédito para su activación. Actívalo en la dirección que habrá recibido en tu email, usando tu email __@inlumine.ual.es__.
+
+*Crea un nuevo proyecto* GCP con el nombre *cnsa2020-__abc123__* (sustituyendo __abc123__ por tu nombre de usuario), y dale permisos al profesor. Para ello, revisa las instrucciones que vimos en la asignatura del primer cuatrimestre. El crédito del cada cupón dura 12 meses, así que este nuevo proyecto asígnalo a la cuenta de facturación de la asignatura del primer cuatrimestre, ya que es mejor consumir ese crédito porque caduca antes. Si se consume el crédito del primer cupón, simplemente tendrás que cambiar tu proyecto *cnsa2020-__abc123__* a la nueva cuenta de facturación del nuevo cupón.
 
 === Terraform
 
+Terraform es una aplicación que se distribuye en un único archivo ejecutable. Las instrucciones de instalación de Terraform está disponibles https://learn.hashicorp.com/terraform/getting-started/install.html[aquí].
+
+En Windows se recomienda instalarlo con https://chocolatey.org/docs/installation[Chocolatey]. Así que si previamente has instalado Chocolatey, simplemente abre una ventana de comandos (cmd) con *permiso de administrador* y ejecuta: 
+
+[source,bash]
+----
+choco install terraform -y
+----
+
 === GCloud CLI para  GCP
+
+Google Cloud Command Line Interface está disponible para su instalación https://cloud.google.com/sdk/install[aquí].
+
+En Windows se recomienda instalarlo con Chocolatey: abre una ventana de comandos (cmd) con *permiso de administrador* y ejecuta: 
+
+[source,bash]
+----
+choco install gcloudsdk -y
+----
 
 === Github Student Education Pack
 
-Alta en Github Student Education Pack: https://education.github.com/pack
+Para poder usar servicios adicionales, como DNS gratuito, debes darte de alta en https://education.github.com/pack[Github Student Education Pack].
 
+Si ya dispones de una cuenta de GitHub, y no quieres crear una cuenta nueva, simplemente debes añadir tu email __@inlumine.ual.es__ a la lista de emails de tu cuenta actual. Para ello, sique las https://help.github.com/en/github/setting-up-and-managing-your-github-user-account/adding-an-email-address-to-your-github-account[instrucciones]. Tras añadir tu email, haz clic en el enlace https://education.github.com/benefits[Get the pack].
 
 == Creación de la infraestructura de VMs en GCP
 
-Vamos a crear 2 VM:
+Utilizando una plantila de terraform crea 2 instancias de máquina virtuale en tu proyecto en Google Cloud: 
 
-. Máquina virtual con Jenkins con Docker instalado.
-. Máquina virtual de despliegue (VM Deploy) con Docker y Docker Compose instalados
+. Instancia para instalar Jenkins mendiante un contenedor Docker.
+. Instancia de despliegue (VM Deploy) con Docker y Docker Composer instalados.
 
-Para ello, vamos a usar la plantilla de terraform disponible en el repositorio https://github.com/ualcnsa/terraformGoogleCloudSample.
+Utiliza la plantilla de terraform disponible en el repositorio https://github.com/ualcnsa/terraformGoogleCloudSample. 
+
+En primer lugar realiza un __fork__ del repositorio, para hacer las modificaciones al mismo que sean necesarias. Despues modifica las variables correspondientes para usar tu proyecto en la plantilla.
+
+=== Estructura del proyecto terraform
+
+El repositorio consta de tres archivos con extension .tf, y una carpeta con un template para la creación de instancias.
+
+[source,subs="verbatim,quotes"]
+----
+terraformGoogleCloudSample
+├── instance
+│   └── *main.tf* <4>
+├── .gitignore
+├── README.md
+├── *mynetwork.tf* <2>
+├── *output.tf* <3>
+└── *provider.tf* <1>
+----
+<1> Descripción del proveedor sobre el que ejecutar la plantilla, en nuestro caso Google Cloud.
+<2> Plantilla principal. Crea la red, las reglas de firewall, las 2 instancias llamando al __módulo__ `main.tf` de la carpeta `instance`, y por último realiza la inicialización de cada instancia.
+<3> Plantilla con los valores que se muestran de salida al finalizar la ejecución
+<4> Módilo genérico para crear una instancia. Es llamado desde `network.tf` pasándole las variables que necesita para crear la instancia.
+
+El archivo `*provider.tf*` deberás modificarlo:
+
+.provider.tf
+[source, tf]
+----
+# Descargar json con credenciales de aquí:
+# https://console.cloud.google.com/apis/credentials/serviceaccountkey
+# Tras ello definir la variable de entorno apuntando a el json
+# export GOOGLE_CLOUD_KEYFILE_JSON=path/file.json
+
+variable "gcp_project" {
+  # Configurar el nombre del proyecto en GCP
+  default = "cnsa-2020" <1>
+}
+
+provider "google" {
+  project     = "${var.gcp_project}"
+  region      = "us-central1"
+}
+----
+<1> Sustituye este valor por el nombre de tu proyecto (__cnsa2020-abc123__)
+
+Para que terraform pueda conectar al __provider__ Google Cloud desde tu máquina local, debes proporcionar un archivo con credenciales. Descarga el archivo `.json` de aquí: https://console.cloud.google.com/apis/credentials/serviceaccountkey
+
+.Descarga de archivo de credenciales Google Cloud
+image::crear-clave-cuenta-servicio.png[role="thumb", align="center"]
+
+<1> Selecciona el proyecto
+<2> Selecciona la opción __Compute engine__, y pulsa __Crear__
+
+Guarda el archivo .json en tu proyecto. A continuación, en tu terminal define la variable de entorno apuntando a el archivo recién descargado, sustituyendo `path/file.json` por la ruta relativa y el nombre del archivo de credenciales: 
+[source, bash, subs="verbatim,quotes"]
+export GOOGLE_CLOUD_KEYFILE_JSON=*path/file.json*
+
+
+[WARNING]
+====
+Recuerda *no subir nunca tu archivo json de credenciales* a un repositorio público como GitHub. Para ello, añade el nombre el archivo de credenciales  al `.gitignore`. En ese archivo va tu clave privada que sustituye a tu usuario y contraseña para crear recursos en GCP. Hay robots que continuamente buscan PRIVATE KEYS y API TOKENS en repositorios públicos como GitHub. Si un __hacker__ accede a ese archivo, lo usará para crear servicios hasta gastar tu crédito por completo, fundamentalmente para minar bitcoins.
+====
+
+=== Ejecución de terraform
+.Videotutorial
+****
+Accede al https://drive.google.com/file/d/1_ku2LnVbMmWgns-s8_23ATAQ3nrQEJo2/view?usp=sharing[videotutorial] explicativo de esta sección.
+
+****
+==== `terraform init`
+Una vez configurado el __provider__ comprueba que la conexión es correcta: en tu terminal, ejecuta el comando `terraform init` para inicializar el proyecto como un proyecto terraform. Si todo es correcto aparecerá un mensaje de éxito.
+
+.`terraform init` correcto
+image::terraform-init-ok.png[role="thumb", align="center"]
+
+Si por el contrario recibes algún mensaje de error, revisa el motivo del error: 
+
+. Terraform puede que no esté accesible. Debería estar en el `PATH`
+. Revisa si la variable de entorno si se ha guardado correctamente, ejecuta `echo $GOOGLE_CLOUD_KEYFILE_JSON` y comprueba que es la ruta y nombre de archivo correctos.
+
+==== `terraform plan`
+
+Ejecuta el comando `terraform plan` para ver el resultado de elementos que se crearán o eliminarán al ejecutar la plantilla. Debe aparecer que se crearán 7 elementos. 
+
+.`terraform plan` correcto
+image::terraform-plan-ok.png[role="thumb", align="center"]
+
+==== `terraform apply`
+
+Ejecuta el comando `terraform apply --auto-approve` para ejecutar la plantilla. Comenzará a crear los 7 elementos definidos en la plantilla. Tardará unos *5 minutos* así que ten paciencia. Sobre todo tardará en ejecutar los bloques de inicialización de las instancias, en las que se actualizan los paquetes, se instala Docker y otros paquetes. En todo momento verás en pantalla el `log` de las operaciones que se están realizando.
+
+Comprueba que las instancias se han creado correctamente en tu proyecto Google Cloud. 
+
+[WARNING]
+====
+*Apaga las instancias* cuando dejes de usarlas, para evitar que consuman crédito. 
+====
+
+==== `terraform destroy`
+
+Cuando desees eliminar todos los recursos que hemos creado con esta plantilla, simplemente ejecuta `terraform destroy`. Por ahora debes simplemente apagarlos cuando no los uses, porque los necesitaremos en el resto de la asignatura.
 
 
 == Cloud DNS
 
-Vamos a asignar nombres de DNS a las máquinas virtuales con Cloud DNS y xxxx. 
+Google Cloud ha asignado una IP pública estática a cada una de tus instancias (la IP no cambiará al apagar la instancia y volver a encenderla). A continuación, vamos a asignar nombres de DNS a esas IPs con Cloud DNS y uno de los servicios de DNS disponibles en el Student Pack de GitHub. 
 
-=== Alta de nombres de dominio
+=== Alta de nombre de dominio
+
+GitHub Student pack ofrece varios servicios de nombres dominios gratuitos durante 1 año. Puedes usar name.com, namecheap, o .tech domains. En uno de ellos vamos a dar de alta un nombre de dominio para nuestras instancias en Google Cloud. Voy a describir cómo hacerlo con *.tech*. 
+
+Accede a https://get.tech/github-student-developer-pack[get.tech] y prueba un nombre de dominio que te guste y que esté disponible. 
+
+.Comprobar si el dominio está disponible en get.tech
+image::tech-domain-disponible.png[role="thumb", align="center"]
+
+A continuación, logueate con tu cuenta de github, y verás que tienes el descuento por un año. Procede a la compra gratuita. Además, tendrás que registrarte para poder acceder posteriormente a la configuración. Debes completar los datos de registro ya que te identifican como propietario del nombre de dominio. Si lo deseas, usa como dirección __Universidad de Almería, Ctra. Sacramento s/n, 04120, Almería, Spain__. 
+
+=== Configuración de nombres de dominio
+
+Para configurar el nombre de dominio que acabas de adquirir a las IPs reservadas, debes usar Cloud DNS en Google Cloud. Cloud DNS permite asignar los nombres de dominio a las direcciones IP públicas de las instancias. Recuerda comprobar que las IPs son estáticas.
+
+. En el menú de la consola de Google Cloud, entra en *Servicios de red*, *Cloud DNS*.
+
+.Cloud DNS
+image::cloud-dns.png[role="thumb", 360, align="center"]
+
+[start=2]
+. Haz clic en *Crear Zona*.
+
+.Cloud DNS, crear zona
+image::cloud-dns-crear-zona.png[role="thumb", align="center"]
+
+[start=3]
+. A continuación, haz clic en *Añadir Conjunto de registros*. Para cada instancia, crea un conjunto de registros.
+
+.Cloud DNS. Crear conjunto de registros, instancia Jenkins
+image::cloud-dns-crear-conjunto-de-registros.png[role="thumb", align="center"]
+
+.Cloud DNS. Crear conjunto de registros, instancia de despligue de apps
+image::cloud-dns-crear-conjunto-de-registros2.png[role="thumb", align="center"]
+
+Tras la creación, debes tener un resultado similar a este: 
+
+.Cloud DNS. Detalles de la Zona
+image::cloud-dns-detalles-zona.png[role="thumb", align="center"]
 
 
+[start=4]
+. El último paso será modificar los servidores de DNS de la configuración en la web .tech, para poner los valores de los servidores de Google Cloud. Para ello, logueate en get.tech. Entra en tu pedido. 
 
-=== Asignación en Cloud DNS
+.get.tech. Acceso al pedido
+image::get-tech-manage-orders.png[role="thumb", align="center"]
+
+[start=5]
+. Modifica los nombres de los servidores con los valores de tu zona en Cloud DNS
+
+.get.tech. Nombres de los servidores
+image::get-tech-manage-servers.png[role="thumb", align="center"]
+
+[start=6]
+. Guarda los cambios. Hasta *pasadas 24 horas* no estarán disponibles.
 
 
-== Puesta en marcha de Jenkins
+== Instalación de Jenkins
 
-Vamos a usar la primera VM para instalar Jenkins como contenedor docker. 
+Vamos a usar la primera instancia para instalar Jenkins. En lugar de realizar una https://github.com/ualhmis/Jenkins2Instalacion/blob/master/jenkins2_2019.adoc[instalación completa sobre el sistema operativo], utilizando los paquetes de Ubuntu, tal como se hace en la asignatura Herramientas y Métodos de Ingeniería del Software, de 3º del Grado en Ingeniería Informática, aquí vas a desplegar Jenkins como un contenedor de  docker. 
 
 === Construcción de la imagen del contenedor Jenkins
 
-La imagen de Jenkins en DockerHub necesita instalarle el propio Docker, para permitir que Jenkins ejecute tareas de docker, como docker build, para construir contenedores. 
+La imagen pública del contenedor de Jenkins está disponible en https://hub.docker.com/_/jenkins/[DockerHub]. Esta imagen genérica necesita instalarle algunos plugins y herramientas. En concreto, hay que instalarle el propio Docker para permitir que Jenkins ejecute tareas de docker, como por ejemplo `docker build` para construir imágenes de contenedores. 
 
-Por tanto, vamos a crear una imagen personalizada del contenedor de Jenkins basándonos en la imagen pública, pero instalándole Docker  usando el siguiente Dockerfile (referencia medium).
+Por tanto, vamos a crear una imagen personalizada del contenedor de Jenkins basándonos en la imagen pública e instalándo Docker dentro del contenedor.
+Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia máquina donde lo vamos a ejecutar, es decir en la instancia de jenkins. 
+
+Conecta por ssh a la instancia. Crea una carpeta `jenkins-docker` y crea el archivo `Dockerfile`. Usa el siguiente Dockerfile (descrito en esta entrada de __medium.com__:  https://medium.com/@gustavo.guss/jenkins-building-docker-image-and-sending-to-registry-64b84ea45ee9[Jenkins Building Docker Image and Sending to Registry]).
 
 .Dockerfile
 [source, docker]
 ----
-FROM python:3.7-alpine
-WORKDIR /code
-ENV FLASK_APP app.py
-ENV FLASK_RUN_HOST 0.0.0.0
-RUN apk add --no-cache gcc musl-dev linux-headers
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
-COPY . .
-CMD ["flask", "run"]
+FROM jenkins/jenkins:lts
+
+USER root
+
+RUN apt-get update && \
+apt-get -y install apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg2 \
+    software-properties-common && \
+curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg > /tmp/dkey; apt-key add /tmp/dkey && \
+add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
+    $(lsb_release -cs) \
+    stable" && \
+  apt-get update && \
+  apt-get -y install docker-ce
+
+RUN apt-get install -y docker-ce
+
+RUN usermod -a -G docker jenkins
+
+USER jenkins
 ----
 
-Construimos la imagen con docker build
+Construimos la imagen a partir del Dockerfile:
 
-[source,bash]
+[source,bash,subs="verbatim,quotes"]
 ----
-docker build ... 
+docker build --tag *ualjjcanada*/jenkins-docker:1.0 . <1>
 ----
+<1> Sustituye *ualjjcanada/* por tu usuario de Dockerhub si estás registrado, si no simplemente no lo pongas.
+
+.`docker build` de Jenkins con Docker
+image::docker-build-tag.png[role="thumb", align="center"]
+
+.`docker build` sucessfull
+image::docker-build-tag-successfully.png[role="thumb", align="center"]
+
+Comprueba que la imagen ha sido creada, y está disponible en tu máquina: `docker image ls`
+
+.`docker image ls`
+image::docker-image-ls.png[role="thumb", align="center"]
+
 
 === Publicación en Google Container Registry
 
@@ -135,33 +347,109 @@ Opcionalmente podemos publicar nuestra imagen personalizada en DockerHub, o alte
 
 Ejecutamos el contenedor a partir de la imagen creada previamente. 
 
-[source,bash]
+. Crear una carpeta para `jenkins_home` que configuraremos como volumen para que los datos de Jenkins se guarden fuera del contenedor. 
+
+[source,bash,subs="verbatim,quotes"]
 ----
-docker run ... 
+mkdir ~/jenkins_home
+chmod 777 ~/jenkins_home
 ----
+
+[start=2]
+. Ejecutamos el contenedor con `docker run`:
+
+[source,bash,subs="verbatim,quotes"]
+----
+docker run -d --name jenkins-docker -p 80:8080 -p 50000:50000 -v ~/jenkins_home:/var/jenkins_home --restart always ualjjcanada/jenkins-docker:1.0
+----
+ 
+Los parámetros de `docker run` son:
+
+* `--name jenkins-docker`: nombre que le asignamos al contenedor
+
+* `-p 80:8080`: jenkins se ejecutará en el puerto 80 en el host, que está mapeado al puerto 8080 del contenedor
+
+* `-v ~/jenkins_home:/var/jenkins_home`: carpeta local `~/jenkins_home` mapeada con la carpeta `/var/jenkins_home` del contenedor, que es donde Jenkins guarda todos los archivos que utiliza. Si se tira el contenedor o se actualiza, no se pierden los datos. 
+
+* `--restart always`: inicial el contenedor cuando se inicia la instancia.
+
+* `ualjjcanada/jenkins-docker:1.0`: imagen del contenedor a ejecutar, la que hemos construido en el paso anterior.
+
+[start=3]
+. Comprueba que el conetenedor está ejecutándose con `docker ps`
+
+.`docker ps`
+image::docker-ps-jenkins.png[role="thumb", align="center"]
 
 
 === Configuración básica de Jenkins 
 
-A continuación se muestran los pasos para realizar la la configuración básica y la instalación de algunos plugins adicionales.
+A continuación se muestran los pasos a realizar en el inicio y configuración básica de Jenkins. Además, se describe la instalación de algunos plugins adicionales.
 
-Configuramos las tools en Jenkins.
+. Conectamos a la IP/URL de la instancia con el navegador web. Aparecerá la ventana para introducir el password inicial. Para ver el password ejecuta: `cat /home/ubuntu/jenkins_home/secrets/initialAdminPassword`
+
+.Contraseña inicial de Jenkins
+image::jenkins-unlock.png[role="thumb", align="center"]
+
+[start=2]
+. Selecciona Install suggested plugins.
+
+.Install suggested plugins
+image::jenkins-install-suggested-plugins.png[role="thumb", align="center"]
+
+Tras unos minutos, introduce los datos del  usuario administrador de Jenkins. Introduce un nombre de usuario y contraseña.
+
+Acepta el nombre de dominio de la máquina. Si aun no has registrado el nombre de dominio, lo puedes hacer más tarde en la configuración general de Jenkins. 
+
+Jenkins está listo.
+
+.Bienvenida a Jenkins
+image::jenkins-welcome.png[role="thumb", align="center"]
 
 
 === Creación del primer proyecto Jenkins
 
-Creamos el primer pipeline de Jenkins. 
+Creamos el primer proyecto de Jenkins. Comprueba que Jenkins puede llamar a docker. Para ello crea un nuevo proyecto tipo freestyle.
+
+.Nuevo proyecto, freestyle
+image::jenkins-new-hello-docker.png[role="thumb", align="center"]
+
+En la sección *Build*, añade un bloque *Execute shell*. Pega estos comandos: 
+
+[source,bash,subs="verbatim,quotes"]
+----
+whoami
+git --version
+docker -v
+----
+
+Guarda los cambios. Haz clic sobre *Build now*. Haz clic sobre la bolita azul para ver el la salida por consola.
+
+.Build now. Restultado del build
+image::jenkins-new-hello-docker-console-output.png[role="thumb", align="center"]
+
+.Salida por consola
+image::jenkins-new-hello-docker-console-success.png[role="thumb", align="center"]
+
+
+=== Instalación de plugins adicionales
+
+Vamos a instalar varios plugins: greenballs, NodeJs, GitHub integration, ....
+
+
+=== Configuración las tools en Jenkins
+
+En la opción de Manage Jenkins > Global tools configuration, configura las siguientes herramientas: Maven y NodeJs
 
 === Conexión con la máquina de despliegue
 
-Para que la máquina de Jenkins pueda realizar el despluiegue de nuestros proyectos sobre otra máquina virtual, debemos configurar ambas máquinas para que puedan tener comunicación via SSH. 
+Para que la máquina de Jenkins pueda realizar el despliegue de nuestros proyectos sobre la otra instancia que hemos preparado, debemos configurar ambas máquinas para que puedan tener comunicación via SSH. 
 
-Aquí va el rollo ya documentado en las prácitcas de 3º HMIS: 
+__Aquí va la descrición ya documentado en las prácitcas de 3º HMIS:__
+
 . Creación de la pareja de claves ssh desde el usuario jenkins
 . Prueba de conexión ssh desde la terminal
 . Proyecto Jenkins que ejecuta comandos en la máquna de despliegue
-
-
 
 
 == Ejemplo 1: Aplicación web Java. 
@@ -178,7 +466,6 @@ Configuramos el Pipeline.
 
 === Deploy en un Docker container
 
-=== Deploy con Docker Compose ¿?
 
 == Ejemplo 2. Hola mundo en NodeJs
 
@@ -192,7 +479,7 @@ Configuramos el Pipeline.
 
 === Deploy en un Docker container
 
-=== Deploy con Docker Compose ¿?
+// === Deploy con Docker Compose ¿?
 
 
 == Ejemplo 3. Web App en NodeJs
@@ -210,30 +497,4 @@ Configuramos el Pipeline.
 === Deploy con Docker Compose ¿?
 
 
-== Proyecto NodeJs con KeystoneJS 
-
-Vamos a crear un proyecto de aplicacion web completa con Keystone 5 (https://www.keystonejs.com/), una framewor para escalable, extensible y de código abierto para la construcción de apliaciones NodeJs.
-
-=== Primeros pasos
-
-=== Ejecución en local
-
-
-== CI/CD de proyecto creado con KeystoneJs 
-
-Vamos a usar Jenkins para construir y desplegar el proyecto de webapp creada con Keystone.
-
-=== Creación de proyecto Jenkins con pipelines
-
-Configuramos el Pipeline.
-
-=== Despliegue en la VM
-
-=== Deploy en un Docker container
-
-=== Deploy con Docker Compose ¿?
-
-== Evolución del proyecto
-
-El objetivo es implementar nuevas características en nuestro proyecto, y que cuando subimos nuevo código al repositorio, el proyecto se construye en Jenkins y si todo va bien, y se despliega automáticamente.
 
