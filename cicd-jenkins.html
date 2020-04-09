@@ -444,7 +444,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle">Tabla de contenidos</div>
 <ul class="sectlevel1">
-<li><a href="#_prerequisitos">1. Prerequisitos</a>
+<li><a href="#_prerrequisitos">1. Prerrequisitos</a>
 <ul class="sectlevel2">
 <li><a href="#_cupones_educativos_google_cloud">1.1. Cupones educativos Google Cloud</a></li>
 <li><a href="#_terraform">1.2. Terraform</a></li>
@@ -452,7 +452,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_github_student_education_pack">1.4. Github Student Education Pack</a></li>
 </ul>
 </li>
-<li><a href="#_creación_de_la_infraestructura_de_vms_en_gcp">2. Creación de la infraestructura de VMs en GCP</a>
+<li><a href="#_creación_de_la_infraestructura_en_google_cloud">2. Creación de la infraestructura en Google Cloud</a>
 <ul class="sectlevel2">
 <li><a href="#_estructura_del_proyecto_terraform">2.1. Estructura del proyecto terraform</a></li>
 <li><a href="#_ejecución_de_terraform">2.2. Ejecución de terraform</a></li>
@@ -537,7 +537,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 </div>
 </div>
 <div class="sect1">
-<h2 id="_prerequisitos">1. Prerequisitos</h2>
+<h2 id="_prerrequisitos">1. Prerrequisitos</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Para comenzar a trabajar, será necesario tener instalados en la máquina local las siguientes herramientas: Terraform, Google Cloud CLI. Se presupone que ya se tiene instalado un entorno de desarrollo como Visual Studio Code, y una pareja de claves SSH personal en la carpeta <code>HOME</code> del usuario (<code>~</code>).</p>
@@ -607,21 +607,21 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <p>Para poder usar servicios adicionales, como DNS gratuito, debes darte de alta en <a href="https://education.github.com/pack">Github Student Education Pack</a>.</p>
 </div>
 <div class="paragraph">
-<p>Si ya dispones de una cuenta de GitHub, y no quieres crear una cuenta nueva, simplemente debes añadir tu email <em>@inlumine.ual.es</em> a la lista de emails de tu cuenta actual. Para ello, sique las <a href="https://help.github.com/en/github/setting-up-and-managing-your-github-user-account/adding-an-email-address-to-your-github-account">instrucciones</a>. Tras añadir tu email, haz clic en el enlace <a href="https://education.github.com/benefits">Get the pack</a>.</p>
+<p>Si ya dispones de una cuenta de GitHub, y no quieres crear una cuenta nueva, simplemente debes añadir tu email <em>@inlumine.ual.es</em> a la lista de emails de tu cuenta actual. Para ello, sigue las <a href="https://help.github.com/en/github/setting-up-and-managing-your-github-user-account/adding-an-email-address-to-your-github-account">instrucciones</a>. Tras añadir tu email, haz clic en el enlace <a href="https://education.github.com/benefits">Get the pack</a>.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_creación_de_la_infraestructura_de_vms_en_gcp">2. Creación de la infraestructura de VMs en GCP</h2>
+<h2 id="_creación_de_la_infraestructura_en_google_cloud">2. Creación de la infraestructura en Google Cloud</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Utilizando una plantila de terraform crea 2 instancias de máquina virtuale en tu proyecto en Google Cloud:</p>
+<p>Utilizando una plantilla de terraform crea 2 instancias de máquina virtuales en tu proyecto en Google Cloud:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Instancia para instalar Jenkins mendiante un contenedor Docker.</p>
+<p>Instancia para instalar Jenkins mediante un contenedor Docker.</p>
 </li>
 <li>
 <p>Instancia de despliegue (VM Deploy) con Docker y Docker Composer instalados.</p>
@@ -632,7 +632,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <p>Utiliza la plantilla de terraform disponible en el repositorio <a href="https://github.com/ualcnsa/terraformGoogleCloudSample" class="bare">https://github.com/ualcnsa/terraformGoogleCloudSample</a>.</p>
 </div>
 <div class="paragraph">
-<p>En primer lugar realiza un <em>fork</em> del repositorio, para hacer las modificaciones al mismo que sean necesarias. Despues modifica las variables correspondientes para usar tu proyecto en la plantilla.</p>
+<p>En primer lugar realiza un <em>fork</em> del repositorio, para hacer las modificaciones al mismo que sean necesarias. Después modifica las variables correspondientes para usar tu proyecto en la plantilla.</p>
 </div>
 <div class="sect2">
 <h3 id="_estructura_del_proyecto_terraform">2.1. Estructura del proyecto terraform</h3>
@@ -667,7 +667,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Módilo genérico para crear una instancia. Es llamado desde <code>network.tf</code> pasándole las variables que necesita para crear la instancia.</td>
+<td>Módulo genérico para crear una instancia. Es llamado desde <code>network.tf</code> pasándole las variables que necesita para crear la instancia.</td>
 </tr>
 </table>
 </div>
@@ -751,7 +751,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <div class="title">Videotutorial</div>
 <div class="paragraph">
-<p>Accede al <a href="https://drive.google.com/file/d/1_ku2LnVbMmWgns-s8_23ATAQ3nrQEJo2/view?usp=sharing" target="_blank" rel="noopener">videotutorial</a> explicativo de esta sección.</p>
+<p>Accede al <a href="https://drive.google.com/file/d/1_ku2LnVbMmWgns-s8_23ATAQ3nrQEJo2/view?usp=sharing" target="_blank" rel="noopener">videotutorial</a> explicativo de esta sección (mp4, 20 minutos, 171M).</p>
 </div>
 </div>
 </div>
@@ -818,7 +818,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="sect3">
 <h4 id="_terraform_destroy">2.2.4. <code>terraform destroy</code></h4>
 <div class="paragraph">
-<p>Cuando desees eliminar todos los recursos que hemos creado con esta plantilla, simplemente ejecuta <code>terraform destroy</code>. Por ahora debes simplemente apagarlos cuando no los uses, porque los necesitaremos en el resto de la asignatura.</p>
+<p>Cuando desees eliminar todos los recursos que hemos creado con esta plantilla, simplemente ejecuta <code>terraform destroy</code>. Por ahora debes simplemente apagar las instancias cuando no las uses, porque las necesitaremos en el resto de la asignatura.</p>
 </div>
 </div>
 </div>
@@ -833,7 +833,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="sect2">
 <h3 id="_alta_de_nombre_de_dominio">3.1. Alta de nombre de dominio</h3>
 <div class="paragraph">
-<p>GitHub Student pack ofrece varios servicios de nombres dominios gratuitos durante 1 año. Puedes usar name.com, namecheap, o .tech domains. En uno de ellos vamos a dar de alta un nombre de dominio para nuestras instancias en Google Cloud. Voy a describir cómo hacerlo con <strong>.tech</strong>.</p>
+<p>GitHub Student pack ofrece varios servicios de nombres dominios gratuitos durante 1 año. Puedes usar <em>name.com</em>, <em>namecheap</em>, o <em>.tech domains</em>. En uno de ellos vamos a dar de alta un nombre de dominio para nuestras instancias en Google Cloud. Voy a describir cómo hacerlo con <strong>.tech</strong>.</p>
 </div>
 <div class="paragraph">
 <p>Accede a <a href="https://get.tech/github-student-developer-pack">get.tech</a> y prueba un nombre de dominio que te guste y que esté disponible.</p>
@@ -845,7 +845,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="title">Fig. 4. Comprobar si el dominio está disponible en get.tech</div>
 </div>
 <div class="paragraph">
-<p>A continuación, logueate con tu cuenta de github, y verás que tienes el descuento por un año. Procede a la compra gratuita. Además, tendrás que registrarte para poder acceder posteriormente a la configuración. Debes completar los datos de registro ya que te identifican como propietario del nombre de dominio. Si lo deseas, usa como dirección <em>Universidad de Almería, Ctra. Sacramento s/n, 04120, Almería, Spain</em>.</p>
+<p>A continuación, inicia sesión con tu cuenta de github, y verás que tienes el descuento por un año. Procede a la compra gratuita. Además, tendrás que registrarte para poder acceder posteriormente a la configuración. Debes completar los datos de registro ya que te identifican como propietario del nombre de dominio. Si lo deseas, usa como dirección <em>Universidad de Almería, Ctra. Sacramento s/n, 04120, Almería, Spain</em>.</p>
 </div>
 </div>
 <div class="sect2">
@@ -896,7 +896,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <img src="images/cloud-dns-crear-conjunto-de-registros2.png" alt="cloud dns crear conjunto de registros2">
 </div>
-<div class="title">Fig. 8. Cloud DNS. Crear conjunto de registros, instancia de despligue de apps</div>
+<div class="title">Fig. 8. Cloud DNS. Crear conjunto de registros, instancia de despliegue de apps</div>
 </div>
 <div class="paragraph">
 <p>Tras la creación, debes tener un resultado similar a este:</p>
@@ -910,7 +910,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="olist arabic">
 <ol class="arabic" start="4">
 <li>
-<p>El último paso será modificar los servidores de DNS de la configuración en la web .tech, para poner los valores de los servidores de Google Cloud. Para ello, logueate en get.tech. Entra en tu pedido.</p>
+<p>El último paso será modificar los servidores de DNS de la configuración en la web .tech, para poner los valores de los servidores de Google Cloud. Para ello, inicia sesión en get.tech. Entra en tu pedido.</p>
 </li>
 </ol>
 </div>
@@ -1015,7 +1015,7 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 <div class="content">
 <img src="images/docker-build-tag-successfully.png" alt="docker build tag successfully">
 </div>
-<div class="title">Fig. 13. <code>docker build</code> sucessfull</div>
+<div class="title">Fig. 13. <code>docker build</code> successful</div>
 </div>
 <div class="paragraph">
 <p>Comprueba que la imagen ha sido creada, y está disponible en tu máquina: <code>docker image ls</code></p>
@@ -1088,7 +1088,7 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 <div class="olist arabic">
 <ol class="arabic" start="3">
 <li>
-<p>Comprueba que el conetenedor está ejecutándose con <code>docker ps</code></p>
+<p>Comprueba que el contenedor está ejecutándose con <code>docker ps</code></p>
 </li>
 </ol>
 </div>
@@ -1175,7 +1175,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/jenkins-new-hello-docker-console-output.png" alt="jenkins new hello docker console output">
 </div>
-<div class="title">Fig. 20. Build now. Restultado del build</div>
+<div class="title">Fig. 20. Build now. Resultado del build</div>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
@@ -1189,6 +1189,17 @@ docker <span class="nt">-v</span></code></pre>
 </div>
 <div class="sect2">
 <h3 id="_instalación_de_plugins_adicionales">4.6. Instalación de plugins adicionales</h3>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Por completar</div>
+<div class="paragraph">
+<p>De aquí en adelante está por completar. En breve lo actualizaré.</p>
+</div>
+<div class="paragraph">
+<p>Gracias por vuestra paciencia.</p>
+</div>
+</div>
+</div>
 <div class="paragraph">
 <p>Vamos a instalar varios plugins: greenballs, NodeJs, GitHub integration, &#8230;&#8203;.</p>
 </div>
@@ -1205,18 +1216,18 @@ docker <span class="nt">-v</span></code></pre>
 <p>Para que la máquina de Jenkins pueda realizar el despliegue de nuestros proyectos sobre la otra instancia que hemos preparado, debemos configurar ambas máquinas para que puedan tener comunicación via SSH.</p>
 </div>
 <div class="paragraph">
-<p><em>Aquí va la descrición ya documentado en las prácitcas de 3º HMIS:</em></p>
+<p><em>Aquí va la descripción ya documentado en las prácticas de 3º HMIS:</em></p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Creación de la pareja de claves ssh desde el usuario jenkins</p>
+<p>Creación de la pareja de claves ssh desde el usuario jenkins.</p>
 </li>
 <li>
-<p>Prueba de conexión ssh desde la terminal</p>
+<p>Prueba de conexión ssh desde la terminal.</p>
 </li>
 <li>
-<p>Proyecto Jenkins que ejecuta comandos en la máquna de despliegue</p>
+<p>Proyecto Jenkins que ejecuta comandos en la instancia de despliegue.</p>
 </li>
 </ol>
 </div>
@@ -1227,7 +1238,7 @@ docker <span class="nt">-v</span></code></pre>
 <h2 id="_ejemplo_1_aplicación_web_java">5. Ejemplo 1: Aplicación web Java.</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Una vez que todo fuciona correctamente, vamos a estudiar varios ejemplos, tanto en Java como en NodeJs.</p>
+<p>Una vez que todo funciona correctamente, vamos a estudiar varios ejemplos, tanto en Java como en NodeJs.</p>
 </div>
 <div class="paragraph">
 <p>En este primer ejemplo, nos vamos a basar en el proyecto PetClinic con Spring Boot, disponible en https&#8230;&#8203;.</p>
@@ -1299,7 +1310,7 @@ docker <span class="nt">-v</span></code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-09 04:30:34 +0200
+Last updated 2020-04-09 04:51:31 +0200
 </div>
 </div>
 <style>

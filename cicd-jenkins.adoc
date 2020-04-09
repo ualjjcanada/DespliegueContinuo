@@ -57,7 +57,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 // Entrar en modo numerado de apartados
 :numbered:
 
-== Prerequisitos
+== Prerrequisitos
 
 Para comenzar a trabajar, será necesario tener instalados en la máquina local las siguientes herramientas: Terraform, Google Cloud CLI. Se presupone que ya se tiene instalado un entorno de desarrollo como Visual Studio Code, y una pareja de claves SSH personal en la carpeta `HOME` del usuario (`~`).
 
@@ -104,18 +104,18 @@ choco install gcloudsdk -y
 
 Para poder usar servicios adicionales, como DNS gratuito, debes darte de alta en https://education.github.com/pack[Github Student Education Pack].
 
-Si ya dispones de una cuenta de GitHub, y no quieres crear una cuenta nueva, simplemente debes añadir tu email __@inlumine.ual.es__ a la lista de emails de tu cuenta actual. Para ello, sique las https://help.github.com/en/github/setting-up-and-managing-your-github-user-account/adding-an-email-address-to-your-github-account[instrucciones]. Tras añadir tu email, haz clic en el enlace https://education.github.com/benefits[Get the pack].
+Si ya dispones de una cuenta de GitHub, y no quieres crear una cuenta nueva, simplemente debes añadir tu email __@inlumine.ual.es__ a la lista de emails de tu cuenta actual. Para ello, sigue las https://help.github.com/en/github/setting-up-and-managing-your-github-user-account/adding-an-email-address-to-your-github-account[instrucciones]. Tras añadir tu email, haz clic en el enlace https://education.github.com/benefits[Get the pack].
 
-== Creación de la infraestructura de VMs en GCP
+== Creación de la infraestructura en Google Cloud
 
-Utilizando una plantila de terraform crea 2 instancias de máquina virtuale en tu proyecto en Google Cloud: 
+Utilizando una plantilla de terraform crea 2 instancias de máquina virtuales en tu proyecto en Google Cloud: 
 
-. Instancia para instalar Jenkins mendiante un contenedor Docker.
+. Instancia para instalar Jenkins mediante un contenedor Docker.
 . Instancia de despliegue (VM Deploy) con Docker y Docker Composer instalados.
 
 Utiliza la plantilla de terraform disponible en el repositorio https://github.com/ualcnsa/terraformGoogleCloudSample. 
 
-En primer lugar realiza un __fork__ del repositorio, para hacer las modificaciones al mismo que sean necesarias. Despues modifica las variables correspondientes para usar tu proyecto en la plantilla.
+En primer lugar realiza un __fork__ del repositorio, para hacer las modificaciones al mismo que sean necesarias. Después modifica las variables correspondientes para usar tu proyecto en la plantilla.
 
 === Estructura del proyecto terraform
 
@@ -135,7 +135,7 @@ terraformGoogleCloudSample
 <1> Descripción del proveedor sobre el que ejecutar la plantilla, en nuestro caso Google Cloud.
 <2> Plantilla principal. Crea la red, las reglas de firewall, las 2 instancias llamando al __módulo__ `main.tf` de la carpeta `instance`, y por último realiza la inicialización de cada instancia.
 <3> Plantilla con los valores que se muestran de salida al finalizar la ejecución
-<4> Módilo genérico para crear una instancia. Es llamado desde `network.tf` pasándole las variables que necesita para crear la instancia.
+<4> Módulo genérico para crear una instancia. Es llamado desde `network.tf` pasándole las variables que necesita para crear la instancia.
 
 El archivo `*provider.tf*` deberás modificarlo:
 
@@ -180,7 +180,7 @@ Recuerda *no subir nunca tu archivo json de credenciales* a un repositorio públ
 === Ejecución de terraform
 .Videotutorial
 ****
-Accede al https://drive.google.com/file/d/1_ku2LnVbMmWgns-s8_23ATAQ3nrQEJo2/view?usp=sharing[videotutorial, window="_blank"] explicativo de esta sección.
+Accede al https://drive.google.com/file/d/1_ku2LnVbMmWgns-s8_23ATAQ3nrQEJo2/view?usp=sharing[videotutorial, window="_blank"] explicativo de esta sección (mp4, 20 minutos, 171M).
 
 ****
 ==== `terraform init`
@@ -214,7 +214,7 @@ Comprueba que las instancias se han creado correctamente en tu proyecto Google C
 
 ==== `terraform destroy`
 
-Cuando desees eliminar todos los recursos que hemos creado con esta plantilla, simplemente ejecuta `terraform destroy`. Por ahora debes simplemente apagarlos cuando no los uses, porque los necesitaremos en el resto de la asignatura.
+Cuando desees eliminar todos los recursos que hemos creado con esta plantilla, simplemente ejecuta `terraform destroy`. Por ahora debes simplemente apagar las instancias cuando no las uses, porque las necesitaremos en el resto de la asignatura.
 
 
 == Cloud DNS
@@ -223,14 +223,14 @@ Google Cloud ha asignado una IP pública estática a cada una de tus instancias 
 
 === Alta de nombre de dominio
 
-GitHub Student pack ofrece varios servicios de nombres dominios gratuitos durante 1 año. Puedes usar name.com, namecheap, o .tech domains. En uno de ellos vamos a dar de alta un nombre de dominio para nuestras instancias en Google Cloud. Voy a describir cómo hacerlo con *.tech*. 
+GitHub Student pack ofrece varios servicios de nombres dominios gratuitos durante 1 año. Puedes usar __name.com__, __namecheap__, o __.tech domains__. En uno de ellos vamos a dar de alta un nombre de dominio para nuestras instancias en Google Cloud. Voy a describir cómo hacerlo con *.tech*. 
 
 Accede a https://get.tech/github-student-developer-pack[get.tech] y prueba un nombre de dominio que te guste y que esté disponible. 
 
 .Comprobar si el dominio está disponible en get.tech
 image::tech-domain-disponible.png[role="thumb", align="center"]
 
-A continuación, logueate con tu cuenta de github, y verás que tienes el descuento por un año. Procede a la compra gratuita. Además, tendrás que registrarte para poder acceder posteriormente a la configuración. Debes completar los datos de registro ya que te identifican como propietario del nombre de dominio. Si lo deseas, usa como dirección __Universidad de Almería, Ctra. Sacramento s/n, 04120, Almería, Spain__. 
+A continuación, inicia sesión con tu cuenta de github, y verás que tienes el descuento por un año. Procede a la compra gratuita. Además, tendrás que registrarte para poder acceder posteriormente a la configuración. Debes completar los datos de registro ya que te identifican como propietario del nombre de dominio. Si lo deseas, usa como dirección __Universidad de Almería, Ctra. Sacramento s/n, 04120, Almería, Spain__. 
 
 === Configuración de nombres de dominio
 
@@ -253,7 +253,7 @@ image::cloud-dns-crear-zona.png[role="thumb", align="center"]
 .Cloud DNS. Crear conjunto de registros, instancia Jenkins
 image::cloud-dns-crear-conjunto-de-registros.png[role="thumb", align="center"]
 
-.Cloud DNS. Crear conjunto de registros, instancia de despligue de apps
+.Cloud DNS. Crear conjunto de registros, instancia de despliegue de apps
 image::cloud-dns-crear-conjunto-de-registros2.png[role="thumb", align="center"]
 
 Tras la creación, debes tener un resultado similar a este: 
@@ -263,7 +263,7 @@ image::cloud-dns-detalles-zona.png[role="thumb", align="center"]
 
 
 [start=4]
-. El último paso será modificar los servidores de DNS de la configuración en la web .tech, para poner los valores de los servidores de Google Cloud. Para ello, logueate en get.tech. Entra en tu pedido. 
+. El último paso será modificar los servidores de DNS de la configuración en la web .tech, para poner los valores de los servidores de Google Cloud. Para ello, inicia sesión en get.tech. Entra en tu pedido. 
 
 .get.tech. Acceso al pedido
 image::get-tech-manage-orders.png[role="thumb", align="center"]
@@ -330,7 +330,7 @@ docker build --tag *ualjjcanada*/jenkins-docker:1.0 . <1>
 .`docker build` de Jenkins con Docker
 image::docker-build-tag.png[role="thumb", align="center"]
 
-.`docker build` sucessfull
+.`docker build` successful
 image::docker-build-tag-successfully.png[role="thumb", align="center"]
 
 Comprueba que la imagen ha sido creada, y está disponible en tu máquina: `docker image ls`
@@ -376,7 +376,7 @@ Los parámetros de `docker run` son:
 * `ualjjcanada/jenkins-docker:1.0`: imagen del contenedor a ejecutar, la que hemos construido en el paso anterior.
 
 [start=3]
-. Comprueba que el conetenedor está ejecutándose con `docker ps`
+. Comprueba que el contenedor está ejecutándose con `docker ps`
 
 .`docker ps`
 image::docker-ps-jenkins.png[role="thumb", align="center"]
@@ -426,7 +426,7 @@ docker -v
 
 Guarda los cambios. Haz clic sobre *Build now*. Haz clic sobre la bolita azul para ver el la salida por consola.
 
-.Build now. Restultado del build
+.Build now. Resultado del build
 image::jenkins-new-hello-docker-console-output.png[role="thumb", align="center"]
 
 .Salida por consola
@@ -437,6 +437,13 @@ Por consola se visualiza el resultado de ejecutar los comandos dentro del conten
 
 === Instalación de plugins adicionales
 
+.Por completar
+****
+De aquí en adelante está por completar. En breve lo actualizaré.
+
+Gracias por vuestra paciencia.
+****
+
 Vamos a instalar varios plugins: greenballs, NodeJs, GitHub integration, ....
 
 
@@ -446,18 +453,19 @@ En la opción de Manage Jenkins > Global tools configuration, configura las sigu
 
 === Conexión con la máquina de despliegue
 
+
 Para que la máquina de Jenkins pueda realizar el despliegue de nuestros proyectos sobre la otra instancia que hemos preparado, debemos configurar ambas máquinas para que puedan tener comunicación via SSH. 
 
-__Aquí va la descrición ya documentado en las prácitcas de 3º HMIS:__
+__Aquí va la descripción ya documentado en las prácticas de 3º HMIS:__
 
-. Creación de la pareja de claves ssh desde el usuario jenkins
-. Prueba de conexión ssh desde la terminal
-. Proyecto Jenkins que ejecuta comandos en la máquna de despliegue
+. Creación de la pareja de claves ssh desde el usuario jenkins.
+. Prueba de conexión ssh desde la terminal.
+. Proyecto Jenkins que ejecuta comandos en la instancia de despliegue.
 
 
 == Ejemplo 1: Aplicación web Java. 
 
-Una vez que todo fuciona correctamente, vamos a estudiar varios ejemplos, tanto en Java como en NodeJs.
+Una vez que todo funciona correctamente, vamos a estudiar varios ejemplos, tanto en Java como en NodeJs.
 
 En este primer ejemplo, nos vamos a basar en el proyecto PetClinic con Spring Boot, disponible en https....
 
