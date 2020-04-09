@@ -180,7 +180,7 @@ Recuerda *no subir nunca tu archivo json de credenciales* a un repositorio públ
 === Ejecución de terraform
 .Videotutorial
 ****
-Accede al https://drive.google.com/file/d/1_ku2LnVbMmWgns-s8_23ATAQ3nrQEJo2/view?usp=sharing[videotutorial] explicativo de esta sección.
+Accede al https://drive.google.com/file/d/1_ku2LnVbMmWgns-s8_23ATAQ3nrQEJo2/view?usp=sharing[videotutorial, window="_blank"] explicativo de esta sección.
 
 ****
 ==== `terraform init`
@@ -420,6 +420,7 @@ En la sección *Build*, añade un bloque *Execute shell*. Pega estos comandos:
 ----
 whoami
 git --version
+java -version
 docker -v
 ----
 
@@ -430,6 +431,8 @@ image::jenkins-new-hello-docker-console-output.png[role="thumb", align="center"]
 
 .Salida por consola
 image::jenkins-new-hello-docker-console-success.png[role="thumb", align="center"]
+
+Por consola se visualiza el resultado de ejecutar los comandos dentro del contenedor. Como puedes ver, `git` y `java` están instalados, venían ya en la imagen de jenkins:lts de la que hemos partido en la definición del Dockerfile. Además, `docker` también está disponible, se ha instalado correctamente mediante la definición incluida en el Dockerfile.
 
 
 === Instalación de plugins adicionales

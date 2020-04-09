@@ -471,7 +471,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_ejecución_del_contenedor_de_jenkins">4.3. Ejecución del contenedor de Jenkins</a></li>
 <li><a href="#_configuración_básica_de_jenkins">4.4. Configuración básica de Jenkins</a></li>
 <li><a href="#_creación_del_primer_proyecto_jenkins">4.5. Creación del primer proyecto Jenkins</a></li>
-<li><a href="#_conexión_con_la_máquina_de_despliegue">4.6. Conexión con la máquina de despliegue</a></li>
+<li><a href="#_instalación_de_plugins_adicionales">4.6. Instalación de plugins adicionales</a></li>
+<li><a href="#_configuración_las_tools_en_jenkins">4.7. Configuración las tools en Jenkins</a></li>
+<li><a href="#_conexión_con_la_máquina_de_despliegue">4.8. Conexión con la máquina de despliegue</a></li>
 </ul>
 </li>
 <li><a href="#_ejemplo_1_aplicación_web_java">5. Ejemplo 1: Aplicación web Java.</a>
@@ -479,7 +481,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_creación_de_proyecto_jenkins_con_pipelines">5.1. Creación de proyecto Jenkins con pipelines</a></li>
 <li><a href="#_despliegue_en_la_vm">5.2. Despliegue en la VM</a></li>
 <li><a href="#_deploy_en_un_docker_container">5.3. Deploy en un Docker container</a></li>
-<li><a href="#_deploy_con_docker_compose">5.4. Deploy con Docker Compose ¿?</a></li>
 </ul>
 </li>
 <li><a href="#_ejemplo_2_hola_mundo_en_nodejs">6. Ejemplo 2. Hola mundo en NodeJs</a>
@@ -494,7 +495,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_creación_de_proyecto_jenkins_con_pipelines_3">7.1. Creación de proyecto Jenkins con pipelines</a></li>
 <li><a href="#_despliegue_en_la_vm_3">7.2. Despliegue en la VM</a></li>
 <li><a href="#_deploy_en_un_docker_container_3">7.3. Deploy en un Docker container</a></li>
-<li><a href="#_deploy_con_docker_compose_2">7.4. Deploy con Docker Compose ¿?</a></li>
+<li><a href="#_deploy_con_docker_compose">7.4. Deploy con Docker Compose ¿?</a></li>
 </ul>
 </li>
 </ul>
@@ -750,7 +751,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <div class="title">Videotutorial</div>
 <div class="paragraph">
-<p>Accede al <a href="https://drive.google.com/file/d/1_ku2LnVbMmWgns-s8_23ATAQ3nrQEJo2/view?usp=sharing">videotutorial</a> explicativo de esta sección.</p>
+<p>Accede al <a href="https://drive.google.com/file/d/1_ku2LnVbMmWgns-s8_23ATAQ3nrQEJo2/view?usp=sharing" target="_blank" rel="noopener">videotutorial</a> explicativo de esta sección.</p>
 </div>
 </div>
 </div>
@@ -993,16 +994,37 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash">docker build <span class="nt">--tag</span> <span class="k">*</span>ualjjcanada<span class="k">*</span>/jenkins-docker:1.0 <span class="nb">.</span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker build <span class="nt">--tag</span> <span class="k"><strong></span>ualjjcanada<span class="k"></strong></span>/jenkins-docker:1.0 <span class="nb">.</span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Sustituye ualjjcanada por tu usuario</td>
+<td>Sustituye <strong>ualjjcanada/</strong> por tu usuario de Dockerhub si estás registrado, si no simplemente no lo pongas.</td>
 </tr>
 </table>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/docker-build-tag.png" alt="docker build tag">
+</div>
+<div class="title">Fig. 12. <code>docker build</code> de Jenkins con Docker</div>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/docker-build-tag-successfully.png" alt="docker build tag successfully">
+</div>
+<div class="title">Fig. 13. <code>docker build</code> sucessfull</div>
+</div>
+<div class="paragraph">
+<p>Comprueba que la imagen ha sido creada, y está disponible en tu máquina: <code>docker image ls</code></p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/docker-image-ls.png" alt="docker image ls">
+</div>
+<div class="title">Fig. 14. <code>docker image ls</code></div>
 </div>
 </div>
 <div class="sect2">
@@ -1016,37 +1038,187 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 <div class="paragraph">
 <p>Ejecutamos el contenedor a partir de la imagen creada previamente.</p>
 </div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Crear una carpeta para <code>jenkins_home</code> que configuraremos como volumen para que los datos de Jenkins se guarden fuera del contenedor.</p>
+</li>
+</ol>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash">docker run ...</code></pre>
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">mkdir</span> ~/jenkins_home
+<span class="nb">chmod </span>777 ~/jenkins_home</code></pre>
 </div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="2">
+<li>
+<p>Ejecutamos el contenedor con <code>docker run</code>:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">docker run <span class="nt">-d</span> <span class="nt">--name</span> jenkins-docker <span class="nt">-p</span> 80:8080 <span class="nt">-p</span> 50000:50000 <span class="nt">-v</span> ~/jenkins_home:/var/jenkins_home <span class="nt">--restart</span> always ualjjcanada/jenkins-docker:1.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Los parámetros de <code>docker run</code> son:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>--name jenkins-docker</code>: nombre que le asignamos al contenedor</p>
+</li>
+<li>
+<p><code>-p 80:8080</code>: jenkins se ejecutará en el puerto 80 en el host, que está mapeado al puerto 8080 del contenedor</p>
+</li>
+<li>
+<p><code>-v ~/jenkins_home:/var/jenkins_home</code>: carpeta local <code>~/jenkins_home</code> mapeada con la carpeta <code>/var/jenkins_home</code> del contenedor, que es donde Jenkins guarda todos los archivos que utiliza. Si se tira el contenedor o se actualiza, no se pierden los datos.</p>
+</li>
+<li>
+<p><code>--restart always</code>: inicial el contenedor cuando se inicia la instancia.</p>
+</li>
+<li>
+<p><code>ualjjcanada/jenkins-docker:1.0</code>: imagen del contenedor a ejecutar, la que hemos construido en el paso anterior.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="3">
+<li>
+<p>Comprueba que el conetenedor está ejecutándose con <code>docker ps</code></p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/docker-ps-jenkins.png" alt="docker ps jenkins">
+</div>
+<div class="title">Fig. 15. <code>docker ps</code></div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_configuración_básica_de_jenkins">4.4. Configuración básica de Jenkins</h3>
 <div class="paragraph">
-<p>A continuación se muestran los pasos para realizar la la configuración básica y la instalación de algunos plugins adicionales.</p>
+<p>A continuación se muestran los pasos a realizar en el inicio y configuración básica de Jenkins. Además, se describe la instalación de algunos plugins adicionales.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Conectamos a la IP/URL de la instancia con el navegador web. Aparecerá la ventana para introducir el password inicial. Para ver el password ejecuta: <code>cat /home/ubuntu/jenkins_home/secrets/initialAdminPassword</code></p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-unlock.png" alt="jenkins unlock">
+</div>
+<div class="title">Fig. 16. Contraseña inicial de Jenkins</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="2">
+<li>
+<p>Selecciona Install suggested plugins.</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-install-suggested-plugins.png" alt="jenkins install suggested plugins">
+</div>
+<div class="title">Fig. 17. Install suggested plugins</div>
 </div>
 <div class="paragraph">
-<p>Configuramos las tools en Jenkins.</p>
+<p>Tras unos minutos, introduce los datos del  usuario administrador de Jenkins. Introduce un nombre de usuario y contraseña.</p>
+</div>
+<div class="paragraph">
+<p>Acepta el nombre de dominio de la máquina. Si aun no has registrado el nombre de dominio, lo puedes hacer más tarde en la configuración general de Jenkins.</p>
+</div>
+<div class="paragraph">
+<p>Jenkins está listo.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-welcome.png" alt="jenkins welcome">
+</div>
+<div class="title">Fig. 18. Bienvenida a Jenkins</div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_creación_del_primer_proyecto_jenkins">4.5. Creación del primer proyecto Jenkins</h3>
 <div class="paragraph">
-<p>Creamos el primer pipeline de Jenkins.</p>
+<p>Creamos el primer proyecto de Jenkins. Comprueba que Jenkins puede llamar a docker. Para ello crea un nuevo proyecto tipo freestyle.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-new-hello-docker.png" alt="jenkins new hello docker">
+</div>
+<div class="title">Fig. 19. Nuevo proyecto, freestyle</div>
+</div>
+<div class="paragraph">
+<p>En la sección <strong>Build</strong>, añade un bloque <strong>Execute shell</strong>. Pega estos comandos:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">whoami
+</span>git <span class="nt">--version</span>
+java <span class="nt">-version</span>
+docker <span class="nt">-v</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Guarda los cambios. Haz clic sobre <strong>Build now</strong>. Haz clic sobre la bolita azul para ver el la salida por consola.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-new-hello-docker-console-output.png" alt="jenkins new hello docker console output">
+</div>
+<div class="title">Fig. 20. Build now. Restultado del build</div>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-new-hello-docker-console-success.png" alt="jenkins new hello docker console success">
+</div>
+<div class="title">Fig. 21. Salida por consola</div>
+</div>
+<div class="paragraph">
+<p>Por consola se visualiza el resultado de ejecutar los comandos dentro del contenedor. Como puedes ver, <code>git</code> y <code>java</code> están instalados, venían ya en la imagen de jenkins:lts de la que hemos partido en la definición del Dockerfile. Además, <code>docker</code> también está disponible, se ha instalado correctamente mediante la definición incluida en el Dockerfile.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_conexión_con_la_máquina_de_despliegue">4.6. Conexión con la máquina de despliegue</h3>
+<h3 id="_instalación_de_plugins_adicionales">4.6. Instalación de plugins adicionales</h3>
 <div class="paragraph">
-<p>Para que la máquina de Jenkins pueda realizar el despluiegue de nuestros proyectos sobre otra máquina virtual, debemos configurar ambas máquinas para que puedan tener comunicación via SSH.</p>
+<p>Vamos a instalar varios plugins: greenballs, NodeJs, GitHub integration, &#8230;&#8203;.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_configuración_las_tools_en_jenkins">4.7. Configuración las tools en Jenkins</h3>
+<div class="paragraph">
+<p>En la opción de Manage Jenkins &gt; Global tools configuration, configura las siguientes herramientas: Maven y NodeJs</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_conexión_con_la_máquina_de_despliegue">4.8. Conexión con la máquina de despliegue</h3>
+<div class="paragraph">
+<p>Para que la máquina de Jenkins pueda realizar el despliegue de nuestros proyectos sobre la otra instancia que hemos preparado, debemos configurar ambas máquinas para que puedan tener comunicación via SSH.</p>
 </div>
 <div class="paragraph">
-<p>Aquí va el rollo ya documentado en las prácitcas de 3º HMIS:
-. Creación de la pareja de claves ssh desde el usuario jenkins
-. Prueba de conexión ssh desde la terminal
-. Proyecto Jenkins que ejecuta comandos en la máquna de despliegue</p>
+<p><em>Aquí va la descrición ya documentado en las prácitcas de 3º HMIS:</em></p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Creación de la pareja de claves ssh desde el usuario jenkins</p>
+</li>
+<li>
+<p>Prueba de conexión ssh desde la terminal</p>
+</li>
+<li>
+<p>Proyecto Jenkins que ejecuta comandos en la máquna de despliegue</p>
+</li>
+</ol>
 </div>
 </div>
 </div>
@@ -1072,10 +1244,6 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 </div>
 <div class="sect2">
 <h3 id="_deploy_en_un_docker_container">5.3. Deploy en un Docker container</h3>
-
-</div>
-<div class="sect2">
-<h3 id="_deploy_con_docker_compose">5.4. Deploy con Docker Compose ¿?</h3>
 
 </div>
 </div>
@@ -1123,7 +1291,7 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 
 </div>
 <div class="sect2">
-<h3 id="_deploy_con_docker_compose_2">7.4. Deploy con Docker Compose ¿?</h3>
+<h3 id="_deploy_con_docker_compose">7.4. Deploy con Docker Compose ¿?</h3>
 
 </div>
 </div>
@@ -1131,7 +1299,7 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-09 02:42:10 +0200
+Last updated 2020-04-09 04:30:34 +0200
 </div>
 </div>
 <style>
