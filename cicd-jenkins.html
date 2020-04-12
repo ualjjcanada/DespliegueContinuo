@@ -1030,7 +1030,7 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 <div class="sect2">
 <h3 id="_publicación_en_google_container_registry">4.2. Publicación en Google Container Registry</h3>
 <div class="paragraph">
-<p>Opcionalmente podemos publicar nuestra imagen personalizada en DockerHub, o alternativamente el Google Container Registry.</p>
+<p>Opcionalmente podemos publicar nuestra imagen personalizada en DockerHub, o alternativamente el Google Container Registry. Más adelante se describirá cómo hacerlo.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1075,10 +1075,10 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 <p><code>-p 80:8080</code>: jenkins se ejecutará en el puerto 80 en el host, que está mapeado al puerto 8080 del contenedor</p>
 </li>
 <li>
-<p><code>-v ~/jenkins_home:/var/jenkins_home</code>: carpeta local <code>~/jenkins_home</code> mapeada con la carpeta <code>/var/jenkins_home</code> del contenedor, que es donde Jenkins guarda todos los archivos que utiliza. Si se tira el contenedor o se actualiza, no se pierden los datos.</p>
+<p><code>-v ~/jenkins_home:/var/jenkins_home</code>: mapea la carpeta local <code>~/jenkins_home</code> con la carpeta <code>/var/jenkins_home</code> del contenedor. En el contenedor, la carpeta HOME del usuario <em>jenkins</em> es <code>/var/jenkins_home</code>, donde Jenkins guarda todos los archivos que utiliza. Si se tira el contenedor o se actualiza, no se pierden los datos ya que se guardan "fuera" del contenedor.</p>
 </li>
 <li>
-<p><code>--restart always</code>: inicial el contenedor cuando se inicia la instancia.</p>
+<p><code>--restart always</code>: inicia el contenedor cuando se enciende la instancia.</p>
 </li>
 <li>
 <p><code>ualjjcanada/jenkins-docker:1.0</code>: imagen del contenedor a ejecutar, la que hemos construido en el paso anterior.</p>
@@ -1201,35 +1201,310 @@ docker <span class="nt">-v</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Vamos a instalar varios plugins: greenballs, NodeJs, GitHub integration, &#8230;&#8203;.</p>
+<p>Vamos a instalar varios plugins: greenballs, NodeJs, GitHub integration.</p>
+</div>
+<div class="paragraph">
+<p>Haz clic en <em>Manage Jenkins</em> &gt; <em>Manage Plugins</em>. En la pestaña <em>Available</em> busca <em>Github integration</em>, seleccionaló y pulsa en <em>Download now and install after restart</em>.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-plugins-github-integration.png" alt="jenkins plugins github integration">
+</div>
+<div class="title">Fig. 22. Instalación del plugin Github integration</div>
+</div>
+<div class="paragraph">
+<p>Repite los pasos para los plugins <em>Green Balls</em> y  <em>NodeJS</em>.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-plugins-nodejs.png" alt="jenkins plugins nodejs">
+</div>
+<div class="title">Fig. 23. Instalación del plugin NodeJS</div>
+</div>
+<div class="paragraph">
+<p>Marca <em>Restart Jenkins</em> para completar la instalación. Tras unos segundos, vuelve a iniciar sesión y tendrás los plugins instalados.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-plugins-restart.png" alt="jenkins plugins restart">
+</div>
+<div class="title">Fig. 24. Reiniciar para completar la instalación</div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_configuración_las_tools_en_jenkins">4.7. Configuración las tools en Jenkins</h3>
 <div class="paragraph">
-<p>En la opción de Manage Jenkins &gt; Global tools configuration, configura las siguientes herramientas: Maven y NodeJs</p>
+<p>Tras la instalación del plugin <a href="https://plugins.jenkins.io/nodejs/"><em>NodeJS</em></a>, es necesario realizar la siguiente configuración:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Ve a <em>Manage Jenkins</em>, <em>Global Tool configuration</em>.</p>
+</li>
+<li>
+<p>En <strong>NodeJS</strong>, añade un instalador. Dale por nombre "nodejs" y marca instalar automáticamente.</p>
+</li>
+<li>
+<p>Guarda los cambios.</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-tool-nodejs.png" alt="jenkins tool nodejs">
+</div>
+<div class="title">Fig. 25. Configuración de herramienta NodeJS</div>
+</div>
+<div class="paragraph">
+<p>De la misma forma, instala la última versión de Maven.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_conexión_con_la_máquina_de_despliegue">4.8. Conexión con la máquina de despliegue</h3>
 <div class="paragraph">
-<p>Para que la máquina de Jenkins pueda realizar el despliegue de nuestros proyectos sobre la otra instancia que hemos preparado, debemos configurar ambas máquinas para que puedan tener comunicación via SSH.</p>
+<p>Para realizar el despliegue, deberás permitir que Jenkins ejecute unos comandos en la máquina de despliegue. Para ello, la instancia Jenkins debe poder conectarse a la instancia de despliegue mediante una conexión SSH basada en autenticación por pareja de claves pública/privada, que ha demostrado ser más seguro sobre la autenticación estándar de nombre de usuario/contraseña.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/deploy-schema-full.png" alt="deploy schema full">
+</div>
+<div class="title">Fig. 26. Esquema de despliegue con Jenkins</div>
 </div>
 <div class="paragraph">
-<p><em>Aquí va la descripción ya documentado en las prácticas de 3º HMIS:</em></p>
+<p>Para ello, los pasos que se detallan a continuación permiten:</p>
 </div>
+<div class="ulist">
+<ul>
+<li>
+<p>generar una nueva pareja de claves que usaremos para el despliegue,</p>
+</li>
+<li>
+<p>copiar la clave pública generada en la instancia de despliegue,</p>
+</li>
+<li>
+<p>y por último probar que la conexión se realiza correctamente.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Ejecuta los siguientes pasos:</p>
+</div>
+<div class="sect3">
+<h4 id="_generar_la_nueva_pareja_de_claves_de_despliegue">4.8.1. Generar la nueva pareja de claves de despliegue</h4>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Creación de la pareja de claves ssh desde el usuario jenkins.</p>
-</li>
-<li>
-<p>Prueba de conexión ssh desde la terminal.</p>
-</li>
-<li>
-<p>Proyecto Jenkins que ejecuta comandos en la instancia de despliegue.</p>
+<p>Conecta por SSH a la máquina Jenkins: <code>ssh ubuntu@<em>instancia-jenkins</em></code></p>
 </li>
 </ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/ssh-from-developer-to-jenkins.png" alt="ssh from developer to jenkins">
+</div>
+<div class="title">Fig. 27. Conexión SSH a la instancia Jenkins</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="2">
+<li>
+<p>Crea la carpeta donde se va a guardar la nueva pareja de claves: <code>mkdir /home/ubuntu/jenkins_home/.ssh</code></p>
+</li>
+<li>
+<p>Crea una pareja de claves ssh de despliegue: <code>ssh-keygen -t rsa -b 4096</code></p>
+</li>
+<li>
+<p>Cuando pida el <strong>nombre</strong>, escribe el nuevo nombre <strong>id_rsa_deploy</strong> junto con la ubicación donde Jenkins va a buscar las claves de forma predeterminada, que es: <code>/home/ubuntu/jenkins_home/.ssh/<strong>id_rsa_deploy</strong></code></p>
+</li>
+<li>
+<p>Por último, deja la contraseña en blanco (pulsa ENTER): <code>Enter passphrase (empty for no passphrase):</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Esto crea la clave privada en <code>/home/ubuntu/jenkins_home/.ssh/<strong>id_dsa_deploy</strong></code> y una clave pública asociada en <code>/home/ubuntu/jenkins_home/.ssh/<strong>id_dsa_deploy.pub</strong></code>. Esta nueva pareja de claves la usaremos exclusivamente para el despliegue de nuestros proyectos. Al haberlos guardado en la carpeta <code>/home/ubuntu/jenkins_home/</code> los archivos están accesibles dentro del contenedor, porque recuerda que esa carpeta la habíamos mapeado con la carpeta <code>/var/jenkins_home</code> del contenedor.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-ls-deploy-keys.png" alt="jenkins ls deploy keys">
+</div>
+<div class="title">Fig. 28. Pareja de claves <em>id_rsa_deploy</em></div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_copiar_la_clave_pública_a_la_instancia_de_despliegue">4.8.2. Copiar la clave pública a la instancia de despliegue</h4>
+<div class="olist arabic">
+<ol class="arabic" start="6">
+<li>
+<p>Muestra el contenido de la clave pública: <code>cat /home/ubuntu/jenkins_home/.ssh/id_rsa_deploy.pub</code></p>
+</li>
+<li>
+<p>Copia el contenido: con el ratón, selecciona el contenido de la clave, desde “ssh-rsa” hasta el final, y pulsa ENTER (o CTRC+C)</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-cat-public-key.png" alt="jenkins cat public key">
+</div>
+<div class="title">Fig. 29. Copia el contenido de <em>id_rsa_deploy.pub</em></div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="8">
+<li>
+<p>Ahora pégalo en tu PC, lo necesitaremos más adelante.</p>
+</li>
+<li>
+<p>Desconecta de la máquina Jenkins: <code>exit</code></p>
+</li>
+<li>
+<p>Conecta por ssh a la instancia de despliegue</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/ssh-from-developer-to-deploy.png" alt="ssh from developer to deploy">
+</div>
+<div class="title">Fig. 30. Conexión SSH a la instancia Jenkins</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="11">
+<li>
+<p>Edita el archivo <code>authorized_keys</code>:  <code>nano home/ubuntu/.ssh/authorized_keys</code></p>
+</li>
+<li>
+<p>Ese archivo ya tenía una clave pública, la correspondiente a tu pareja de claves personal que inyectamos en la creación de la instancia con Terraform (por eso has podido conectar por ssh a esa máquina). Pega el contenido de la clave pública de despliegue. Ahora debe tener 2 claves públicas.</p>
+</li>
+<li>
+<p>Ya puedes desconectar de la instancia de despliegue.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_prueba_de_la_conexión_desde_jenkins_a_despliegue">4.8.3. Prueba de la conexión desde jenkins a despliegue</h4>
+<div class="paragraph">
+<p>Vamos a probar que funciona:</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-ssh-to-deploy.png" alt="jenkins ssh to deploy">
+</div>
+<div class="title">Fig. 31. Conexión SSH desde la instancia Jenkins a la de despliegue</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="14">
+<li>
+<p>Conecta de nuevo a la instancia jenkins y prueba la conexión ssh a la instancia de despliegue. Recuerda que puesto que Jenkins se está ejecutando como un contenedor, debes probar la conexión ssh desde dentro del contenedor:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">docker <span class="nb">exec</span> <span class="nt">-it</span> jenkins-docker ssh ubuntu@<em>instancia_deploy</em> <span class="nt">-i</span> /var/jenkins_home/.ssh/id_rsa_deploy</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>En el comando anterior:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>docker exec -it</code> indica ejecutar un comando desde dentro del contenedor</p>
+</li>
+<li>
+<p><code>jenkins-docker</code> es el nombre del contenedor</p>
+</li>
+<li>
+<p><code>ssh ubuntu@<em>instancia_deploy</em> -i /var/jenkins_home/.ssh/id_rsa_deploy</code> es el comando a ejecutar en el contenedor. En este caso, <code>ssh</code> con el parámetro <code>-i &#8230;&#8203;</code> para indica la clave privada que debe usar para conectar.</p>
+</li>
+<li>
+<p>Recuerda que <code>/var/jenkins_home</code> es la carpeta HOME del usuario <em>jenkins</em> dentro del contenedor, y <em>jenkins</em> es el usuario del contenedor que ejecuta Jenkins.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="15">
+<li>
+<p>La primera vez que realizas una conexión ssh desde un usuario en una máquina origen a una destino, te pregunta si deseas almacenar la clave de host de destino en la lista de hosts conocidos (<code>known_hosts</code>) de tu máquina origen. Contesta: <code>yes</code></p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/ssh-host-autentication.png" alt="ssh host autentication">
+</div>
+<div class="title">Fig. 32. Validar la clave del host: <strong>yes</strong></div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="16">
+<li>
+<p>Si todo ha ido bien, la conexión se ha debido realizar. Sal con <code>exit</code>. Si no ha sido así, verifica que la ruta al archivo de la clave privada es correcta, y que el nombre de la máquina de despliegue es correcto.</p>
+</li>
+<li>
+<p>Comprueba que la clave de host de la máquina de destino (despliegue) se ha guardado en la máquina origen (jenkins) en el archivo <code>~/.ssh/known_hosts</code> del usuario que ha ejecutado el comando ssh, en nuestro caso, del usuario jenkins de contenedor: <code>docker exec -it jenkins-docker cat /var/jenkins_home/.ssh/known_hosts</code></p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/ssh-known_hosts.png" alt="ssh known hosts">
+</div>
+<div class="title">Fig. 33. Contenido del archivo <strong>known_hosts</strong> en el contenedor</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="18">
+<li>
+<p>Puedes comprobar también el contenido de <em>known_hosts</em> en el archivo <code>/home/ubuntu/jenkins_home/.ssh/known_hosts</code>, ya que recuerda que hay un volumen mapeado entre la carpeta local <code>/home/ubuntu/jenkins_home</code> y la carpeta del contenedor <code>/var/jenkins_home</code>.</p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/ssh-known_hosts-local.png" alt="ssh known hosts local">
+</div>
+<div class="title">Fig. 34. Contenido del archivo <strong>known_hosts</strong> en la carpeta local</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="19">
+<li>
+<p>Entra en Jenkins y añade el siguiente comando al proyecto <em>hello_docker</em> existente, sustituyendo <em>MAQUINA_DEPLOY</em> por el nombre DNS de la máquina de despliegue.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">ssh <span class="nt">-i</span> ~/.ssh/id_rsa_deploy ubuntu@MAQUINA_DEPLOY <span class="s2">"pwd &amp;&amp; ls -la"</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Como aclaración de este comando:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>el parámetro <code>-i</code> indica la clave privada que queremos usar en la conexión ssh</p>
+</li>
+<li>
+<p><code>"pwd &amp;&amp; ls -la"</code> son comandos básicos que ejecuta sobre la máquina remota. Hemos indicado estos comandos simplemente para probar que la conexión se realiza correctamente.</p>
+</li>
+</ul>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenksin-hello-docker-ssh-to-deploy.png" alt="jenksin hello docker ssh to deploy">
+</div>
+<div class="title">Fig. 35. Modificación del proyecto para que ejecute un comando sobre la instancia de despliegue</div>
+</div>
+<div class="paragraph">
+<p>Tras ejecutar el proyecto en Jenkins, el resultado debe ser correcto.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenksin-hello-docker-ssh-to-deploy-output.png" alt="jenksin hello docker ssh to deploy output">
+</div>
+<div class="title">Fig. 36. Salida por consola. El comando se ha ejecutado correctamente.</div>
+</div>
 </div>
 </div>
 </div>
@@ -1310,7 +1585,7 @@ docker <span class="nt">-v</span></code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-09 04:51:31 +0200
+Last updated 2020-04-12 21:42:37 +0200
 </div>
 </div>
 <style>
