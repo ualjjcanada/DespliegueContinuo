@@ -437,13 +437,6 @@ Por consola se visualiza el resultado de ejecutar los comandos dentro del conten
 
 === Instalación de plugins adicionales
 
-.Por completar
-****
-De aquí en adelante está por completar. En breve lo actualizaré.
-
-Gracias por vuestra paciencia.
-****
-
 Vamos a instalar varios plugins: greenballs, NodeJs, GitHub integration. 
 
 Haz clic en __Manage Jenkins__ > __Manage Plugins__. En la pestaña __Available__ busca __Github integration__, seleccionaló y pulsa en __Download now and install after restart__.
@@ -595,6 +588,14 @@ image::jenksin-hello-docker-ssh-to-deploy-output.png[role="thumb", align="center
 
 
 == Ejemplo 1: Aplicación web Java. 
+
+.Por completar
+****
+De aquí en adelante está por completar. En breve lo actualizaré.
+
+Gracias por vuestra paciencia.
+****
+
 
 Una vez que todo funciona correctamente, vamos a estudiar varios ejemplos, tanto en Java como en NodeJs.
 
