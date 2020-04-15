@@ -12,3 +12,10 @@ https://medium.com/@gustavo.guss/jenkins-starting-with-pipeline-doing-a-node-js-
 
 Continuous Integration/Deployment using Jenkins, Docker, Kubernetes
 https://medium.com/@adityavishwekar/continuous-integration-deployment-using-jenkins-docker-kubernetes-on-oracle-cloud-15d9f969a294
+
+
+
+Deploy via ssh
+
+How to build on Jenkins and publish artifacts via ssh with Pipelines
+https://medium.com/@weblab_tech/how-to-publish-artifacts-in-jenkins-f021b17fde71
