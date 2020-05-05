@@ -482,21 +482,21 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_informe_de_cobertura_de_código">5.2. Informe de Cobertura de código</a></li>
 <li><a href="#_análisis_estático_de_código_checkstyle">5.3. Análisis estático de código: <em>Checkstyle</em></a></li>
 <li><a href="#_despliegue_en_la_vm">5.4. Despliegue en la VM</a></li>
-<li><a href="#_deploy_en_un_docker_container">5.5. Deploy en un Docker container</a></li>
+<li><a href="#_despliegue_en_un_contenedor_docker">5.5. Despliegue en un contenedor Docker</a></li>
 </ul>
 </li>
 <li><a href="#_ejemplo_2_hola_mundo_en_nodejs">6. Ejemplo 2. Hola mundo en NodeJs</a>
 <ul class="sectlevel2">
 <li><a href="#_creación_de_proyecto_jenkins_con_pipelines_2">6.1. Creación de proyecto Jenkins con pipelines</a></li>
 <li><a href="#_despliegue_en_la_vm_2">6.2. Despliegue en la VM</a></li>
-<li><a href="#_deploy_en_un_docker_container_2">6.3. Deploy en un Docker container</a></li>
+<li><a href="#_deploy_en_un_docker_container">6.3. Deploy en un Docker container</a></li>
 </ul>
 </li>
 <li><a href="#_ejemplo_3_web_app_en_nodejs">7. Ejemplo 3. Web App en NodeJs</a>
 <ul class="sectlevel2">
 <li><a href="#_creación_de_proyecto_jenkins_con_pipelines_3">7.1. Creación de proyecto Jenkins con pipelines</a></li>
 <li><a href="#_despliegue_en_la_vm_3">7.2. Despliegue en la VM</a></li>
-<li><a href="#_deploy_en_un_docker_container_3">7.3. Deploy en un Docker container</a></li>
+<li><a href="#_deploy_en_un_docker_container_2">7.3. Deploy en un Docker container</a></li>
 <li><a href="#_deploy_con_docker_compose">7.4. Deploy con Docker Compose ¿?</a></li>
 </ul>
 </li>
@@ -961,7 +961,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia máquina donde lo vamos a ejecutar, es decir en la instancia de jenkins.</p>
 </div>
 <div class="paragraph">
-<p>Conecta por ssh a la instancia. Crea una carpeta <code>jenkins-docker</code> y crea el archivo <code>Dockerfile</code>. Usa el siguiente Dockerfile (descrito en esta entrada de <em>medium.com</em>:  <a href="https://medium.com/@gustavo.guss/jenkins-building-docker-image-and-sending-to-registry-64b84ea45ee9">Jenkins Building Docker Image and Sending to Registry</a>).</p>
+<p>Conecta por ssh a la instancia. Crea una carpeta <code>jenkins-docker</code> y crea el archivo <code>Dockerfile</code>. Usa el siguiente Dockerfile (descrito en esta entrada de <em>medium.com</em>:  <a href="https://medium.com/@gustavo.guss/jenkins-building-docker-image-and-sending-to-registry-64b84ea45ee9">Jenkins Building Docker Image and Sending to Registry</a>.</p>
 </div>
 <div class="listingblock">
 <div class="title">Dockerfile</div>
@@ -1910,16 +1910,45 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 </div>
 <div class="sect2">
 <h3 id="_despliegue_en_la_vm">5.4. Despliegue en la VM</h3>
-<div class="sidebarblock">
+<div class="paragraph">
+<p>Para desplegar la aplicación PetClinic en la instancia de despliegue vamos a copiar sobre ella el archivo JAR y a continuación ejecutaremos en ella la orden de java para ponerla en marcha:</p>
+</div>
+<div class="paragraph">
+<p>Copia este nueva fase en tu pipeline, sustituyendo DEPLOY_MACHINE por el nombre DNS de tu instancia:</p>
+</div>
+<div class="listingblock">
 <div class="content">
-<div class="title">Por completar</div>
-<div class="paragraph">
-<p>De aquí en adelante está por completar. En breve lo actualizaré.</p>
+<pre class="rouge highlight"><code data-lang="groovy">  <span class="n">stage</span><span class="o">(</span><span class="s1">'Deploy'</span><span class="o">){</span>
+    <span class="n">steps</span> <span class="o">{</span>
+      <span class="n">sh</span> <span class="s1">'''
+        ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "mkdir -p ~/spring-petclinic" <i class="conum" data-value="1"></i><b>(1)</b>
+        scp -i ~/.ssh/id_rsa_deploy $WORKSPACE/target/*.jar ubuntu@DEPLOY_MACHINE:~/spring-petclinic <i class="conum" data-value="2"></i><b>(2)</b>
+        ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "if pgrep java; then pkill java; fi" <i class="conum" data-value="3"></i><b>(3)</b>
+        ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "nohup java -jar ~/spring-petclinic/*.jar &gt; ~/spring-petclinic/yourservice.log 2&gt;&amp;1 &amp;" <i class="conum" data-value="4"></i><b>(4)</b>
+      '''</span>
+    <span class="o">}</span>
+  <span class="o">}</span></code></pre>
 </div>
-<div class="paragraph">
-<p>Gracias por vuestra paciencia.</p>
 </div>
-</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Crea la carpeta <code>spring-petclinic</code> dentro de la carpeta HOME del usuario <code>ubuntu</code> en la máquina de despliegue</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Copia con <code>scp</code> el archivo <code>.jar</code>, que se ha generado tras la construcción con maven, en la máquina de despligue</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Detiene el proceso <code>java</code> si existe.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Ejecuta la aplicación java empaquetada en el <code>.jar</code> en background y con <code>nohup</code> que hace que el proceso siga funcionando incluso si el usuario que lo inició cierra la sesión. De esta manera finaliza el comando ssh y el proceso sigue funcionando, es decir, la aplicación PetClinic estará desplegada y funcionando.</td>
+</tr>
+</table>
 </div>
 <div class="sidebarblock">
 <div class="content">
@@ -1937,16 +1966,36 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 </div>
 </div>
 <div class="sect2">
-<h3 id="_deploy_en_un_docker_container">5.5. Deploy en un Docker container</h3>
+<h3 id="_despliegue_en_un_contenedor_docker">5.5. Despliegue en un contenedor Docker</h3>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Por completar</div>
 <div class="paragraph">
-<p>Para <a href="https://spring.io/guides/gs/spring-boot-docker/">crear el contendedor de Docker</a> que empaquete la aplicación PetClinic basada en Spring Boot, vamos a definir el siguiente <code>Dockerfile</code>:</p>
+<p>De aquí en adelante está por completar. En breve lo actualizaré.</p>
+</div>
+<div class="paragraph">
+<p>Gracias por vuestra paciencia.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Para realizar el despliegue de PetClinic como contenedor, primero tenemos que <a href="https://www.callicoder.com/spring-boot-docker-example/">dockerizar</a> la aplicación, luego publicar la imagen de contenedor en un registro, y por último ejecutar el contenedor en la instancia de despliegue.</p>
+</div>
+<div class="paragraph">
+<p>Para <a href="https://spring.io/guides/gs/spring-boot-docker/">crear el contendedor de Docker</a> que empaquete la aplicación PetClinic , vamos a definir el siguiente <code>Dockerfile</code>:</p>
 </div>
 <div class="listingblock">
 <div class="title">Dockerfile</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="docker"><span class="k">FROM</span><span class="s"> openjdk:8-jdk-alpine</span>
+<pre class="rouge highlight"><code data-lang="docker"><span class="c"># Start with a base image containing Java runtime</span>
+<span class="k">FROM</span><span class="s"> openjdk:8-jdk-alpine</span>
+<span class="c"># Make port 8080 available to the world outside this container</span>
+<span class="k">EXPOSE</span><span class="s"> 8080</span>
+<span class="c"># The application's jar file</span>
 <span class="k">ARG</span><span class="s"> JAR_FILE=target/*.jar</span>
+<span class="c"># Copy the application's jar to the container</span>
 <span class="k">COPY</span><span class="s"> ${JAR_FILE} app.jar</span>
+<span class="c"># Run the jar file</span>
 <span class="k">ENTRYPOINT</span><span class="s"> ["java","-jar","/app.jar"]</span></code></pre>
 </div>
 </div>
@@ -2014,7 +2063,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 
 </div>
 <div class="sect2">
-<h3 id="_deploy_en_un_docker_container_2">6.3. Deploy en un Docker container</h3>
+<h3 id="_deploy_en_un_docker_container">6.3. Deploy en un Docker container</h3>
 
 </div>
 </div>
@@ -2036,7 +2085,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 
 </div>
 <div class="sect2">
-<h3 id="_deploy_en_un_docker_container_3">7.3. Deploy en un Docker container</h3>
+<h3 id="_deploy_en_un_docker_container_2">7.3. Deploy en un Docker container</h3>
 
 </div>
 <div class="sect2">
@@ -2048,7 +2097,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-15 02:02:29 +0200
+Last updated 2020-05-05 13:02:44 +0200
 </div>
 </div>
 <style>
