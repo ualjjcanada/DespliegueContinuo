@@ -28,3 +28,8 @@ https://docs.bitnami.com/tutorials/create-ci-cd-pipeline-jenkins-gke/
 - deploy on gke with Pipelines
 - 2 deploy stages: deploy to test + deploy to production (confirmation required)
  
+
+ Oficial Jenkins BlueOcean tutorial Maven 
+ https://www.jenkins.io/doc/tutorials/build-a-java-app-with-maven/
+
+ - Jenkins docker with docker agents

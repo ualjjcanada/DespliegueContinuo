@@ -878,9 +878,10 @@ De aquí en adelante está por completar. En breve lo actualizaré.
 Gracias por vuestra paciencia.
 ****
 
+==== Creación del `Dockerfile`
 Para realizar el despliegue de PetClinic como contenedor, primero tenemos que https://www.callicoder.com/spring-boot-docker-example/[dockerizar] la aplicación, luego publicar la imagen de contenedor en un registro, y por último ejecutar el contenedor en la instancia de despliegue.
 
-Para https://spring.io/guides/gs/spring-boot-docker/[crear el contendedor de Docker] que empaquete la aplicación PetClinic , vamos a definir el siguiente `Dockerfile`:
+Para https://spring.io/guides/gs/spring-boot-docker/[crear el contendedor de Docker] que empaquete la aplicación PetClinic, vamos a definir el siguiente archivo `Dockerfile` que debe estar en el raiz del respositorio:
 
 .Dockerfile
 [source, docker]
@@ -897,14 +898,35 @@ COPY ${JAR_FILE} app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
 ----
 
-Puedes construir la imagen del contenedor con: 
+El Dockerfile es muy sencillo, contiene los pasos básicos para ejecutar una aplicación String Boot en un contenedor: partiendo de una imagen de `openjdk`, copia el archivo `target/*.jar` en el contenedor con el nombre `app.jar` y lo ejecuta mediante el comando `ENTRYPOINT` para que no haya ninguna shell sobre el proceso `java`. 
+
+Puedes construir la imagen del contenedor:
+
+. Construye el proyecto PetClinic con maven en tu equipo local:
+
+[source, bash]
+----
+./mvnw clean package
+----
+
+.Resultado de la construcción local con Maven
+image::mvn-package-petclinic.png[role="thumb", align="center"]
+
+[start=2]
+. Construye el contenedor con `docker build`:
 
 [source, bash]
 ----
 docker build -t petclinic-docker .
 ----
 
-El Dockerfile es muy sencillo, pero es lo básico para ejecutar una aplicación String Boot en un contenedor: partiendo de una imagen de `openjdk`, copia el archivo `.jar` en el contenedor como `app.jar` y lo ejecuta mediante el `ENTRYPOINT` para que no haya ninguna shell sobre el proceso `java`. 
+.Docker build
+image::docker-build-petclinic.png[role="thumb", align="center"]
+
+[TIP]
+====
+Para trabajar con contenedores Docker en tu equipo local, debes tener Docker instalado. Recuerda iniciar Docker Desktop en Windows, o iniciar el servicio Docker en Linux o Mac. Comprueba que está funcionado ejecutando el comando `docker ps`
+====
 
 Prueba la ejecución del contenedor en local: 
 
@@ -913,9 +935,51 @@ Prueba la ejecución del contenedor en local:
 docker run -p 8080:8080 -t petclinic-docker
 ---- 
 
+Comprueba que se ha iniciado la aplicación en http://localhost:8080.
+
+Para el contenedor. 
 Una vez creada la imagen y probada su ejecución, el siguiente paso será publicarla la imagen en un registro de contenedores, mediante `docker push`. Podemos usar DockerHub pero en este caso vamos a usar Google Cloud Registry. 
 
-...
+==== Autenticación en Container Registry
+
+https://cloud.google.com/container-registry/docs/advanced-authentication[Authentication] allows you to connect to Container Registry with your credentials. To push or pull images, you must configure the permissions that are required to access the registry.
+
+Using https://cloud.google.com/container-registry/docs/advanced-authentication#json-key[JSON key file] as authentication method:
+
+To create a new service account and a service account key for use with Container Registry repositories only:
+
+. Create the service account for interacting with repositories:
+
+.. In Google Cloud Console, open the https://console.cloud.google.com/apis/credentials/serviceaccountkey?_ga=2.71233296.1082389881.1588672109-358507209.1586347394[Create service account key page].
+
+.. From the Service account list, select New service account
+
+.. In the Service account name field, enter a name
+.. From the Role list, select the appropriate Container Registry role for the service account: Cloud Storage / Storage Administrator
+.. Click Create. A JSON file that contains your key downloads to your computer.
+
+.Creación Service Account Key for pull/push on Container Registry
+image::cloud-containers-registry-key-create.png[role="thumb", align="center"]
+
+[start=2]
+. Guarda el archivo `.json` en la carpeta `secret` de tu proyecto PetClinic. 
+
+[WARNING]
+====
+No olvides añadir la carpeta `secret/` al archivo `.gitignore` para evitar publicar en GitHub tu archivo de credenciales.
+====
+
+[start=3]
+. Use the service account key as your password to authenticate with Docker. Sustituye `keyfile.json` por el nombre de tu archivo de credenciales:
+
+.. En Linux: ```cat keyfile.json | docker login -u _json_key --password-stdin https://grc.io```
+.. En Windows: ```docker login -u _json_key --password-stdin https://grc.io < keyfile.json```
+
+.Autenticación de Docker contra Container Registry
+image::cloud-containers-registry-login.png[role="thumb", align="center"]
+
+
+==== Publicación y despliegue 
 
 La acción de despliegue consistirá en hacer:
 
@@ -925,6 +989,15 @@ La acción de despliegue consistirá en hacer:
 
 Estas acciones debemos añadirlas a un `stage` del pipeline de Jenkins que se encargará de desplegar el nuevo contenedor automáticamente.
 
+[TIP]
+====
+```
+# Remove all stopped containers
+docker rm $(docker ps -a -q)
+# Remove all images
+docker rmi $(docker images -q)
+```
+====
 
 == Ejemplo 2. Hola mundo en NodeJs
 
