@@ -1110,48 +1110,95 @@ pipeline {
     stage("Build image") {
       steps {
         script {
-          myapp = docker.build("env.CONTAINER_REGISTRY/evn.GOOGLE_CLOUD_PROJECT/petclinic:${env.BUILD_ID}")        }
+          dockerImage = docker.build(
+            "${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/petclinic:${env.BUILD_ID}",
+            "-f Dockerfile ."
+          ) 
       }
     }
   }
 }
 ----
 
+Para probar que el contenedor se ha creado bien, añade esta fase que hace un despliegue "local" en la propia máquina de Jenkins: 
 
+[source,groovy]
+----
+    stage("Run image locally") {
+      steps {
+        sh "docker stop petclinic || true && docker rm  petclinic || true"
+        sh "mkdir -p logs"
+        sh "nohup docker run -p 8080:8080 -t --name petclinic ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/petclinic:${env.BUILD_ID} > logs/yourservice-docker-${env.BUILD_ID}.log 2>&1 &" 
+      }
+    }
+----
 
+La aplicación debe estar accesible en el puerto 8080 en tu máquina de Jenkins. Para asegurarnos que la aplicación se está ejecutando bien, lo adecuado sería realizar unos tests end-to-end, con Selenium.
 
+[source,groovy]
+----
+    stage('End-to-end Test image') {
+        /* Ideally, we would run some end-to-end tests against our running container.
+        steps{
+            sh 'echo "End-to-end Tests passed"'
+        }
+    }
+----
+El siguiente paso es publicar la imagen en el registro.
 
+. Primero, es necesario crear unas credenciales en Jenkins para poder hacer `push` en Container Registry:
 
+.. _Go to jenkins home, click on “credentials” and “(global)”_
 
-        stage("Push image") {
-            steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                            myapp.push("latest")
-                            myapp.push("${env.BUILD_ID}")
-                    }
-                }
-            }
-        }        
-        stage('Deploy to GKE') {
-            steps{
-                sh "sed -i 's/hello:latest/hello:${env.BUILD_ID}/g' deployment.yaml"
-                step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+.. _Click on “Add Credentials” in left menu._
+
+.. _Select *Google Service Account from private key* for the “Kind” field, and enter your project name ( myregistry in this example). Then upload the JSON private key.
+
+.Credenciales en Jenkins para Container Registry
+image::jenkins-credentials-container-registry.png[role="thumb", align="center"]
+
+[start=2]
+. Una vez guardadas las credenciales, vamos a definir la fase para publicar la imagen del contenedor: 
+
+[source,groovy]
+----
+    stage("Push image") {
+        steps {
+            script {
+                docker.withRegistry('https://'+ CONTAINER_REGISTRY, 'gcr:'+ GOOGLE_CLOUD_PROJECT) {
+                        dockerImage.push("latest")
+                        dockerImage.push("${env.BUILD_ID}")
+                        
             }
         }
-    }    
-}
+    }        
+----
 
+Comprobar que se ha publicado correctamente en el registro.
 
+Por último, quedaría el paso de desplegar al entorno de producción. Una vez empaquetada como un contenedor, una aplicación se puede desplegar de varias formas: en máquina virtual con GCE, en plataforma como servicio con Google App Engine, en Kubernetes con GKE, y en Cloud Run, un servicio de Google Cloud específico para el despliegue de contenedores. Para nosotros es nuestra máquina virtual de despliegue es nuestro entorno de producción en el que vamos a desplegar el contenedor. 
 
-
-Los pasos para el despliegue de la nueva imagen del contenedor actualizada consistirán:
+Los pasos para el despliegue de la nueva imagen del contenedor consistirán en ejecutar los siguientes comandos sobre la máquina de despliegue:
 
 - `docker stop` del contenedor por si estuviera ejecutándose  
 - `docker rm` para eliminar la imagen existente, de una versión anterior
-- `docker run` que automáticamente hará primero un `docker pull` de la imagen actualizada del registro. 
+- `docker run` que automáticamente hará primero un `docker pull` de la imagen actualizada del registro. Lo lanzaremos en el puerto 80 ya que el 8080 está ocupado por el despliegue sin contenedor. 
 
 Estas acciones debemos añadirlas a un `stage` del pipeline de Jenkins que se encargará de desplegar el nuevo contenedor automáticamente.
+
+[source,groovy]
+----
+    stage('Deploy to Production') {
+      steps{
+        sh '''
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@webapps.mastertaiiual.tech "mkdir -p  ~/logs"
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@webapps.mastertaiiual.tech " if docker ps -q --filter name=petclinic | grep . ; then docker stop petclinic && docker rm -fv petclinic; fi"
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@webapps.mastertaiiual.tech "nohup docker run -p 80:8080 -t --name petclinic ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/petclinic:latest  > logs/yourservice-docker.log 2>&1 &"
+        '''
+      }
+    }    
+----
+
 
 [TIP]
 ====
@@ -1163,7 +1210,24 @@ docker rmi $(docker images -q)
 ```
 ====
 
-https://stackoverflow.com/questions/54573068/pushing-docker-image-through-jenkins
+Por último, es una buena práctica eliminar las imágenes que se van generando en cada build. Primero paramos y eliminamos el contenedor local, luego eliminamos la imagen.
+
+[source,groovy]
+----
+    stage('Remove Unused docker image') {
+      steps{
+        // input message:"Proceed with removing image locally?"
+        sh 'if docker ps -q --filter name=petclinic | grep . ; then docker stop petclinic && docker rm -fv petclinic; fi'
+        sh 'docker rmi ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/petclinic:$BUILD_NUMBER'
+      }
+    }
+----
+
+****
+Referencias
+
+. https://stackoverflow.com/questions/54573068/pushing-docker-image-through-jenkins
+****
 
 == Ejemplo 2. Hola mundo en NodeJs
 
@@ -1177,22 +1241,6 @@ Configuramos el Pipeline.
 
 === Deploy en un Docker container
 
-// === Deploy con Docker Compose ¿?
-
-
-== Ejemplo 3. Web App en NodeJs
-
-Nos vamos a basar en el proyecto ...  en NodeJs, disponible en https....
-
-=== Creación de proyecto Jenkins con pipelines
-
-Configuramos el Pipeline.
-
-=== Despliegue en la VM
-
-=== Deploy en un Docker container
-
-=== Deploy con Docker Compose ¿?
 
 
 
