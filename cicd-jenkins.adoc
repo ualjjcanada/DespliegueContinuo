@@ -360,7 +360,7 @@ chmod 777 ~/jenkins_home
 
 [source,bash,subs="verbatim,quotes"]
 ----
-docker run -d --name jenkins-docker -p 80:8080 -p 50000:50000 -v ~/jenkins_home:/var/jenkins_home --restart always ualjjcanada/jenkins-docker:1.0
+docker run -d --name jenkins-docker -p 80:8080 -p 50000:50000 -v /var/run/docker.sock:/var/run/docker.sock -v ~/jenkins_home:/var/jenkins_home --restart always ualjjcanada/jenkins-docker:1.0
 ----
  
 Los parámetros de `docker run` son:
@@ -368,6 +368,8 @@ Los parámetros de `docker run` son:
 * `--name jenkins-docker`: nombre que le asignamos al contenedor
 
 * `-p 80:8080`: jenkins se ejecutará en el puerto 80 en el host, que está mapeado al puerto 8080 del contenedor
+
+* `-v /var/run/docker.sock:/var/run/docker.sock`: volumen para compartir el docker socket (usando en tu máquina) con el contenedor. 
 
 * `-v ~/jenkins_home:/var/jenkins_home`: mapea la carpeta local `~/jenkins_home` con la carpeta `/var/jenkins_home` del contenedor. En el contenedor, la carpeta HOME del usuario _jenkins_ es `/var/jenkins_home`, donde Jenkins guarda todos los archivos que utiliza. Si se tira el contenedor o se actualiza, no se pierden los datos ya que se guardan "fuera" del contenedor. 
 
@@ -871,17 +873,13 @@ Referencias:
 
 === Despliegue en un contenedor Docker
 
-.Por completar
-****
-De aquí en adelante está por completar. En breve lo actualizaré.
+Para realizar el despliegue de PetClinic como contenedor, primero tenemos que https://www.callicoder.com/spring-boot-docker-example/[dockerizar] la aplicación, luego publicar la imagen de contenedor en un registro como DockerHub o Google Container Registry, y por último ejecutar el contenedor en la instancia de despliegue.
 
-Gracias por vuestra paciencia.
-****
+A continuación se describe cómo crear un contenedor Docker de la aplicación PetClinic. Los pasos se realizan en local, y al final configuraremos el pipeline de Jenkins para que se realicen automáticamente. 
 
 ==== Creación del `Dockerfile`
-Para realizar el despliegue de PetClinic como contenedor, primero tenemos que https://www.callicoder.com/spring-boot-docker-example/[dockerizar] la aplicación, luego publicar la imagen de contenedor en un registro, y por último ejecutar el contenedor en la instancia de despliegue.
 
-Para https://spring.io/guides/gs/spring-boot-docker/[crear el contendedor de Docker] que empaquete la aplicación PetClinic, vamos a definir el siguiente archivo `Dockerfile` que debe estar en el raiz del respositorio:
+Para https://spring.io/guides/gs/spring-boot-docker/[crear el contendedor de Docker] que empaquete la aplicación PetClinic, vamos a definir el siguiente archivo `Dockerfile` que debe estar en la carpeta raíz del proyecto:
 
 .Dockerfile
 [source, docker]
@@ -932,31 +930,34 @@ Prueba la ejecución del contenedor en local:
 
 [source, bash]
 ----
-docker run -p 8080:8080 -t petclinic-docker
+docker run -it -p 8080:8080 -t petclinic-docker
 ---- 
 
 Comprueba que se ha iniciado la aplicación en http://localhost:8080.
 
-Para el contenedor. 
-Una vez creada la imagen y probada su ejecución, el siguiente paso será publicarla la imagen en un registro de contenedores, mediante `docker push`. Podemos usar DockerHub pero en este caso vamos a usar Google Cloud Registry. 
+Para el contenedor con CTRL+C.
+
+Una vez creada la imagen con `docker build` y probada su ejecución con `docker run`, el siguiente paso será publicar la imagen en un registro de contenedores, mediante `docker push`. Podemos usar https://hub.docker.com/[DockerHub] pero en este caso vamos a usar Google Cloud https://cloud.google.com/container-registry?hl=es[Container Registry]. 
 
 ==== Autenticación en Container Registry
 
-https://cloud.google.com/container-registry/docs/advanced-authentication[Authentication] allows you to connect to Container Registry with your credentials. To push or pull images, you must configure the permissions that are required to access the registry.
+Para poder hacer `push` debemos tener permisos de escritura, y por tanto debemos autenticarnos en el servicio Container Registry. 
 
-Using https://cloud.google.com/container-registry/docs/advanced-authentication#json-key[JSON key file] as authentication method:
+https://cloud.google.com/container-registry/docs/advanced-authentication[Authentication] _allows you to connect to Container Registry with your credentials. To push or pull images, you must configure the permissions that are required to access the registry._
 
-To create a new service account and a service account key for use with Container Registry repositories only:
+_Using https://cloud.google.com/container-registry/docs/advanced-authentication#json-key[JSON key file] as authentication method:_
 
-. Create the service account for interacting with repositories:
+_To create a new service account and a service account key for use with Container Registry repositories only:_
 
-.. In Google Cloud Console, open the https://console.cloud.google.com/apis/credentials/serviceaccountkey?_ga=2.71233296.1082389881.1588672109-358507209.1586347394[Create service account key page].
+. _Create the service account for interacting with repositories:_
 
-.. From the Service account list, select New service account
+.. In Google Cloud Console, open the https://console.cloud.google.com/apis/credentials/serviceaccountkey?_ga=2.71233296.1082389881.1588672109-358507209.1586347394[Create service account key page]._
 
-.. In the Service account name field, enter a name
-.. From the Role list, select the appropriate Container Registry role for the service account: Cloud Storage / Storage Administrator
-.. Click Create. A JSON file that contains your key downloads to your computer.
+.. _From the Service account list, select New service account_
+
+.. _In the Service account name field, enter a name_
+.. _From the Role list, select the appropriate Container Registry role for the service account: Cloud Storage / Storage Administrator_
+.. _Click Create. A JSON file that contains your key downloads to your computer._
 
 .Creación Service Account Key for pull/push on Container Registry
 image::cloud-containers-registry-key-create.png[role="thumb", align="center"]
@@ -970,18 +971,181 @@ No olvides añadir la carpeta `secret/` al archivo `.gitignore` para evitar publ
 ====
 
 [start=3]
-. Use the service account key as your password to authenticate with Docker. Sustituye `keyfile.json` por el nombre de tu archivo de credenciales:
+. _Use the service account key as your password to authenticate with Docker._ Sustituye `keyfile.json` por el nombre de tu archivo de credenciales:
 
-.. En Linux: ```cat keyfile.json | docker login -u _json_key --password-stdin https://grc.io```
-.. En Windows: ```docker login -u _json_key --password-stdin https://grc.io < keyfile.json```
+.. En Linux: 
+
+[source, bash]
+----
+cat keyfile.json | docker login -u _json_key --password-stdin https://gcr.io
+----
+
+[start=2,]
+  .. En Windows:
+
+[source, bash]
+----
+docker login -u _json_key --password-stdin https://gcr.io < keyfile.json
+----
+
 
 .Autenticación de Docker contra Container Registry
 image::cloud-containers-registry-login.png[role="thumb", align="center"]
 
 
+
 ==== Publicación y despliegue 
 
-La acción de despliegue consistirá en hacer:
+. Construir el contenedor con el nombre completo incluyendo la referencia a Container registry (gcr.io). Primero definimos una variable de entorno con el nombre de nuestro proyecto GCP, y luego construimos de nuevo la imagen con el nombre completo del registro de contenedores: 
+
+
+[source, bash]
+----
+GOOGLE_CLOUD_PROJECT=cnsa-2020-user123
+
+docker build -t gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0 .
+----
+
+ 
+[start=2]
+. A continuación vamos a publicar con `docker push`: habilita la API de Container Registry en tu proyecto GCP
+
+.Habilitar la API Container Registry
+image::container-registry-habilitar-api.png[role="thumb", align="center"]
+
+[start=3]
+. Publica la imagen con ```docker push [HOSTNAME]/[PROJECT-ID]/[IMAGE]:[TAG]```: 
+
+[source, bash]
+----
+docker push gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0
+----
+
+[start=4]
+. Comprueba que se ha publicado correctamente.
+
+.Lista de imágenes en Container Registry
+image::container-registry-pushed-petclinic.png[role="thumb", align="center"]
+
+La imagen ya está disponible en nuestro repositorio privado de nuestro proyecto GCP. Utilizando nuestras credenciales podremos hacer `docker pull` de dicha imagen para descargarla en cualquier sistema con el motor de docker, y ejecutarlo con `docker run`.
+
+[source, bash]
+----
+GOOGLE_CLOUD_PROJECT=cnsa-2020-user123
+
+docker run -p 8080:8080 -t --name petclinic  gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0
+---- 
+
+Si conectas a la instancia de despliegue que creamos al principio de esta actividad, y ejecutas el comando `docker run` anterior, dará un error de autenticación:
+
+.Error de autenticación en Container Registry
+image::docker-run-petclinic-webapp-error-authentication.png[role="thumb", align="center"]
+
+Para arreglarlo, habrá que copiar en la máquina de despliegue el archivo de credenciales `.json` con premisos sobre Container Registry, una vez disponible este archivo en la instancia de despliegue ejecutar el comando `docker login` y tras ello ya si podremos hacer `docker pull` y `docker run`.
+
+[source, bash]
+----
+# Compiamos el archivo de credenciales
+scp ./secret/file.json ubuntu@DNS_MAQUINA_DEPLOY:~/file.json
+# Conectamos a la máquina de despliegue
+ssh ubuntu@DNS_MAQUINA_DEPLOY
+# Autenticamos docker contra Container Registry
+cat keyfile.json | docker login -u _json_key --password-stdin https://gcr.io
+# ejecutamos el contenedor desde gcr.io
+docker run -p 8080:8080 -t --name petclinic gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0
+---- 
+
+Es posible que la ejecución del contenedor de un error, porque el puerto 8080 ya esté en uso:
+
+[source, bash]
+----
+Error starting userland proxy: listen tcp 0.0.0.0:8080: bind: address already in use. 
+----
+
+Para solucionarlo, bien detén el proceso java que está corriendo con la aplicación PetClinic tal y como la desplegamos en la sección anterior (```if pgrep java; then pkill java; fi```), o bien utiliza otro puerto, por ejemplo, el 80, que debe estar disponible: 
+
+[source, bash]
+----
+docker run -p 80:8080 -t --name petclinic gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0
+----
+
+==== Construcción de la imagen y despliegue del contenedor con Jenkins
+
+A continuación vamos a automatizar con Jenkins los tres procesos descritos anteriormente de forma "manual": la construcción de la imagen del contenedor, la publicación de la imagen en el registro, y el despliegue del contenedor. 
+
+Son necesarios los siguientes plugins para trabajar con docker y pipelines y con Container Registry: Docker Pipeline (que ya está instalado), https://plugins.jenkins.io/google-container-registry-auth[Google Container Registry Auth]
+
+Definimos un nuevo proyecto en Jenkins de tipo pipeline, con el nombre ```PetClinic-Docker-abc123``` sustituyendo abc123 por nuestro nombre de usuario. Son necesarios 3 fases (stages) en el pipeline: build image, push image, y deploy container.
+
+[source,groovy]
+----
+pipeline {
+  agent any 
+  environment {
+    CONTAINER_REGISTRY = 'gcr.io'
+    GOOGLE_CLOUD_PROJECT = 'cnsa-2020'
+    CREDENTIALS_ID = 'cnsa-2020-gcr'
+  }
+  tools {
+    maven "Default Maven" 
+  }
+  stages {
+    stage("Checkout code") {
+      steps {
+        // checkout scm
+        git 'https://github.com/ualcnsa/spring-petclinic.git'
+      }
+    }
+    stage('Compile, Test, Package') { 
+      steps {
+        sh "mvn clean package"
+      }
+      post { 
+        success {
+          junit '**/target/surefire-reports/TEST-*.xml'
+          archiveArtifacts 'target/*.jar'
+        }
+      }
+    }
+    stage("Build image") {
+      steps {
+        script {
+          myapp = docker.build("env.CONTAINER_REGISTRY/evn.GOOGLE_CLOUD_PROJECT/petclinic:${env.BUILD_ID}")        }
+      }
+    }
+  }
+}
+----
+
+
+
+
+
+
+
+        stage("Push image") {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+                            myapp.push("latest")
+                            myapp.push("${env.BUILD_ID}")
+                    }
+                }
+            }
+        }        
+        stage('Deploy to GKE') {
+            steps{
+                sh "sed -i 's/hello:latest/hello:${env.BUILD_ID}/g' deployment.yaml"
+                step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+            }
+        }
+    }    
+}
+
+
+
+
+Los pasos para el despliegue de la nueva imagen del contenedor actualizada consistirán:
 
 - `docker stop` del contenedor por si estuviera ejecutándose  
 - `docker rm` para eliminar la imagen existente, de una versión anterior
@@ -998,6 +1162,8 @@ docker rm $(docker ps -a -q)
 docker rmi $(docker images -q)
 ```
 ====
+
+https://stackoverflow.com/questions/54573068/pushing-docker-image-through-jenkins
 
 == Ejemplo 2. Hola mundo en NodeJs
 
