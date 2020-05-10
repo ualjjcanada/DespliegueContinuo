@@ -745,7 +745,7 @@ image::plugins-code-coverage-api-install.png[role="thumb", align="center"]
 
 [start=2]
 
-. Añade las dos siguientes linea al bloque `post` para que se guarde y muestre el informe de cobertura.
+. Añade las dos siguientes lineas al bloque `post` para que se guarde y muestre el informe de cobertura.
 
 [source,groovy]
 ----
@@ -775,7 +775,7 @@ image::plugins-jacoco-details-result.png[role="thumb", align="center"]
 
 === Análisis estático de código: __Checkstyle__
 
-Para mantener y aumentar la calidad de nuestro código debemos ayudarnos, entre otras herramientas, de técnicas de análisis estático de código. Básicamente, se encargan de buscar defectos en el código sin necesidad de que este se ejecute. En Java una de las más habituales es Checkstyle, aunque hay otras como FindBugs, PMD, y SonarQube que integra a los anteriores. 
+Para mantener y aumentar la calidad de nuestro código debemos ayudarnos, entre otras herramientas, de técnicas de https://es.wikipedia.org/wiki/An%C3%A1lisis_est%C3%A1tico_de_software[*análisis estático de código*]. Básicamente, se encargan de buscar defectos en el código sin necesidad de que este se ejecute. En Java una de las más habituales es https://checkstyle.sourceforge.io/[Checkstyle], aunque hay otras como FindBugs, PMD, y SonarQube que integra a los anteriores. 
 
 ****
 *CheckStyle* valida el estilo del código respecto al estilo oficial de Java.
@@ -812,13 +812,13 @@ Para ejecutar y visualizar el informe en Jenkins:
 
 [source,groovy]
 ----
-	stage ('Analysis') {
-      steps {
-		  // Warnings next generation plugin required
-		  sh "mvn checkstyle:checkstyle site -DgenerateReports=false"
-		  recordIssues enabledForFailure: true, tool: checkStyle() 
-	  }
-	}
+  stage ('Analysis') {
+    steps {
+      // Warnings next generation plugin required
+      sh "mvn checkstyle:checkstyle site -DgenerateReports=false"
+      recordIssues enabledForFailure: true, tool: checkStyle() 
+    }
+  }
 ----
 
 Tras la construcción, el pipeline tiene una nueva fase y además en el menú tenemos acceso al informe de CheckStyle.
@@ -836,9 +836,18 @@ Si estás interesado en profundizar en este tema, te recomiendo integrar https:/
 - https://docs.sonarqube.org/latest/setup/get-started-2-minutes/[Instalar SonarQube] como aplicación o como contenedor Docker (recomendado)
 - Instalar el plugin https://plugins.jenkins.io/sonar/[SonarQube Scanner for Jenkins]
 - https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-jenkins/#header-1[Configurar] SonarQube Scanner for Jenkins
-- https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-jenkins/#header-5[Añadir al pipeline] la fase de análisis de Sonar
+- https://docs.sonarqube.org/latest/analysis/scan/sonarscanner-for-jenkins/#header-6[Añadir al pipeline] la fase de análisis de Sonar (_Declarative pipeline example:_). Más info de Sonar en pipeline: https://www.jenkins.io/doc/pipeline/steps/sonar/#sonarqube-scanner-for-jenkins[SonarQube Scanner for Jenkins]
 
-Además, Si tu proyecto está en un repositorio público en GitHub, puedes ahorrarte tener que instalar tu propio SonarQube utilizando https://sonarcloud.io/[SonarCloud], el servicio de SonarQube en la nube (SaaS) gratuito para proyectos públicos, con el que evitas tener que instalar y mantener tu propio SonarQube. Incluso puedes configurar SonarCloud y Jenkins para que  https://blog.jdriven.com/2019/08/sonarcloud-github-pull-request-analysis-from-jenkins/[analizar los __pull request__] de tu repositorio y conocer el resultado del análisis de Sonar antes de hacer el __merge__ del pull request.
+
+Además, Si tu proyecto está en un repositorio público en GitHub, puedes ahorrarte tener que instalar tu propio SonarQube utilizando https://sonarcloud.io/[SonarCloud], el servicio de SonarQube en la nube (SaaS) gratuito para proyectos públicos, con el que evitas tener que instalar y mantener tu propio SonarQube. 
+
+Para lanzar el análisis de Sonar con maven:
+
+. Genera el login https://docs.sonarqube.org/latest/user-guide/user-token/[TOKEN]
+
+. Ejecuta los goals de maven: `clean verify sonar:sonar -Dsonar.login=$SONAR_LOGIN_TOKEN`
+
+Incluso puedes configurar SonarCloud y Jenkins para que  https://blog.jdriven.com/2019/08/sonarcloud-github-pull-request-analysis-from-jenkins/[analizar los __pull request__] de tu repositorio y conocer el resultado del análisis de Sonar antes de hacer el __merge__ del pull request.
 ****
 
 === Despliegue en la VM
@@ -1027,7 +1036,7 @@ docker push gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0
 .Lista de imágenes en Container Registry
 image::container-registry-pushed-petclinic.png[role="thumb", align="center"]
 
-La imagen ya está disponible en nuestro repositorio privado de nuestro proyecto GCP. Utilizando nuestras credenciales podremos hacer `docker pull` de dicha imagen para descargarla en cualquier sistema con el motor de docker, y ejecutarlo con `docker run`.
+La imagen del contenedor PetClinic ya está disponible en el registro privado de nuestro proyecto GCP. Utilizando nuestras credenciales podremos hacer `docker pull` de dicha imagen para descargarla en cualquier máquina con docker, y ejecutarlo con `docker run`.
 
 [source, bash]
 ----
@@ -1041,7 +1050,7 @@ Si conectas a la instancia de despliegue que creamos al principio de esta activi
 .Error de autenticación en Container Registry
 image::docker-run-petclinic-webapp-error-authentication.png[role="thumb", align="center"]
 
-Para arreglarlo, habrá que copiar en la máquina de despliegue el archivo de credenciales `.json` con premisos sobre Container Registry, una vez disponible este archivo en la instancia de despliegue ejecutar el comando `docker login` y tras ello ya si podremos hacer `docker pull` y `docker run`.
+Para arreglarlo, habrá que copiar en la máquina de despliegue el archivo de credenciales `.json` con premisos sobre Container Registry. A continuación se muestran los comandos necesarios para ello. Una vez disponible este archivo en la instancia de despliegue ejecutar el comando `docker login` y tras ello ya si podremos hacer `docker pull` y `docker run`.
 
 [source, bash]
 ----
@@ -1071,11 +1080,17 @@ docker run -p 80:8080 -t --name petclinic gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic
 
 ==== Construcción de la imagen y despliegue del contenedor con Jenkins
 
-A continuación vamos a automatizar con Jenkins los tres procesos descritos anteriormente de forma "manual": la construcción de la imagen del contenedor, la publicación de la imagen en el registro, y el despliegue del contenedor. 
+Hasta ahora hemos realizado todos los pasos manualmente. A continuación, vamos a automatizar en Jenkins todo el proceso: 
 
-Son necesarios los siguientes plugins para trabajar con docker y pipelines y con Container Registry: Docker Pipeline (que ya está instalado), https://plugins.jenkins.io/google-container-registry-auth[Google Container Registry Auth]
+- la construcción de la imagen del contenedor, 
+- la publicación de la imagen en el registro, y
+- el despliegue del contenedor. 
 
-Definimos un nuevo proyecto en Jenkins de tipo pipeline, con el nombre ```PetClinic-Docker-abc123``` sustituyendo abc123 por nuestro nombre de usuario. Son necesarios 3 fases (stages) en el pipeline: build image, push image, y deploy container.
+En Jenkins, son necesarios los siguientes plugins para trabajar con Docker y pipelines, y con Container Registry: Docker Pipeline (que ya está instalado), https://plugins.jenkins.io/google-container-registry-auth[Google Container Registry Auth].
+
+Definimos un nuevo proyecto en Jenkins de tipo pipeline, con el nombre ```PetClinic-Docker-abc123``` sustituyendo abc123 por nuestro nombre de usuario. Son necesarios 3 fases (stages) en el pipeline: _build image_, _push image_, y _deploy container_.
+
+Comenzamos por la *construcción de la imagen*:
 
 [source,groovy]
 ----
@@ -1083,7 +1098,7 @@ pipeline {
   agent any 
   environment {
     CONTAINER_REGISTRY = 'gcr.io'
-    GOOGLE_CLOUD_PROJECT = 'cnsa-2020'
+    GOOGLE_CLOUD_PROJECT = 'cnsa-2020-abc123'
     CREDENTIALS_ID = 'cnsa-2020-gcr'
   }
   tools {
@@ -1120,31 +1135,35 @@ pipeline {
 }
 ----
 
-Para probar que el contenedor se ha creado bien, añade esta fase que hace un despliegue "local" en la propia máquina de Jenkins: 
+Para probar que la imagen del contenedor se ha creado bien, añade esta fase que hace un despliegue "local" en la propia máquina de Jenkins, es decir, ejecuta un contenedor basado en la imagen que acabamos de crear: 
 
 [source,groovy]
 ----
     stage("Run image locally") {
       steps {
-        sh "docker stop petclinic || true && docker rm  petclinic || true"
-        sh "mkdir -p logs"
-        sh "nohup docker run -p 8080:8080 -t --name petclinic ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/petclinic:${env.BUILD_ID} > logs/yourservice-docker-${env.BUILD_ID}.log 2>&1 &" 
+        sh "docker stop petclinic || true && docker rm  petclinic || true" <1>
+        sh "mkdir -p logs" <2>
+        sh "nohup docker run -p 8080:8080 -t --name petclinic ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/petclinic:${env.BUILD_ID} > logs/yourservice-docker-${env.BUILD_ID}.log 2>&1 &" <3>
       }
     }
 ----
+<1> Por si ya se ha ejecutado el pipeline anteriormente, es necesario comprobar si el contenedor `petclinic` ya se está ejecutando, y en tal caso pararlo con `docker stop` y eliminarlo con `docker rm`
+<2> Crea la carpeta `logs` con el parámetro `-p` para que no falle la creación si la carpeta ya existe.
+<3> Con `docker run` ejecuta el contenedor `petclinic` a partir de la imagen recién construida. Para que  el pipeline pueda finalizar y el contenedor siga ejecutándose, se añade `nohup` y se lanza el comando en background, guardando la salida por consola en el archivo `.log`.
 
-La aplicación debe estar accesible en el puerto 8080 en tu máquina de Jenkins. Para asegurarnos que la aplicación se está ejecutando bien, lo adecuado sería realizar unos tests end-to-end, con Selenium.
+La aplicación debe estar accesible en el puerto 8080 en tu máquina de Jenkins. Para asegurarnos que la aplicación se está ejecutando bien, debemos problarlo "manualmente". Para automatizar esta prueba, lo adecuado sería realizar unos tests end-to-end, con https://www.selenium.dev[Selenium]. Esto se explicará en otra actividad, dedicada al testing.
 
 [source,groovy]
 ----
     stage('End-to-end Test image') {
-        /* Ideally, we would run some end-to-end tests against our running container.
+        // Ideally, we would run some end-to-end tests against our running container.
         steps{
             sh 'echo "End-to-end Tests passed"'
         }
     }
 ----
-El siguiente paso es publicar la imagen en el registro.
+
+El siguiente paso es *publicar la imagen* en el registro.
 
 . Primero, es necesario crear unas credenciales en Jenkins para poder hacer `push` en Container Registry:
 
@@ -1152,7 +1171,7 @@ El siguiente paso es publicar la imagen en el registro.
 
 .. _Click on “Add Credentials” in left menu._
 
-.. _Select *Google Service Account from private key* for the “Kind” field, and enter your project name ( myregistry in this example). Then upload the JSON private key.
+.. _Select *Google Service Account from private key* for the “Kind” field, and enter your project name ( myregistry in this example). Then upload the JSON private key._
 
 .Credenciales en Jenkins para Container Registry
 image::jenkins-credentials-container-registry.png[role="thumb", align="center"]
@@ -1176,32 +1195,46 @@ image::jenkins-credentials-container-registry.png[role="thumb", align="center"]
 
 Comprobar que se ha publicado correctamente en el registro.
 
-Por último, quedaría el paso de desplegar al entorno de producción. Una vez empaquetada como un contenedor, una aplicación se puede desplegar de varias formas: en máquina virtual con GCE, en plataforma como servicio con Google App Engine, en Kubernetes con GKE, y en Cloud Run, un servicio de Google Cloud específico para el despliegue de contenedores. Para nosotros es nuestra máquina virtual de despliegue es nuestro entorno de producción en el que vamos a desplegar el contenedor. 
+.Imagen publicada en Container Registry, etiquetada con el número de build
+image::jenkins-published-container-registry.png[role="thumb", align="center"]
+
+
+Por último, quedaría el paso de *desplegar al entorno de producción*. Una vez empaquetada como un contenedor, Google Cloud permite desplegar de varias formas:
+
+- en *máquina virtual* con GCE, 
+- en plataforma como servicio con *Google App Engine*,
+- en Kubernetes con *GKE*,
+- y en *Cloud Run*, un servicio de Google Cloud específico para el despliegue de contenedores. 
+
+Para nosotros, es la máquina virtual de despliegue es nuestro entorno de producción en el que vamos a desplegar el contenedor. 
 
 Los pasos para el despliegue de la nueva imagen del contenedor consistirán en ejecutar los siguientes comandos sobre la máquina de despliegue:
 
 - `docker stop` del contenedor por si estuviera ejecutándose  
-- `docker rm` para eliminar la imagen existente, de una versión anterior
-- `docker run` que automáticamente hará primero un `docker pull` de la imagen actualizada del registro. Lo lanzaremos en el puerto 80 ya que el 8080 está ocupado por el despliegue sin contenedor. 
+- `docker rm` para eliminar el contenedor existente, que puede estar basado en una imagen de una versión anterior
+- `docker run` que primero hará un `docker pull` de la imagen actualizada del registro. Lo lanzaremos en el puerto 80 ya que el 8080 está ocupado por el despliegue que hicimos sin contenedor. 
 
-Estas acciones debemos añadirlas a un `stage` del pipeline de Jenkins que se encargará de desplegar el nuevo contenedor automáticamente.
+Estas acciones debemos añadirlas a un `stage` del pipeline de Jenkins que se encargará de desplegar el nuevo contenedor automáticamente. En el siguiente código, sustituye `DNS_DEPLOY_INSTANCE` por el nombre DNS de tu instancia de depliegue. También puedes definirla como una variable de entorno al inicio del pipeline.
 
 [source,groovy]
 ----
     stage('Deploy to Production') {
       steps{
         sh '''
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@webapps.mastertaiiual.tech "mkdir -p  ~/logs"
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@webapps.mastertaiiual.tech " if docker ps -q --filter name=petclinic | grep . ; then docker stop petclinic && docker rm -fv petclinic; fi"
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@webapps.mastertaiiual.tech "nohup docker run -p 80:8080 -t --name petclinic ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/petclinic:latest  > logs/yourservice-docker.log 2>&1 &"
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "mkdir -p  ~/logs" <1>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE " if docker ps -q --filter name=petclinic | grep . ; then docker stop petclinic && docker rm -fv petclinic; fi" <2>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "nohup docker run -p 80:8080 -t --name petclinic ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/petclinic:latest  > logs/yourservice-docker.log 2>&1 &" <3>
         '''
       }
     }    
 ----
-
+<1> Ejecuta en la instancia de despliegue el comando para crear la carpeta `logs` si esta no existe
+<2> Ejecuta en la instancia de despliegue el comando que detiene y elimina el contenedor `petclinic` en caso de que ya se estuviera ejecutando 
+<3> Ejecuta en la instancia de despliegue el comando para ejecutar el contenedor basado en la última versión de la imagen, lanzándolo en background y con `nohup` para que el pipeline finalice y el contenedor permanezca en ejecución.
 
 [TIP]
 ====
+Algunos comando útiles de docker:
 ```
 # Remove all stopped containers
 docker rm $(docker ps -a -q)
@@ -1210,18 +1243,42 @@ docker rmi $(docker images -q)
 ```
 ====
 
-Por último, es una buena práctica eliminar las imágenes que se van generando en cada build. Primero paramos y eliminamos el contenedor local, luego eliminamos la imagen.
+La aplicación PetClinic debe estar accesible _en producción_, en el puerto 8080 en la instancia de despliegue. Para asegurarnos, debemos problarlo "manualmente". Para automatizar esta prueba _en producción_, lo adecuado de nuevo sería realizar unos tests end-to-end, con https://www.selenium.dev[Selenium]. Esto se explicará en otra actividad, dedicada al testing.
+
+[source,groovy]
+----
+    stage('End-to-end Test on Production') {
+        // Ideally, we would run some end-to-end tests against our running container.
+        steps{
+            sh 'echo "End-to-end Tests passed on Production"'
+        }
+    }
+----
+
+Por último, es una buena práctica eliminar las imágenes que se van generando en cada build, para liberar espacio en la máquina de Jenkins. Primero paramos y eliminamos el contenedor local, luego eliminamos la imagen.
 
 [source,groovy]
 ----
     stage('Remove Unused docker image') {
       steps{
-        // input message:"Proceed with removing image locally?"
-        sh 'if docker ps -q --filter name=petclinic | grep . ; then docker stop petclinic && docker rm -fv petclinic; fi'
-        sh 'docker rmi ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/petclinic:$BUILD_NUMBER'
+        // input message:"Proceed with removing image locally?" <1>
+        sh 'if docker ps -q --filter name=petclinic | grep . ; then docker stop petclinic && docker rm -fv petclinic; fi' <2>
+        sh 'docker rmi ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/petclinic:$BUILD_NUMBER' <3>
       }
     }
 ----
+<1> Pide confirmación al usuario, que tendrán que pulsar un botón de _Proceed_ para continuar la ejecución del pipeline
+<2> Para y elimina el contenedor _local_ 
+<3> Elimina la imagen de contenedor en _local_ con `docker rmi` para liberar espacio.
+
+.Input message (paso comentado en el ejemplo)
+image::jenkins-petclinic-full-pipeline-proceed.png[role="thumb", align="center"]
+
+El pipeline completo, con todas sus fases, debe quedar así:
+
+.Pipeline completo
+image::jenkins-petclinic-full-pipeline.png[role="thumb", align="center"]
+
 
 ****
 Referencias
@@ -1229,17 +1286,22 @@ Referencias
 . https://stackoverflow.com/questions/54573068/pushing-docker-image-through-jenkins
 ****
 
-== Ejemplo 2. Hola mundo en NodeJs
+== Ejemplo 2. _Hola mundo_ en NodeJs
 
-Nos vamos a basar en el proyecto HelloWorld en NodeJs, disponible en https....
+A continuación se muestra un ejemplo de *construcción y despliegue en Jenkins de un proyecto NodeJs*. Nos vamos a basar en el proyecto _HelloWorld_ en NodeJs, disponible en https....
+Los pasos a realizar son similares al ejemplo anterior con Java, el decir, el pipeline tendrá las mismas fases; eso si, adaptaremos las ordenes o comandos a ejecutar, ya que ahora se trata de un proyecto NodeJs en lugar de Java-Maven.
 
 === Creación de proyecto Jenkins con pipelines
 
 Configuramos el Pipeline.
 
+=== Informe de cobertura
+
+=== Análisis estático de código 
+
 === Despliegue en la VM
 
-=== Deploy en un Docker container
+=== Deploy en un contenedor Docker
 
 
 
