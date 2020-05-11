@@ -204,6 +204,31 @@ Guardamos los cambios. Tras un par de ejecuciones del build, se visualiza el gr�
 .Publicado el gráfico de tendencia de los test
 image::jenkins-nodeapp-pipeline-test-result-trend.png[role="thumb", align="center"]
 
+.*Webhook*: ejecución automática del build en Jenkins tras un push en GitHub
+****
+Configura en GitHub un nuevo _Webhook_ para que tras cada cambio de código en el repositorio, Jenkins sea notificado y lance la construcción del pipeline:
+
+. En GitHub, seleccionamos el repositorio sobre el que queremos activar la construcción en Jenkins y hacemos clic en: _Settings > WebHooks > Add webhook_
+
+. En Payload URL:
+
+    http://{YOUR_JENKINS_URL}/github-webhook/
+
+.Nuevo Webhook
+image::jenkins-webhook-github.png[role="thumb", align="center"]
+
+[start=3]
+. Finalmente, en la configuración del proyecto en Jenkins, en la sección Build Trigers, marca la opción _GitHub hook tirigger from GITScm polling_
+
+.Activar el Webhook en build trigers
+image::jenkins-webhook-build-triger.png[role="thumb", align="center"]
+
+
+A partir de ahora, cuando el repositorio en GitHub reciba un push notificará a Jenkins para que lance la construcción automáticamente. 
+
+****
+
+
 
 === Informe de cobertura
 
@@ -295,6 +320,8 @@ image::maven-script-console-site.png[role="thumb", align="center"]
 
 Tras ello ya podrás visualizar correctamente. Pero ten en cuenta que cada vez que reinicies Jenkins esta configuración  se pierde y vuelve a la configuración predeterminada. 
 
+
+
 === Análisis estático de código 
 
 El código JavaScript es dinámicamente tipado, por lo que en lugar de usar el compilador para realizar el análisis estático de código, como ocurre en lenguajes como Java, las formas más comunes de https://medium.com/codecademy-engineering/static-analysis-in-javascript-a-technical-introduction-859de5d444a6[análisis estático en JavaScript] son _formatters_ y _linters_.
@@ -368,7 +395,7 @@ El parámetro `-s` se utiliza para que no muestre mensajes de error. Habrá gene
             recordIssues enabledForFailure: true,
                 blameDisabled: true,
                 tools: [esLint(pattern: '**/eslint-result.xml')],
-                qualityGates: [[threshold: 10, type: 'NEW']]
+                qualityGates: [[threshold: 1, type: 'NEW']]
         }
       }
     }
@@ -382,12 +409,15 @@ El parámetro `-s` se utiliza para que no muestre mensajes de error. Habrá gene
 image::eslint-jenkins-link.png[role="thumb", align="center"]
 
 [start=7]
-. La fase de análisis falla (está en rojo) porque cuando ESLint detecta un error, hace que falle. Si te fijas, los 2 errores detectados han sido en el test (y pueden ser falsos positivos). Para evitarlo, elimina `test/*.js` del script `lint` en `package.json`.
+. La fase de análisis falla (está en rojo) porque cuando ESLint detecta un error, finaliza con error (`EXIT 1`). Si te fijas en el informe, los 2 errores detectados han sido en el archivo `test.js` (y pueden ser falsos positivos). Para evitarlo, elimina `test/*.js` del script `lint` en `package.json`.
+
+Tras ello, la nueva ejecución del pipeline se ejecutará correctamente. 
 
 .Fase _ESLint_ _passed_
 image::eslint-jenkins-pass-grapth.png[role="thumb", align="center"]
 
 === Despliegue en la VM
+
 
 === Deploy en un contenedor Docker
 
