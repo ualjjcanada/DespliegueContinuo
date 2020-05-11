@@ -2888,6 +2888,51 @@ docker rmi $(docker images -q)</code></pre>
 </div>
 <div class="title">Fig. 63. Publicado el gráfico de tendencia de los test</div>
 </div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title"><strong>Webhook</strong>: ejecución automática del build en Jenkins tras un push en GitHub</div>
+<div class="paragraph">
+<p>Configura en GitHub un nuevo <em>Webhook</em> para que tras cada cambio de código en el repositorio, Jenkins sea notificado y lance la construcción del pipeline:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>En GitHub, seleccionamos el repositorio sobre el que queremos activar la construcción en Jenkins y hacemos clic en: <em>Settings &gt; WebHooks &gt; Add webhook</em></p>
+</li>
+<li>
+<p>En Payload URL:</p>
+<div class="literalblock">
+<div class="content">
+<pre>http://{YOUR_JENKINS_URL}/github-webhook/</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-webhook-github.png" alt="jenkins webhook github">
+</div>
+<div class="title">Fig. 64. Nuevo Webhook</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="3">
+<li>
+<p>Finalmente, en la configuración del proyecto en Jenkins, en la sección Build Trigers, marca la opción <em>GitHub hook tirigger from GITScm polling</em></p>
+</li>
+</ol>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-webhook-build-triger.png" alt="jenkins webhook build triger">
+</div>
+<div class="title">Fig. 65. Activar el Webhook en build trigers</div>
+</div>
+<div class="paragraph">
+<p>A partir de ahora, cuando el repositorio en GitHub reciba un push notificará a Jenkins para que lance la construcción automáticamente.</p>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_informe_de_cobertura">6.2. Informe de cobertura</h3>
@@ -2928,7 +2973,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/node-mocha-coverage-jenkins-ok.png" alt="node mocha coverage jenkins ok">
 </div>
-<div class="title">Fig. 64. Ejecución de cobertura</div>
+<div class="title">Fig. 66. Ejecución de cobertura</div>
 </div>
 <div class="paragraph">
 <p>Como resultado, en la carpeta <code>coverage</code> del proyecto se ha generado el informe de cobertura.</p>
@@ -2937,13 +2982,13 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/node-mocha-coverage-results.png" alt="node mocha coverage results" width="160">
 </div>
-<div class="title">Fig. 65. Informe de cobertura</div>
+<div class="title">Fig. 67. Informe de cobertura</div>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
 <img src="images/node-mocha-coverage-index.png" alt="node mocha coverage index">
 </div>
-<div class="title">Fig. 66. Informe de cobertura en html</div>
+<div class="title">Fig. 68. Informe de cobertura en html</div>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -3007,7 +3052,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/jenkins-node-coverage-report-link.png" alt="jenkins node coverage report link">
 </div>
-<div class="title">Fig. 67. Enlace al informe de cobertura en html</div>
+<div class="title">Fig. 69. Enlace al informe de cobertura en html</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="3">
@@ -3026,7 +3071,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/maven-script-console-site.png" alt="maven script console site">
 </div>
-<div class="title">Fig. 68. Script Console: permisos para visualizar el informe de cobertura</div>
+<div class="title">Fig. 70. Script Console: permisos para visualizar el informe de cobertura</div>
 </div>
 <div class="paragraph">
 <p>Tras ello ya podrás visualizar correctamente. Pero ten en cuenta que cada vez que reinicies Jenkins esta configuración  se pierde y vuelve a la configuración predeterminada.</p>
@@ -3077,7 +3122,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/eslint-init.png" alt="eslint init">
 </div>
-<div class="title">Fig. 69. ESLint init</div>
+<div class="title">Fig. 71. ESLint init</div>
 </div>
 <div class="paragraph">
 <p>Se habrá creado un archivo <code>.eslintrc.json</code>, que incluirá esta línea:</p>
@@ -3153,7 +3198,7 @@ docker rmi $(docker images -q)</code></pre>
             <span class="n">recordIssues</span> <span class="nl">enabledForFailure:</span> <span class="kc">true</span><span class="o">,</span>
                 <span class="nl">blameDisabled:</span> <span class="kc">true</span><span class="o">,</span>
                 <span class="nl">tools:</span> <span class="o">[</span><span class="n">esLint</span><span class="o">(</span><span class="nl">pattern:</span> <span class="s1">'**/eslint-result.xml'</span><span class="o">)],</span>
-                <span class="nl">qualityGates:</span> <span class="o">[[</span><span class="nl">threshold:</span> <span class="mi">10</span><span class="o">,</span> <span class="nl">type:</span> <span class="s1">'NEW'</span><span class="o">]]</span>
+                <span class="nl">qualityGates:</span> <span class="o">[[</span><span class="nl">threshold:</span> <span class="mi">1</span><span class="o">,</span> <span class="nl">type:</span> <span class="s1">'NEW'</span><span class="o">]]</span>
         <span class="o">}</span>
       <span class="o">}</span>
     <span class="o">}</span></code></pre>
@@ -3170,20 +3215,23 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/eslint-jenkins-link.png" alt="eslint jenkins link">
 </div>
-<div class="title">Fig. 70. Enlace al informe <em>ESLint</em></div>
+<div class="title">Fig. 72. Enlace al informe <em>ESLint</em></div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="7">
 <li>
-<p>La fase de análisis falla (está en rojo) porque cuando ESLint detecta un error, hace que falle. Si te fijas, los 2 errores detectados han sido en el test (y pueden ser falsos positivos). Para evitarlo, elimina <code>test/*.js</code> del script <code>lint</code> en <code>package.json</code>.</p>
+<p>La fase de análisis falla (está en rojo) porque cuando ESLint detecta un error, finaliza con error (<code>EXIT 1</code>). Si te fijas en el informe, los 2 errores detectados han sido en el archivo <code>test.js</code> (y pueden ser falsos positivos). Para evitarlo, elimina <code>test/*.js</code> del script <code>lint</code> en <code>package.json</code>.</p>
 </li>
 </ol>
+</div>
+<div class="paragraph">
+<p>Tras ello, la nueva ejecución del pipeline se ejecutará correctamente.</p>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
 <img src="images/eslint-jenkins-pass-grapth.png" alt="eslint jenkins pass grapth">
 </div>
-<div class="title">Fig. 71. Fase <em>ESLint</em> <em>passed</em></div>
+<div class="title">Fig. 73. Fase <em>ESLint</em> <em>passed</em></div>
 </div>
 </div>
 <div class="sect2">
@@ -3218,7 +3266,7 @@ docker rmi $(docker images -q)</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-11 03:31:25 +0200
+Last updated 2020-05-11 14:56:17 +0200
 </div>
 </div>
 <style>
