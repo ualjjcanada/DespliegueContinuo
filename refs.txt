@@ -35,4 +35,5 @@ https://docs.bitnami.com/tutorials/create-ci-cd-pipeline-jenkins-gke/
  - Jenkins docker with docker agents
 
 
+Hello NodeJs Jenkins pipelines: 
  https://tutorials.releaseworksacademy.com/learn/building-your-first-docker-image-with-jenkins-2-guide-for-developers

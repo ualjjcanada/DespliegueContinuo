@@ -1283,26 +1283,13 @@ image::jenkins-petclinic-full-pipeline.png[role="thumb", align="center"]
 ****
 Referencias
 
-. https://stackoverflow.com/questions/54573068/pushing-docker-image-through-jenkins
+. Deploy via ssh: https://medium.com/@weblab_tech/how-to-publish-artifacts-in-jenkins-f021b17fde71[How to build on Jenkins and publish artifacts via ssh with Pipelines] @ Medium 
+
+
+. https://medium.com/@gustavo.guss/jenkins-building-docker-image-and-sending-to-registry-64b84ea45ee9[Jenkins Building Docker Image and Sending to Registry] @ Medium
+
+. https://stackoverflow.com/questions/54573068/pushing-docker-image-through-jenkins[Pushing docker image through jenkins] @ StackOverflow
+
 ****
 
-== Ejemplo 2. _Hola mundo_ en NodeJs
-
-A continuación se muestra un ejemplo de *construcción y despliegue en Jenkins de un proyecto NodeJs*. Nos vamos a basar en el proyecto _HelloWorld_ en NodeJs, disponible en https....
-Los pasos a realizar son similares al ejemplo anterior con Java, el decir, el pipeline tendrá las mismas fases; eso si, adaptaremos las ordenes o comandos a ejecutar, ya que ahora se trata de un proyecto NodeJs en lugar de Java-Maven.
-
-=== Creación de proyecto Jenkins con pipelines
-
-Configuramos el Pipeline.
-
-=== Informe de cobertura
-
-=== Análisis estático de código 
-
-=== Despliegue en la VM
-
-=== Deploy en un contenedor Docker
-
-
-
-
+include::node-example.adoc[]

@@ -1,0 +1,379 @@
+////
+Codificación, idioma, tabla de contenidos, tipo de documento
+////
+:encoding: utf-8
+:lang: es
+:toc: right
+:toc-title: Tabla de contenidos
+:keywords: CI/CD Jenkins Pipelines NodeJs Docker KeystoneJs
+:doctype: book
+:icons: font
+
+////
+/// activar btn:
+////
+:experimental:
+
+:source-highlighter: rouge
+:rouge-linenums-mode: inline
+
+// :highlightjsdir: ./highlight
+
+:figure-caption: Fig.
+:imagesdir: images
+
+
+
+== Ejemplo 2. _Hola mundo_ en NodeJs
+
+A continuación se muestra un ejemplo de *construcción y despliegue en Jenkins de un proyecto NodeJs*. Los pasos a realizar son similares al ejemplo anterior con Java, el decir, el pipeline tendrá las mismas fases; eso si, adaptaremos las ordenes o comandos a ejecutar, ya que ahora se trata de un proyecto NodeJs en lugar de Java-Maven.
+
+Para cada cambio de código en el repositorio de la app, Jenkins será notificado y descargará los cambios en el servidor Jenkins, instalará las dependencias y ejecutará los tests. Si los tests pasan, Jenkins desplegará la aplicación en el servidor de despliegue. Y si fallan, se notificará al desarrollador.
+
+Nos vamos a basar en  el proyecto _HelloWorld_ en NodeJs, disponible en https://github.com/ualcnsa/nodeapp.
+
+Veamos los archivos que componen la aplicación: 
+
+. El archivo `package.json` contienen información básica de la aplicación y las dependencias: 
+
+- *express*: Node framework
+- *mocha*: framework de testing para node (Se podría haber elegido otro framework de testiong como Jasmin, Jest, Tape etc.)
+- *supertest*: Proporciona abstracción a alto nivel para testing HTTP
+
+[source,json]
+.package.json
+----
+{
+   "name": "node-app",
+   "description": "hello jenkins test app",
+   "version": "0.0.1",
+   "private": true,
+   "directories": {
+      "test": "test"
+    },
+    "scripts": {
+      "test": "mocha"
+    },
+   "dependencies": {
+      "express": "^4.17.1"
+   },
+   "devDependencies": {
+      "mocha": "^7.1.1",
+      "supertest": "^4.0.2"
+   }
+}
+----
+
+Para instalar las dependencias ejecuta `npm install`.
+
+[start=2]
+. El archivo raiz del proyecto `index.js`
+
+[source,js]
+.index.js
+----
+//importing node framework
+var express = require('express');
+ 
+var app = express();//Respond with "hello world" for requests that hit our root "/"
+
+app.get('/', function (req, res) {
+ res.send('hello world');
+});//listen to port 3000 by default
+app.listen(process.env.PORT || 3000);
+ 
+module.exports = app;
+----
+
+Para ejecutar la aplicación, ejecuta: `node index.js`
+
+Puedes ver la aplicación en el navegador accediendo a http://localhost:3000[http://localhost:3000]
+
+*Primer test*
+
+Nuestro primer test va a navegar a la raiz de la aplicación (`/`) y verifiar qeu la página responde con el texto `hello world`.
+
+Se guardará en la carpeta `/test/` con el nombre `test.js`. 
+
+[source,js]
+.test/test.js
+----
+var request = require('supertest');
+var app = require('../index.js');describe('GET /', function() {
+ it('respond with hello world', function(done) { //navigate to root and check the the response is "hello world"
+ request(app).get('/').expect('hello world', done);
+ });
+});
+----
+
+Para ejecutar el test: `npm test`
+
+.npm test
+image::node-mocha-passed.png[role="thumb", align="center"]
+
+=== Creación de proyecto Jenkins con pipelines
+
+Definimos un nuevo proyecto tipo Pipeline. Añadimos la descripción del pipeline:
+
+[source,groovy]
+----
+pipeline {
+  agent any
+    
+  tools {
+    // In Global tools configuration, install Node configured as "nodejs 13"
+    nodejs "nodejs 13"
+  }
+    
+  stages {
+        
+    stage('Cloning Git') {
+      steps {
+        git 'https://github.com/ualcnsa/nodeapp'
+      }
+    }
+        
+    stage('Install dependencies') {
+      steps {
+        sh 'npm install'
+      }
+    }
+     
+    stage('Test') {
+      steps {
+         sh 'npm test'
+      }
+    }      
+  }
+}
+----
+
+El resultado sera:
+
+.Nodeapp pipeline
+image::jenkins-node-pipeline1.png[role="thumb", align="center"]
+
+Vamos a *publicar los resultados de los test* en un gráfico. 
+
+. Editamos `package.json` y añadimos el script `test-jenkins`para generar los resultados de los test que usará Jenkins, y la dependencia para ello:
+
+[source,json]
+.package.json: jenkins-test y dependencia mocha-junit-reporter
+----
+   ... 
+   "scripts": {
+      "test": "mocha --exit",
+      "test-jenkins": "mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./coverage/test.results.xml --exit" <1>
+   },
+   ...
+   "devDependencies": {
+      "mocha": "^7.1.1",
+      "supertest": "^4.0.2",
+      "mocha-junit-reporter":"1.23.3"  <2>
+   }
+----
+<1> Añadimos el script `test-jenkins` que define cómo ejecutar los tests y generar los resultados de los test en formato xml, en el archivo `./coverage/test.results.xml`
+<2> Dependencia a `mocha-junit-reporter` que permite generar los resultados de los test en xml.
+
+Podemos probar en local, llamamos a la ejecución de los test y generación del xml: `npm run test-jenkins`. 
+
+[TIP]
+====
+Añade al `.gitignore` la carpeta `/coverage`, ya que su contenido se generará al lanzar los tests.
+====
+
+[start=2]
+. Actualizamos el pipeline, la fase test:
+
+[source,groovy]
+----    
+    stage('Test') {
+      steps {
+         sh 'npm run test-jenkins'
+      }
+      post { 
+        success {
+          junit '**/test*.xml'
+        }
+      }
+    }      
+----
+
+Guardamos los cambios. Tras un par de ejecuciones del build, se visualiza el gráfico Test Result Trend:
+
+.Publicado el gráfico de tendencia de los test
+image::jenkins-nodeapp-pipeline-test-result-trend.png[role="thumb", align="center"]
+
+
+=== Informe de cobertura
+
+Como ya sabemos, la cobertura de código nos va a ofrecer un valor directamente relacionado con la calidad de los juegos de prueba. Para obtener la cobertura y publicarla en Jenkins, debemos hacer: 
+
+- Añadir a `package.json` un script para cobertura y la dependencia a https://istanbul.js.org/[IstanbulJS], que permite obtener la cobertura con Mocha 
+
+- Modificar la fase _Test_ de Jenkins para que llame al script de cobertura y publique, en el bloque `post`, el informe de cobertura generado.
+
+1.Modifica `package.json`, añadiendo el nuevo script
+
+[source,json]
+.package.json: cobertura y dependencia a IstanbulJS
+----
+   "scripts": {
+      ...
+      "coverage-jenkins": "nyc --reporter=html --reporter=text  mocha  --reporter mocha-junit-reporter --reporter-options mochaFile=./coverage/test.results.xml --timeout=3000 --exit"
+   },
+   ...
+      "devDependencies": {
+      ...
+      "nyc": "^15.0.1"
+   }
+----
+
+Podemos probar en local, llamamos a la ejecución del script: `npm run coverage-jenkins`. 
+
+.Ejecución de cobertura
+image::node-mocha-coverage-jenkins-ok.png[role="thumb", align="center"]
+
+Como resultado, en la carpeta `coverage` del proyecto se ha generado el informe de cobertura.
+
+.Informe de cobertura
+image::node-mocha-coverage-results.png[role="thumb", align="center", width=160]
+
+.Informe de cobertura en html
+image::node-mocha-coverage-index.png[role="thumb", align="center"]
+
+
+[TIP]
+====
+Añade al `.gitignore` la carpeta `/.nyc_output`, ya que su contenido se generará al lanzar la cobertura.
+====
+
+[start=2]
+. Modifica el pipeline de Jenkins, la fase `Test`:
+
+[source,groovy]
+----    
+    stage('Test') {
+      steps {
+         sh 'npm run coverage-jenkins' <1>
+      }
+      post { 
+        success {
+          junit '**/test*.xml'
+          publishHTML target: [ <2>
+            allowMissing          : false,
+            alwaysLinkToLastBuild : false,
+            keepAll               : true,
+            reportDir             : './coverage/',
+            reportFiles           : 'index.html',
+            reportName            : 'Coverage Report'
+          ]
+        }
+      }    
+    }
+
+----
+<1> Llama al nuevo script
+<2> Publica el informe de cobertura
+
+El resultado en Jenkins, debe aparece un enlace nuevo en el menú de la izquierda: 
+
+.Enlace al informe de cobertura en html
+image::jenkins-node-coverage-report-link.png[role="thumb", align="center"]
+
+[start=3]
+. Para poder visualizar correctamente el _Coverage Report_, hay que cambiar la https://wiki.jenkins.io/display/JENKINS/Configuring+Content+Security+Policy#ConfiguringContentSecurityPolicy-TheDefaultRuleSet[configuración de seguridad] de Jenkins predeterminada, que es muy restrictiva para prevenir de archivos HTML/JS maliciosos. Para modificar la configuración, abre la consola de scritps (_Manage Jenkins / Script Console_), y ejecuta estas líneas: 
+
+[source,groovy]
+----
+System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "sandbox; default-src 'none'; img-src 'self'; style-src 'self' 'unsafe-inline'; ")
+System.getProperty("hudson.model.DirectoryBrowserSupport.CSP")
+----
+
+.Script Console: permisos para visualizar el informe de cobertura
+image::maven-script-console-site.png[role="thumb", align="center"]
+
+Tras ello ya podrás visualizar correctamente. Pero ten en cuenta que cada vez que reinicies Jenkins esta configuración  se pierde y vuelve a la configuración predeterminada. 
+
+=== Análisis estático de código 
+
+El código JavaScript es dinámicamente tipado, por lo que en lugar de usar el compilador para realizar el análisis estático de código, como ocurre en lenguajes como Java, las formas más comunes de https://medium.com/codecademy-engineering/static-analysis-in-javascript-a-technical-introduction-859de5d444a6[análisis estático en JavaScript] son _formatters_ y _linters_.
+
+- _Formatters_ o formateadores, escanean y reformatean rápidamente los archivos de código. Uno de los más populares es https://prettier.io/[Prettier], que como cualquier buen formateador, corregirá automaticamente las inconsistencias que encuentre.
+
+- _Linters_ pueden trabajar en aspectos de formato pero sobre todo en otros problemas más complejos. Se basan en una serie de reglas para escanear el código, o descripciones de comportamientos a vigilar, y muestran todas las violaciones que encuentran. El más popular para JavaScript es https://eslint.org/[ESLint]
+
+Vamos a probar *ESLint*. 
+
+. Instala con npm: 
+
+  npm install eslint --save-dev
+
+. A continuación, inicializa un archivo de configuración: 
+
+  npx eslint --init
+
+Y responde a las preguntas: 
+
+.ESLint init
+image::eslint-init.png[role="thumb", align="center"]
+
+Se habrá creado un archivo `.eslintrc.json`, que incluirá esta línea: 
+
+[source,groovy]
+----
+{
+    "extends": "eslint:recommended" <1>
+}
+----
+<1> Habilita las https://eslint.org/docs/rules/[reglas predeterminadas]
+
+
+. Añade a `package.json` un script para `lint` y la dependencia a ESLint
+ 
+[source,json]
+.package.json: lint y dependencia a ESLint
+----
+   "scripts": {
+      ...
+      "lint": "eslint *.js test/*.js -f checkstyle -o coverage/eslint-result.xml "
+   },
+   ...
+   "devDependencies": {
+      ...
+      "eslint": "^7.0.0"
+   }
+   ...
+----
+
+[start=2]
+. Lanzaló en local: 
+
+    npm run lint -s
+
+El parámetro `-s` se utiliza para que no muestre mensajes de error. Habrá generado el archivo `coverage/eslint-result.xml`.
+
+[start=3]
+. En Jenkins, añade una nueva fase `Analysis` en el pipeline, en la que llames a `lint` y publiques el informe con el formato _CheckStyle_.
+
+[source,groovy]
+----
+    
+----
+
+
+=== Despliegue en la VM
+
+=== Deploy en un contenedor Docker
+
+
+****
+Referencias
+
+. https://medium.com/@gustavo.guss/jenkins-starting-with-pipeline-doing-a-node-js-test-72c6057b67d4[Jenkins Starting with Pipeline doing a Node.js test] @ Medium
+
+. https://tutorials.releaseworksacademy.com/learn/building-your-first-docker-image-with-jenkins-2-guide-for-developers[Building your first Docker image with Jenkins] @  Releaseworks Academy Tutorials 
+
+. https://medium.com/@mosheezderman/how-to-set-up-ci-cd-pipeline-for-a-node-js-app-with-jenkins-c51581cc783c[https://medium.com/@mosheezderman/how-to-set-up-ci-cd-pipeline-for-a-node-js-app-with-jenkins-c51581cc783c] @ Medium
+
+****
