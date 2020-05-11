@@ -3109,7 +3109,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="json"><span class="w">   </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="err">...</span><span class="w">
-      </span><span class="nl">"lint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eslint *.js test/*.js -f checkstyle -o coverage/checkstyle-result.xml "</span><span class="w">
+      </span><span class="nl">"lint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eslint *.js -f checkstyle -o coverage/eslint-result.xml"</span><span class="w">
    </span><span class="p">}</span><span class="err">,</span><span class="w">
    </span><span class="err">...</span><span class="w">
    </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
@@ -3120,7 +3120,7 @@ docker rmi $(docker images -q)</code></pre>
 </div>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="2">
+<ol class="arabic" start="4">
 <li>
 <p>Lanzaló en local:</p>
 <div class="literalblock">
@@ -3135,7 +3135,7 @@ docker rmi $(docker images -q)</code></pre>
 <p>El parámetro <code>-s</code> se utiliza para que no muestre mensajes de error. Habrá generado el archivo <code>coverage/eslint-result.xml</code>.</p>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="3">
+<ol class="arabic" start="5">
 <li>
 <p>En Jenkins, añade una nueva fase <code>Analysis</code> en el pipeline, en la que llames a <code>lint</code> y publiques el informe con el formato <em>CheckStyle</em>.</p>
 </li>
@@ -3159,8 +3159,12 @@ docker rmi $(docker images -q)</code></pre>
     <span class="o">}</span></code></pre>
 </div>
 </div>
-<div class="paragraph">
+<div class="olist arabic">
+<ol class="arabic" start="6">
+<li>
 <p>El enlace al informe de ESLint no aparece en la página principal del proyecto, en el menú de enlaces, sino que tienes que hacer clic en el número del último build, y en la nueva página ya aparece el enlace:</p>
+</li>
+</ol>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
@@ -3168,8 +3172,12 @@ docker rmi $(docker images -q)</code></pre>
 </div>
 <div class="title">Fig. 70. Enlace al informe <em>ESLint</em></div>
 </div>
-<div class="paragraph">
+<div class="olist arabic">
+<ol class="arabic" start="7">
+<li>
 <p>La fase de análisis falla (está en rojo) porque cuando ESLint detecta un error, hace que falle. Si te fijas, los 2 errores detectados han sido en el test (y pueden ser falsos positivos). Para evitarlo, elimina <code>test/*.js</code> del script <code>lint</code> en <code>package.json</code>.</p>
+</li>
+</ol>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
@@ -3210,7 +3218,7 @@ docker rmi $(docker images -q)</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-11 03:28:09 +0200
+Last updated 2020-05-11 03:31:25 +0200
 </div>
 </div>
 <style>
