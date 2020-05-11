@@ -721,15 +721,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li>
 <p>Modificar la fase <em>Test</em> de Jenkins para que llame al script de cobertura y publique, en el bloque <code>post</code>, el informe de cobertura generado.</p>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Modifica <code>package.json</code>, añadiendo el nuevo script</p>
-</li>
-</ol>
-</div>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>1.Modifica <code>package.json</code>, añadiendo el nuevo script</p>
 </div>
 <div class="listingblock">
 <div class="title">package.json: cobertura y dependencia a IstanbulJS</div>
@@ -784,9 +780,59 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </table>
 </div>
 <div class="olist arabic">
-<ol class="arabic">
+<ol class="arabic" start="2">
 <li>
-<p>Para poder visualizar correctamente el <em>Coverage Report</em>, hay que cambiar la <a href="https://wiki.jenkins.io/display/JENKINS/Configuring+Content+Security+Policy#ConfiguringContentSecurityPolicy-TheDefaultRuleSet">configuración de seguridad</a> de Jenkins predeterminada que es muy restrictiva para prevenir de archivos HTML/JS maliciosos. Para modificar la configuración, abre la consola de scritps (<em>Manage Jenkins / Script Console</em>), y ejecuta estas líneas:</p>
+<p>Modifica el pipeline de Jenkins, la fase <code>Test</code>:</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy">    <span class="n">stage</span><span class="o">(</span><span class="s1">'Test'</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">steps</span> <span class="o">{</span>
+         <span class="n">sh</span> <span class="s1">'npm run coverage-jenkins'</span> <i class="conum" data-value="1"></i><b>(1)</b>
+      <span class="o">}</span>
+      <span class="n">post</span> <span class="o">{</span>
+        <span class="n">success</span> <span class="o">{</span>
+          <span class="n">junit</span> <span class="s1">'**/test*.xml'</span>
+          <span class="n">publishHTML</span> <span class="nl">target:</span> <span class="o">[</span> <i class="conum" data-value="2"></i><b>(2)</b>
+            <span class="n">allowMissing</span>          <span class="o">:</span> <span class="kc">false</span><span class="o">,</span>
+            <span class="n">alwaysLinkToLastBuild</span> <span class="o">:</span> <span class="kc">false</span><span class="o">,</span>
+            <span class="n">keepAll</span>               <span class="o">:</span> <span class="kc">true</span><span class="o">,</span>
+            <span class="n">reportDir</span>             <span class="o">:</span> <span class="s1">'./coverage/'</span><span class="o">,</span>
+            <span class="n">reportFiles</span>           <span class="o">:</span> <span class="s1">'index.html'</span><span class="o">,</span>
+            <span class="n">reportName</span>            <span class="o">:</span> <span class="s1">'Coverage Report'</span>
+          <span class="o">]</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Llama al nuevo script</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Publica el informe de cobertura</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>El resultado en Jenkins, debe aparece un enlace nuevo en el menú de la izquierda:</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/jenkins-node-coverage-report-link.png" alt="jenkins node coverage report link">
+</div>
+<div class="title">Fig. 7. Enlace al informe de cobertura en html</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="3">
+<li>
+<p>Para poder visualizar correctamente el <em>Coverage Report</em>, hay que cambiar la <a href="https://wiki.jenkins.io/display/JENKINS/Configuring+Content+Security+Policy#ConfiguringContentSecurityPolicy-TheDefaultRuleSet">configuración de seguridad</a> de Jenkins predeterminada, que es muy restrictiva para prevenir de archivos HTML/JS maliciosos. Para modificar la configuración, abre la consola de scritps (<em>Manage Jenkins / Script Console</em>), y ejecuta estas líneas:</p>
 </li>
 </ol>
 </div>
@@ -800,19 +846,157 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <img src="images/maven-script-console-site.png" alt="maven script console site">
 </div>
-<div class="title">Fig. 7. Script Console: permisos para visualizar el informe de cobertura</div>
+<div class="title">Fig. 8. Script Console: permisos para visualizar el informe de cobertura</div>
 </div>
-<div class="olist arabic">
-<ol class="arabic" start="13">
-<li>
+<div class="paragraph">
 <p>Tras ello ya podrás visualizar correctamente. Pero ten en cuenta que cada vez que reinicies Jenkins esta configuración  se pierde y vuelve a la configuración predeterminada.</p>
-</li>
-</ol>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_análisis_estático_de_código">Análisis estático de código</h3>
-
+<div class="paragraph">
+<p>El código JavaScript es dinámicamente tipado, por lo que en lugar de usar el compilador para realizar el análisis estático de código, como ocurre en lenguajes como Java, las formas más comunes de <a href="https://medium.com/codecademy-engineering/static-analysis-in-javascript-a-technical-introduction-859de5d444a6">análisis estático en JavaScript</a> son <em>formatters</em> y <em>linters</em>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><em>Formatters</em> o formateadores, escanean y reformatean rápidamente los archivos de código. Uno de los más populares es <a href="https://prettier.io/">Prettier</a>, que como cualquier buen formateador, corregirá automaticamente las inconsistencias que encuentre.</p>
+</li>
+<li>
+<p><em>Linters</em> pueden trabajar en aspectos de formato pero sobre todo en otros problemas más complejos. Se basan en una serie de reglas para escanear el código, o descripciones de comportamientos a vigilar, y muestran todas las violaciones que encuentran. El más popular para JavaScript es <a href="https://eslint.org/">ESLint</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Vamos a probar <strong>ESLint</strong>.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Instala con npm:</p>
+<div class="literalblock">
+<div class="content">
+<pre>npm install eslint --save-dev</pre>
+</div>
+</div>
+</li>
+<li>
+<p>A continuación, inicializa un archivo de configuración:</p>
+<div class="literalblock">
+<div class="content">
+<pre>npx eslint --init</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Y responde a las preguntas:</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/eslint-init.png" alt="eslint init">
+</div>
+<div class="title">Fig. 9. ESLint init</div>
+</div>
+<div class="paragraph">
+<p>Se habrá creado un archivo <code>.eslintrc.json</code>, que incluirá esta línea:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="o">{</span>
+    <span class="s2">"extends"</span><span class="o">:</span> <span class="s2">"eslint:recommended"</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Habilita las <a href="https://eslint.org/docs/rules/">reglas predeterminadas</a></td>
+</tr>
+</table>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="3">
+<li>
+<p>Añade a <code>package.json</code> un script para <code>lint</code> y la dependencia a ESLint</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="title">package.json: lint y dependencia a ESLint</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="json"><span class="w">   </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="err">...</span><span class="w">
+      </span><span class="nl">"lint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eslint *.js test/*.js -f checkstyle -o coverage/checkstyle-result.xml "</span><span class="w">
+   </span><span class="p">}</span><span class="err">,</span><span class="w">
+   </span><span class="err">...</span><span class="w">
+   </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="err">...</span><span class="w">
+      </span><span class="nl">"eslint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^7.0.0"</span><span class="w">
+   </span><span class="p">}</span><span class="w">
+   </span><span class="err">...</span></code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="2">
+<li>
+<p>Lanzaló en local:</p>
+<div class="literalblock">
+<div class="content">
+<pre>npm run lint -s</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>El parámetro <code>-s</code> se utiliza para que no muestre mensajes de error. Habrá generado el archivo <code>coverage/eslint-result.xml</code>.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="3">
+<li>
+<p>En Jenkins, añade una nueva fase <code>Analysis</code> en el pipeline, en la que llames a <code>lint</code> y publiques el informe con el formato <em>CheckStyle</em>.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy">   <span class="n">stage</span><span class="o">(</span><span class="s1">'Analysis'</span><span class="o">){</span>
+      <span class="n">steps</span><span class="o">{</span>
+          <span class="n">sh</span> <span class="s1">'npm run lint -s'</span>
+      <span class="o">}</span>
+      <span class="n">post</span> <span class="o">{</span>
+         <span class="n">always</span><span class="o">{</span>
+            <span class="c1">// record lint issues found, also, fail the build if there are ANY NEW issues found</span>
+            <span class="n">recordIssues</span> <span class="nl">enabledForFailure:</span> <span class="kc">true</span><span class="o">,</span>
+                <span class="nl">blameDisabled:</span> <span class="kc">true</span><span class="o">,</span>
+                <span class="nl">tools:</span> <span class="o">[</span><span class="n">esLint</span><span class="o">(</span><span class="nl">pattern:</span> <span class="s1">'**/eslint-result.xml'</span><span class="o">)],</span>
+                <span class="nl">qualityGates:</span> <span class="o">[[</span><span class="nl">threshold:</span> <span class="mi">10</span><span class="o">,</span> <span class="nl">type:</span> <span class="s1">'NEW'</span><span class="o">]]</span>
+        <span class="o">}</span>
+      <span class="o">}</span>
+    <span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>El enlace al informe de ESLint no aparece en la página principal del proyecto, en el menú de enlaces, sino que tienes que hacer clic en el número del último build, y en la nueva página ya aparece el enlace:</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/eslint-jenkins-link.png" alt="eslint jenkins link">
+</div>
+<div class="title">Fig. 10. Enlace al informe <em>ESLint</em></div>
+</div>
+<div class="paragraph">
+<p>La fase de análisis falla (está en rojo) porque cuando ESLint detecta un error, hace que falle. Si te fijas, los 2 errores detectados han sido en el test (y pueden ser falsos positivos). Para evitarlo, elimina <code>test/*.js</code> del script <code>lint</code> en <code>package.json</code>.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/eslint-jenkins-pass-grapth.png" alt="eslint jenkins pass grapth">
+</div>
+<div class="title">Fig. 11. Fase <em>ESLint</em> <em>passed</em></div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_despliegue_en_la_vm">Despliegue en la VM</h3>
@@ -846,7 +1030,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-11 00:41:56 +0200
+Last updated 2020-05-11 03:28:01 +0200
 </div>
 </div>
 <style>

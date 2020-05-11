@@ -328,7 +328,7 @@ Se habrá creado un archivo `.eslintrc.json`, que incluirá esta línea:
 ----
 <1> Habilita las https://eslint.org/docs/rules/[reglas predeterminadas]
 
-
+[start=3]
 . Añade a `package.json` un script para `lint` y la dependencia a ESLint
  
 [source,json]
@@ -336,7 +336,7 @@ Se habrá creado un archivo `.eslintrc.json`, que incluirá esta línea:
 ----
    "scripts": {
       ...
-      "lint": "eslint *.js test/*.js -f checkstyle -o coverage/eslint-result.xml "
+      "lint": "eslint *.js -f checkstyle -o coverage/eslint-result.xml"
    },
    ...
    "devDependencies": {
@@ -346,21 +346,46 @@ Se habrá creado un archivo `.eslintrc.json`, que incluirá esta línea:
    ...
 ----
 
-[start=2]
+[start=4]
 . Lanzaló en local: 
 
     npm run lint -s
 
 El parámetro `-s` se utiliza para que no muestre mensajes de error. Habrá generado el archivo `coverage/eslint-result.xml`.
 
-[start=3]
+[start=5]
 . En Jenkins, añade una nueva fase `Analysis` en el pipeline, en la que llames a `lint` y publiques el informe con el formato _CheckStyle_.
 
 [source,groovy]
 ----
-    
+   stage('Analysis'){
+      steps{
+          sh 'npm run lint -s'
+      }
+      post {
+         always{
+            // record lint issues found, also, fail the build if there are ANY NEW issues found
+            recordIssues enabledForFailure: true,
+                blameDisabled: true,
+                tools: [esLint(pattern: '**/eslint-result.xml')],
+                qualityGates: [[threshold: 10, type: 'NEW']]
+        }
+      }
+    }
+
 ----
 
+[start=6]
+. El enlace al informe de ESLint no aparece en la página principal del proyecto, en el menú de enlaces, sino que tienes que hacer clic en el número del último build, y en la nueva página ya aparece el enlace:
+
+.Enlace al informe _ESLint_
+image::eslint-jenkins-link.png[role="thumb", align="center"]
+
+[start=7]
+. La fase de análisis falla (está en rojo) porque cuando ESLint detecta un error, hace que falle. Si te fijas, los 2 errores detectados han sido en el test (y pueden ser falsos positivos). Para evitarlo, elimina `test/*.js` del script `lint` en `package.json`.
+
+.Fase _ESLint_ _passed_
+image::eslint-jenkins-pass-grapth.png[role="thumb", align="center"]
 
 === Despliegue en la VM
 
