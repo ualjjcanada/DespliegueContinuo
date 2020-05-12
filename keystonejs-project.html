@@ -453,8 +453,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#_pruebas_automatizadas">3. Pruebas automatizadas</a>
 <ul class="sectlevel2">
-<li><a href="#_pruebas_unitarias_con">3.1. Pruebas unitarias con &#8230;&#8203;</a></li>
-<li><a href="#_pruebas_end_to_end_con_selenium">3.2. Pruebas end-to-end con Selenium / &#8230;&#8203;</a></li>
+<li><a href="#_pruebas_end_to_end_con_selenium">3.1. Pruebas end-to-end con Selenium</a></li>
 </ul>
 </li>
 <li><a href="#_cicd_de_proyecto_creado_con_keystonejs">4. CI/CD de proyecto creado con KeystoneJs</a>
@@ -462,7 +461,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_creación_de_proyecto_jenkins_con_pipelines">4.1. Creación de proyecto Jenkins con pipelines</a></li>
 <li><a href="#_despliegue_en_la_vm">4.2. Despliegue en la VM</a></li>
 <li><a href="#_deploy_en_un_docker_container">4.3. Deploy en un Docker container</a></li>
-<li><a href="#_deploy_con_docker_compose">4.4. Deploy con Docker Compose</a></li>
+<li><a href="#_configuring_ngnix">4.4. Configuring Ngnix</a></li>
+<li><a href="#_deploy_con_docker_compose">4.5. Deploy con Docker Compose</a></li>
 </ul>
 </li>
 <li><a href="#_evolución_del_proyecto">5. Evolución del proyecto</a></li>
@@ -578,7 +578,7 @@ npm run dev</pre>
 <p>La aplicación esta disponible aquí: <a href="http://localhost:3000/" class="bare">http://localhost:3000/</a></p>
 </div>
 <div class="paragraph">
-<p>Tiene 3 componentes principales:</p>
+<p>La aplicación inicial tiene 3 componentes principales:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -588,7 +588,7 @@ npm run dev</pre>
 </ol>
 </div>
 <div class="paragraph">
-<p>Your simple todo application is up and running:</p>
+<p>Your simple application is up and running:</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -626,7 +626,7 @@ npm run dev</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Prueba la aplicación recien creada.</p>
+<p>Prueba la aplicación recién creada. Utiliza el usuario y contraseña para acceder, crear usuarios, etc.</p>
 </div>
 </div>
 </div>
@@ -635,12 +635,23 @@ npm run dev</pre>
 <h2 id="_pruebas_automatizadas">3. Pruebas automatizadas</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_pruebas_unitarias_con">3.1. Pruebas unitarias con &#8230;&#8203;</h3>
-
+<h3 id="_pruebas_end_to_end_con_selenium">3.1. Pruebas end-to-end con Selenium</h3>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Descarga Selenium IDE para Firefox o Chrome.</p>
+</li>
+<li>
+<p>Graba unas pruebas sobre la aplicación Keystone:  login correcto, login incorrecto, creación de un usuario, etc. Ejecutalas en Selenium IDE.</p>
+</li>
+<li>
+<p>Exporta las pruebas a formato <em>JavaScript with Mocha</em>. Guarda los archivos generados <code>*.spec.js</code> en una nueva carpeta <code>test</code> de la aplicación.</p>
+</li>
+<li>
+<p>G</p>
+</li>
+</ol>
 </div>
-<div class="sect2">
-<h3 id="_pruebas_end_to_end_con_selenium">3.2. Pruebas end-to-end con Selenium / &#8230;&#8203;</h3>
-
 </div>
 </div>
 </div>
@@ -658,16 +669,127 @@ npm run dev</pre>
 </div>
 <div class="sect2">
 <h3 id="_despliegue_en_la_vm">4.2. Despliegue en la VM</h3>
-
+<div class="paragraph">
+<p>En la máquina de despliegue, ejecuta la aplicación Keystone en modo producción: <code>npm run start</code>.</p>
+</div>
+<div class="paragraph">
+<p>Aparecerá un error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Error: The cookieSecret config option is required when running Keystone in a production environment. Update your app or environment config so
+this value is supplied to the Keystone constructor. See [https://www.keystonejs.com/keystonejs/keystone/#config] for details</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Consulta la documentación para resolverlo.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_deploy_en_un_docker_container">4.3. Deploy en un Docker container</h3>
+<div class="paragraph">
+<p><a href="https://www.keystonejs.com/guides/deployment/#docker">Dockeriza</a> la app Keystone:</p>
+</div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p><a href="https://www.keystonejs.com/guides/deployment/#docker">Dockerizar</a> una app Keystone</p>
+<p>Crea un arhivo <code>.dockerignore</code>:</p>
 </li>
 </ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>.git/
+docs/
+dist/
+node_modules/
+package-lock.json
+.env.secret</pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic" start="2">
+<li>
+<p>Construye la imagen del contenedor en varias fases, usando varios <code>FROM</code> en el Dockerfile. Cada <code>FROM</code> inicia una nueva fase en la construcción, que puede referenciarse más adelante. Como muestra el siguiente código, la primera fase realiza el build de la aplicación y la segunda fase usa una imagen limpia y ligera sobre la que se copia la carpeta con el código listo para ser desplegado.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="title">Dockerfile</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="docker"><span class="c"># https://docs.docker.com/samples/library/node/</span>
+<span class="k">ARG</span><span class="s"> NODE_VERSION=12.10.0</span>
+<span class="c"># https://github.com/Yelp/dumb-init/releases</span>
+<span class="k">ARG</span><span class="s"> DUMB_INIT_VERSION=1.2.2</span>
+
+<span class="c"># Build container</span>
+<span class="k">FROM</span><span class="s"> node:${NODE_VERSION}-alpine AS build</span>
+<span class="k">ARG</span><span class="s"> DUMB_INIT_VERSION</span>
+
+<span class="k">WORKDIR</span><span class="s"> /home/node</span>
+
+<span class="k">RUN </span>apk add <span class="nt">--no-cache</span> build-base python2 yarn <span class="o">&amp;&amp;</span> <span class="se">\
+</span>    wget <span class="nt">-O</span> dumb-init <span class="nt">-q</span> https://github.com/Yelp/dumb-init/releases/download/v<span class="k">${</span><span class="nv">DUMB_INIT_VERSION</span><span class="k">}</span>/dumb-init_<span class="k">${</span><span class="nv">DUMB_INIT_VERSION</span><span class="k">}</span>_amd64 <span class="o">&amp;&amp;</span> <span class="se">\
+</span>    <span class="nb">chmod</span> +x dumb-init
+<span class="k">ADD</span><span class="s"> . /home/node</span>
+<span class="k">RUN </span>yarn <span class="nb">install</span> <span class="o">&amp;&amp;</span> yarn build <span class="o">&amp;&amp;</span> yarn cache clean
+
+<span class="c"># Runtime container</span>
+<span class="k">FROM</span><span class="s"> node:${NODE_VERSION}-alpine</span>
+
+<span class="k">WORKDIR</span><span class="s"> /home/node</span>
+
+<span class="k">COPY</span><span class="s"> --from=build /home/node /home/node</span>
+
+<span class="k">EXPOSE</span><span class="s"> 3000</span>
+<span class="k">CMD</span><span class="s"> ["./dumb-init", "yarn", "start"]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Desafortunadamente, al construir la imagen del contenedor se producen un error asociado a la construcción y ejecución en entorno <em>production</em>:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Error: The cookieSecret config option is required when running Keystone in a production environment. Update your app or environment config so this value is supplied to the Keystone constructor. See [https://www.keystonejs.com/keystonejs/keystone/#config] for details.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Este error está relacionado con la configuración en producción sobre SSL.</p>
+</div>
+<div class="paragraph">
+<p>Es necesario configurar un proxy inverso con SSL. La solución, sin saber realmente si va a funcionar o no, implica:
+ - Disponer de una pareja de certificados SSL, se pueden generar con Let’s Encrypt.
+ - <a href="https://medium.com/faun/setting-up-ssl-certificates-for-nginx-in-docker-environ-e7eec5ebb418">Setting up SSL certificates for Nginx in Docker Environment</a>
+ - Los dos pasos anteriores se explican en este tutorial: <a href="https://medium.com/@pentacent/nginx-and-lets-encrypt-with-docker-in-less-than-5-minutes-b4b8a60d3a71">Nginx and Let’s Encrypt with Docker</a></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_configuring_ngnix">4.4. Configuring Ngnix</h3>
+<div class="paragraph">
+<p>While node is perfectly capable of serving our application, for better performance and security, it’s recommended to put a real HTTP server in front. An HTTP server configured as a reverse-proxy protects our application from slow clients and speeds up connections thanks to caching.</p>
+</div>
+<div class="paragraph">
+<p>We’ll use Nginx, a general-purpose HTTP server in our setup.</p>
+</div>
+<div class="paragraph">
+<p>Create a configuration file for Ngnix, the file is called <code>reverse-proxy.conf</code> and is at the root directory of your project, next to the other Dockefiles:</p>
+</div>
+<div class="listingblock">
+<div class="title">reverse-proxy.conf</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="conf"><span class="c"># reverse-proxy.conf
+</span>
+<span class="n">server</span> {
+    <span class="n">listen</span> <span class="m">8020</span>;
+    <span class="n">server_name</span> <span class="n">example</span>.<span class="n">org</span>;
+
+    <span class="n">location</span> / {
+        <span class="n">proxy_pass</span> <span class="n">http</span>://<span class="n">drkiq</span>:<span class="m">8010</span>;
+        <span class="n">proxy_set_header</span> <span class="n">Host</span> $<span class="n">host</span>;
+        <span class="n">proxy_set_header</span> <span class="n">X</span>-<span class="n">Forwarded</span>-<span class="n">For</span> $<span class="n">proxy_add_x_forwarded_for</span>;
+    }
+}</code></pre>
+</div>
 </div>
 <div class="sidebarblock">
 <div class="content">
@@ -683,7 +805,7 @@ npm run dev</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_deploy_con_docker_compose">4.4. Deploy con Docker Compose</h3>
+<h3 id="_deploy_con_docker_compose">4.5. Deploy con Docker Compose</h3>
 <div class="paragraph">
 <p>Ejemplo de <a href="https://stackoverflow.com/questions/59425330/keystonejs-docker-compose-cant-connect-mongo-db">docker-compose</a> con KeystoneJS y Mongo.</p>
 </div>
@@ -701,11 +823,219 @@ npm run dev</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-12 02:34:45 +0200
+Last updated 2020-05-12 22:01:58 +0200
 </div>
 </div>
-<link rel="stylesheet" href="./highlight/styles/github.min.css">
-<script src="./highlight/highlight.min.js"></script>
-<script>hljs.initHighlighting()</script>
+<style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge .cm {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .cp {
+  color: #999999;
+  font-weight: bold;
+}
+pre.rouge .c1 {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .cs {
+  color: #999999;
+  font-weight: bold;
+  font-style: italic;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cpf {
+  color: #999988;
+  font-style: italic;
+}
+pre.rouge .err {
+  color: #a61717;
+  background-color: #e3d2d2;
+}
+pre.rouge .gd {
+  color: #000000;
+  background-color: #ffdddd;
+}
+pre.rouge .ge {
+  color: #000000;
+  font-style: italic;
+}
+pre.rouge .gr {
+  color: #aa0000;
+}
+pre.rouge .gh {
+  color: #999999;
+}
+pre.rouge .gi {
+  color: #000000;
+  background-color: #ddffdd;
+}
+pre.rouge .go {
+  color: #888888;
+}
+pre.rouge .gp {
+  color: #555555;
+}
+pre.rouge .gs {
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #aaaaaa;
+}
+pre.rouge .gt {
+  color: #aa0000;
+}
+pre.rouge .kc {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kd {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kn {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kp {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kr {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .kt {
+  color: #445588;
+  font-weight: bold;
+}
+pre.rouge .k, pre.rouge .kv {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .mf {
+  color: #009999;
+}
+pre.rouge .mh {
+  color: #009999;
+}
+pre.rouge .il {
+  color: #009999;
+}
+pre.rouge .mi {
+  color: #009999;
+}
+pre.rouge .mo {
+  color: #009999;
+}
+pre.rouge .m, pre.rouge .mb, pre.rouge .mx {
+  color: #009999;
+}
+pre.rouge .sb {
+  color: #d14;
+}
+pre.rouge .sc {
+  color: #d14;
+}
+pre.rouge .sd {
+  color: #d14;
+}
+pre.rouge .s2 {
+  color: #d14;
+}
+pre.rouge .se {
+  color: #d14;
+}
+pre.rouge .sh {
+  color: #d14;
+}
+pre.rouge .si {
+  color: #d14;
+}
+pre.rouge .sx {
+  color: #d14;
+}
+pre.rouge .sr {
+  color: #009926;
+}
+pre.rouge .s1 {
+  color: #d14;
+}
+pre.rouge .ss {
+  color: #990073;
+}
+pre.rouge .s, pre.rouge .sa, pre.rouge .dl {
+  color: #d14;
+}
+pre.rouge .na {
+  color: #008080;
+}
+pre.rouge .bp {
+  color: #999999;
+}
+pre.rouge .nb {
+  color: #0086B3;
+}
+pre.rouge .nc {
+  color: #445588;
+  font-weight: bold;
+}
+pre.rouge .no {
+  color: #008080;
+}
+pre.rouge .nd {
+  color: #3c5d5d;
+  font-weight: bold;
+}
+pre.rouge .ni {
+  color: #800080;
+}
+pre.rouge .ne {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nl {
+  color: #990000;
+  font-weight: bold;
+}
+pre.rouge .nn {
+  color: #555555;
+}
+pre.rouge .nt {
+  color: #000080;
+}
+pre.rouge .vc {
+  color: #008080;
+}
+pre.rouge .vg {
+  color: #008080;
+}
+pre.rouge .vi {
+  color: #008080;
+}
+pre.rouge .nv, pre.rouge .vm {
+  color: #008080;
+}
+pre.rouge .ow {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .o {
+  color: #000000;
+  font-weight: bold;
+}
+pre.rouge .w {
+  color: #bbbbbb;
+}
+pre.rouge {
+  background-color: #f8f8f8;
+}
+</style>
 </body>
 </html>
