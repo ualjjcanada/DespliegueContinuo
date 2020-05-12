@@ -26,11 +26,15 @@ Codificación, idioma, tabla de contenidos, tipo de documento
 
 == Ejemplo 2. _Hola mundo_ en NodeJs
 
-A continuación se muestra un ejemplo de *construcción y despliegue en Jenkins de un proyecto NodeJs*. Los pasos a realizar son similares al ejemplo anterior con Java, el decir, el pipeline tendrá las mismas fases; eso si, adaptaremos las ordenes o comandos a ejecutar, ya que ahora se trata de un proyecto NodeJs en lugar de Java-Maven.
+A continuación se muestra un ejemplo de *integración y despliegue continuos en Jenkins de un proyecto NodeJs*. Los pasos a realizar son similares al ejemplo anterior con Java, el decir, el pipeline tendrá las mismas fases; eso si, adaptaremos las ordenes o comandos a ejecutar a la tecnología NodeJs.
 
-Para cada cambio de código en el repositorio de la app, Jenkins será notificado y descargará los cambios en el servidor Jenkins, instalará las dependencias y ejecutará los tests. Si los tests pasan, Jenkins desplegará la aplicación en el servidor de despliegue. Y si fallan, se notificará al desarrollador.
+Al igual con el ejemplo anterior en Java, en primer lugar trabajaremos con la aplicación NodeJS sin _dockerizar_, y después _dockerizaremos_ la aplicación. La mayoría de los pasos siempre los ejecutaremos primero en local, y tras comprobar que funcionan correctamente, los automatizaremos en Jenkins. 
 
-Nos vamos a basar en  el proyecto _HelloWorld_ en NodeJs, disponible en https://github.com/ualcnsa/nodeapp.
+****
+La implementación de la integración y despliegue continuos permitirá que, para cada cambio de código en el repositorio, Jenkins será notificado y descargará los cambios, instalará las dependencias y ejecutará los tests. Si los tests pasan correctamente, Jenkins desplegará la aplicación en el servidor de despliegue. Y si fallan, se notificará al desarrollador.
+****
+
+Nos vamos a basar en  el proyecto _HelloWorld_ en NodeJs, disponible en https://github.com/ualcnsa/nodeapp. Si deseas poder hacer cambios sobre el mismo, crea un _fork_ y trabaja con tu _fork_ a partir de ahora. 
 
 Veamos los archivos que componen la aplicación: 
 
@@ -38,7 +42,7 @@ Veamos los archivos que componen la aplicación:
 
 - *express*: Node framework
 - *mocha*: framework de testing para node (Se podría haber elegido otro framework de testiong como Jasmin, Jest, Tape etc.)
-- *supertest*: Proporciona abstracción a alto nivel para testing HTTP
+- *supertest*: proporciona abstracción a alto nivel para testing HTTP
 
 [source,json]
 .package.json
@@ -67,7 +71,7 @@ Veamos los archivos que componen la aplicación:
 Para instalar las dependencias ejecuta `npm install`.
 
 [start=2]
-. El archivo raiz del proyecto `index.js`
+. El archivo raíz del proyecto `index.js` es un sencillo _hola mundo_.
 
 [source,js]
 .index.js
@@ -91,7 +95,7 @@ Puedes ver la aplicación en el navegador accediendo a http://localhost:3000[htt
 
 *Primer test*
 
-Nuestro primer test va a navegar a la raiz de la aplicación (`/`) y verifiar qeu la página responde con el texto `hello world`.
+Nuestro primer test va a navegar a la raiz de la aplicación (`/`) y verificar que la página responde con el texto esperado `hello world`.
 
 Se guardará en la carpeta `/test/` con el nombre `test.js`. 
 
@@ -111,7 +115,7 @@ Para ejecutar el test: `npm test`
 .npm test
 image::node-mocha-passed.png[role="thumb", align="center"]
 
-=== Creación de proyecto Jenkins con pipelines
+=== Creación del pipeline en Jenkins
 
 Definimos un nuevo proyecto tipo Pipeline. Añadimos la descripción del pipeline:
 
@@ -126,7 +130,6 @@ pipeline {
   }
     
   stages {
-        
     stage('Cloning Git') {
       steps {
         git 'https://github.com/ualcnsa/nodeapp'
@@ -153,9 +156,9 @@ El resultado sera:
 .Nodeapp pipeline
 image::jenkins-node-pipeline1.png[role="thumb", align="center"]
 
-Vamos a *publicar los resultados de los test* en un gráfico. 
+La evolución de las métricas del proyecto es uno de los indicadores que habitualmente muestra Jenkins como _feedback_ para los desarrolladores. Vamos a *publicar los resultados de los test* en un gráfico. 
 
-. Editamos `package.json` y añadimos el script `test-jenkins`para generar los resultados de los test que usará Jenkins, y la dependencia para ello:
+. Editamos `package.json` y añadimos el script `test-jenkins` para generar los resultados de los test en formato xml que usará Jenkins para generar el gráfico, y la dependencia necesaria para ello:
 
 [source,json]
 .package.json: jenkins-test y dependencia mocha-junit-reporter
@@ -179,11 +182,11 @@ Podemos probar en local, llamamos a la ejecución de los test y generación del 
 
 [TIP]
 ====
-Añade al `.gitignore` la carpeta `/coverage`, ya que su contenido se generará al lanzar los tests.
+Añade al `.gitignore` la carpeta `/coverage`, ya que su contenido se generará al lanzar los tests y no se debe guardar en el repositorio.
 ====
 
 [start=2]
-. Actualizamos el pipeline, la fase test:
+. Actualizamos el pipeline, la fase `Test`:
 
 [source,groovy]
 ----    
@@ -234,11 +237,11 @@ A partir de ahora, cuando el repositorio en GitHub reciba un push notificará a 
 
 Como ya sabemos, la cobertura de código nos va a ofrecer un valor directamente relacionado con la calidad de los juegos de prueba. Para obtener la cobertura y publicarla en Jenkins, debemos hacer: 
 
-- Añadir a `package.json` un script para cobertura y la dependencia a https://istanbul.js.org/[IstanbulJS], que permite obtener la cobertura con Mocha 
+- Añadir a `package.json` un script para cobertura y la dependencia a https://istanbul.js.org/[IstanbulJS], que permite obtener la cobertura con Mocha.
 
 - Modificar la fase _Test_ de Jenkins para que llame al script de cobertura y publique, en el bloque `post`, el informe de cobertura generado.
 
-1.Modifica `package.json`, añadiendo el nuevo script
+1.Modifica `package.json`, añadiendo el nuevo script y la dependencia:
 
 [source,json]
 .package.json: cobertura y dependencia a IstanbulJS
@@ -298,7 +301,7 @@ Añade al `.gitignore` la carpeta `/.nyc_output`, ya que su contenido se generar
     }
 
 ----
-<1> Llama al nuevo script
+<1> Llama al nuevo script que calcula la cobertura
 <2> Publica el informe de cobertura
 
 El resultado en Jenkins, debe aparece un enlace nuevo en el menú de la izquierda: 
@@ -307,7 +310,7 @@ El resultado en Jenkins, debe aparece un enlace nuevo en el menú de la izquierd
 image::jenkins-node-coverage-report-link.png[role="thumb", align="center"]
 
 [start=3]
-. Para poder visualizar correctamente el _Coverage Report_, hay que cambiar la https://wiki.jenkins.io/display/JENKINS/Configuring+Content+Security+Policy#ConfiguringContentSecurityPolicy-TheDefaultRuleSet[configuración de seguridad] de Jenkins predeterminada, que es muy restrictiva para prevenir de archivos HTML/JS maliciosos. Para modificar la configuración, abre la consola de scritps (_Manage Jenkins / Script Console_), y ejecuta estas líneas: 
+. Para poder visualizar correctamente el _Coverage Report_, hay que cambiar la https://wiki.jenkins.io/display/JENKINS/Configuring+Content+Security+Policy#ConfiguringContentSecurityPolicy-TheDefaultRuleSet[configuración de seguridad] de Jenkins predeterminada, que es muy restrictiva para prevenir de archivos HTML/JS maliciosos que podrían instalarse como parte de un Plugin. Para modificar la configuración, abre la consola de scritps (_Manage Jenkins / Script Console_), y ejecuta estas líneas: 
 
 [source,groovy]
 ----
@@ -318,8 +321,7 @@ System.getProperty("hudson.model.DirectoryBrowserSupport.CSP")
 .Script Console: permisos para visualizar el informe de cobertura
 image::maven-script-console-site.png[role="thumb", align="center"]
 
-Tras ello ya podrás visualizar correctamente. Pero ten en cuenta que cada vez que reinicies Jenkins esta configuración  se pierde y vuelve a la configuración predeterminada. 
-
+Tras ello ya podrás visualizar correctamente el informe de cobertura. Pero ten en cuenta que cada vez que reinicies Jenkins esta configuración  se pierde y vuelve a la configuración predeterminada. 
 
 
 === Análisis estático de código 
@@ -328,7 +330,7 @@ El código JavaScript es dinámicamente tipado, por lo que en lugar de usar el c
 
 - _Formatters_ o formateadores, escanean y reformatean rápidamente los archivos de código. Uno de los más populares es https://prettier.io/[Prettier], que como cualquier buen formateador, corregirá automaticamente las inconsistencias que encuentre.
 
-- _Linters_ pueden trabajar en aspectos de formato pero sobre todo en otros problemas más complejos. Se basan en una serie de reglas para escanear el código, o descripciones de comportamientos a vigilar, y muestran todas las violaciones que encuentran. El más popular para JavaScript es https://eslint.org/[ESLint]
+- _Linters_ pueden trabajar en aspectos de formato pero también otros problemas más complejos. Se basan en una serie de reglas para escanear el código, o descripciones de comportamientos a vigilar, y muestran todas las violaciones que encuentran. El más popular para JavaScript es https://eslint.org/[ESLint].
 
 Vamos a probar *ESLint*. 
 
@@ -378,10 +380,10 @@ Se habrá creado un archivo `.eslintrc.json`, que incluirá esta línea:
 
     npm run lint -s
 
-El parámetro `-s` se utiliza para que no muestre mensajes de error. Habrá generado el archivo `coverage/eslint-result.xml`.
+El parámetro `-s` se utiliza para que no muestre mensajes de error. Habrá generado el archivo `coverage/eslint-result.xml` en formato similar al informe de _CheckStyle_ para poder importarlo correctamente en Jenkins.
 
 [start=5]
-. En Jenkins, añade una nueva fase `Analysis` en el pipeline, en la que llames a `lint` y publiques el informe con el formato _CheckStyle_.
+. En Jenkins, añade una nueva fase `Analysis` en el pipeline, en la que llames a `lint` y publiques el informe generado por *ESLint* con el formato _CheckStyle_.
 
 [source,groovy]
 ----
@@ -409,7 +411,7 @@ El parámetro `-s` se utiliza para que no muestre mensajes de error. Habrá gene
 image::eslint-jenkins-link.png[role="thumb", align="center"]
 
 [start=7]
-. La fase de análisis falla (está en rojo) porque cuando ESLint detecta un error, finaliza con error (`EXIT 1`). Si te fijas en el informe, los 2 errores detectados han sido en el archivo `test.js` (y pueden ser falsos positivos). Para evitarlo, elimina `test/*.js` del script `lint` en `package.json`.
+. No te preocupes si la fase de análisis que acabas de añadir falla (está en rojo). Es así porque cuando ESLint detecta un error, finaliza con error (`EXIT 1`). Si te fijas en el informe, los 2 errores detectados han sido en el archivo `test.js` (y pueden ser falsos positivos). Para evitarlo, elimina `test/*.js` del script `lint` en `package.json`.
 
 Tras ello, la nueva ejecución del pipeline se ejecutará correctamente. 
 

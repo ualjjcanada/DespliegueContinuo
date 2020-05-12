@@ -29,7 +29,7 @@ Nombre y título del trabajo
 = Despliegue continuo y entrega continua
 
 Computación en la nube servicios y aplicaciones.
-Version 1.0, Marzo-2020.
+Version 1.1, Mayo-2020.
 Joaquín Cañadas <jjcanada@ual.es>
 
 // Entrar en modo no numerado de apartados
@@ -880,13 +880,13 @@ Referencias:
 . https://medium.com/@weblab_tech/how-to-publish-artifacts-in-jenkins-f021b17fde71[How to build on Jenkins and publish artifacts via ssh with Pipelines]
 ****
 
-=== Despliegue en un contenedor Docker
+== Aplicación web Java con Docker
 
 Para realizar el despliegue de PetClinic como contenedor, primero tenemos que https://www.callicoder.com/spring-boot-docker-example/[dockerizar] la aplicación, luego publicar la imagen de contenedor en un registro como DockerHub o Google Container Registry, y por último ejecutar el contenedor en la instancia de despliegue.
 
 A continuación se describe cómo crear un contenedor Docker de la aplicación PetClinic. Los pasos se realizan en local, y al final configuraremos el pipeline de Jenkins para que se realicen automáticamente. 
 
-==== Creación del `Dockerfile`
+=== Creación del `Dockerfile`
 
 Para https://spring.io/guides/gs/spring-boot-docker/[crear el contendedor de Docker] que empaquete la aplicación PetClinic, vamos a definir el siguiente archivo `Dockerfile` que debe estar en la carpeta raíz del proyecto:
 
@@ -948,7 +948,7 @@ Para el contenedor con CTRL+C.
 
 Una vez creada la imagen con `docker build` y probada su ejecución con `docker run`, el siguiente paso será publicar la imagen en un registro de contenedores, mediante `docker push`. Podemos usar https://hub.docker.com/[DockerHub] pero en este caso vamos a usar Google Cloud https://cloud.google.com/container-registry?hl=es[Container Registry]. 
 
-==== Autenticación en Container Registry
+=== Autenticación en Container Registry
 
 Para poder hacer `push` debemos tener permisos de escritura, y por tanto debemos autenticarnos en el servicio Container Registry. 
 
@@ -1003,7 +1003,7 @@ image::cloud-containers-registry-login.png[role="thumb", align="center"]
 
 
 
-==== Publicación y despliegue 
+=== Publicación y despliegue _manual_
 
 . Construir el contenedor con el nombre completo incluyendo la referencia a Container registry (gcr.io). Primero definimos una variable de entorno con el nombre de nuestro proyecto GCP, y luego construimos de nuevo la imagen con el nombre completo del registro de contenedores: 
 
@@ -1078,17 +1078,20 @@ Para solucionarlo, bien detén el proceso java que está corriendo con la aplica
 docker run -p 80:8080 -t --name petclinic gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0
 ----
 
-==== Construcción de la imagen y despliegue del contenedor con Jenkins
+=== Integración y despliegue continuos con Jenkins
 
-Hasta ahora hemos realizado todos los pasos manualmente. A continuación, vamos a automatizar en Jenkins todo el proceso: 
+Hasta ahora hemos realizado todos los pasos de construcción, prueba y despliegue manualmente. A continuación, vamos a automatizar en Jenkins todo el proceso, cuyas principales tareas son: 
 
-- la construcción de la imagen del contenedor, 
-- la publicación de la imagen en el registro, y
-- el despliegue del contenedor. 
-
-En Jenkins, son necesarios los siguientes plugins para trabajar con Docker y pipelines, y con Container Registry: Docker Pipeline (que ya está instalado), https://plugins.jenkins.io/google-container-registry-auth[Google Container Registry Auth].
+****
+- la *construcción* de la imagen del contenedor, 
+- la *publicación* de la imagen en el registro, y
+- el *despliegue* del contenedor.
+****
+En Jenkins, son necesarios los siguientes plugins para trabajar con Docker y pipelines, y con Container Registry: Docker Pipeline ,que ya está instalado, y tendrás que instalar https://plugins.jenkins.io/google-container-registry-auth[Google Container Registry Auth].
 
 Definimos un nuevo proyecto en Jenkins de tipo pipeline, con el nombre ```PetClinic-Docker-abc123``` sustituyendo abc123 por nuestro nombre de usuario. Son necesarios 3 fases (stages) en el pipeline: _build image_, _push image_, y _deploy container_.
+
+==== Construcción y despliegue "local"
 
 Comenzamos por la *construcción de la imagen*:
 
@@ -1163,6 +1166,8 @@ La aplicación debe estar accesible en el puerto 8080 en tu máquina de Jenkins.
     }
 ----
 
+==== Publicación en el regisro
+
 El siguiente paso es *publicar la imagen* en el registro.
 
 . Primero, es necesario crear unas credenciales en Jenkins para poder hacer `push` en Container Registry:
@@ -1181,16 +1186,16 @@ image::jenkins-credentials-container-registry.png[role="thumb", align="center"]
 
 [source,groovy]
 ----
-    stage("Push image") {
-        steps {
-            script {
-                docker.withRegistry('https://'+ CONTAINER_REGISTRY, 'gcr:'+ GOOGLE_CLOUD_PROJECT) {
-                        dockerImage.push("latest")
-                        dockerImage.push("${env.BUILD_ID}")
-                        
-            }
-        }
-    }        
+  stage("Push image") {
+    steps {
+      script {
+        docker.withRegistry('https://'+ CONTAINER_REGISTRY, 'gcr:'+ GOOGLE_CLOUD_PROJECT) {
+          dockerImage.push("latest")
+          dockerImage.push("${env.BUILD_ID}")
+        }        
+      }
+    }
+  }        
 ----
 
 Comprobar que se ha publicado correctamente en el registro.
@@ -1199,20 +1204,24 @@ Comprobar que se ha publicado correctamente en el registro.
 image::jenkins-published-container-registry.png[role="thumb", align="center"]
 
 
+==== Despliegue en producción
+
 Por último, quedaría el paso de *desplegar al entorno de producción*. Una vez empaquetada como un contenedor, Google Cloud permite desplegar de varias formas:
 
+****
 - en *máquina virtual* con GCE, 
 - en plataforma como servicio con *Google App Engine*,
 - en Kubernetes con *GKE*,
 - y en *Cloud Run*, un servicio de Google Cloud específico para el despliegue de contenedores. 
+****
 
-Para nosotros, es la máquina virtual de despliegue es nuestro entorno de producción en el que vamos a desplegar el contenedor. 
+Para nosotros, la *máquina virtual de despliegue* es nuestro entorno de producción en el que vamos a desplegar el contenedor. 
 
 Los pasos para el despliegue de la nueva imagen del contenedor consistirán en ejecutar los siguientes comandos sobre la máquina de despliegue:
 
 - `docker stop` del contenedor por si estuviera ejecutándose  
 - `docker rm` para eliminar el contenedor existente, que puede estar basado en una imagen de una versión anterior
-- `docker run` que primero hará un `docker pull` de la imagen actualizada del registro. Lo lanzaremos en el puerto 80 ya que el 8080 está ocupado por el despliegue que hicimos sin contenedor. 
+- `docker run` para ejecutar el contenedor, que automáticamente  hará un `docker pull` de la imagen actualizada del registro. Lo lanzaremos en el puerto 80 ya que el 8080 está ocupado por el despliegue que hicimos sin contenedor. 
 
 Estas acciones debemos añadirlas a un `stage` del pipeline de Jenkins que se encargará de desplegar el nuevo contenedor automáticamente. En el siguiente código, sustituye `DNS_DEPLOY_INSTANCE` por el nombre DNS de tu instancia de depliegue. También puedes definirla como una variable de entorno al inicio del pipeline.
 
@@ -1234,7 +1243,7 @@ Estas acciones debemos añadirlas a un `stage` del pipeline de Jenkins que se en
 
 [TIP]
 ====
-Algunos comando útiles de docker:
+Algunos https://www.docker.com/sites/default/files/d8/2019-09/docker-cheat-sheet.pdf[comandos] útiles de Docker:
 ```
 # Remove all stopped containers
 docker rm $(docker ps -a -q)
@@ -1255,7 +1264,7 @@ La aplicación PetClinic debe estar accesible _en producción_, en el puerto 808
     }
 ----
 
-Por último, es una buena práctica eliminar las imágenes que se van generando en cada build, para liberar espacio en la máquina de Jenkins. Primero paramos y eliminamos el contenedor local, luego eliminamos la imagen.
+Por último, es una buena práctica eliminar las imágenes que se van generando en cada build, para liberar espacio en la máquina de Jenkins. Primero paramos y eliminamos el contenedor que desplegamos anteriormente en la fase del pipeline `Run image locally`; luego eliminamos la imagen.
 
 [source,groovy]
 ----
@@ -1279,6 +1288,10 @@ El pipeline completo, con todas sus fases, debe quedar así:
 .Pipeline completo
 image::jenkins-petclinic-full-pipeline.png[role="thumb", align="center"]
 
+Enhorabuena!! Has conseguido definir un pipeline completo de integración y despliegue continuos, y con contenedores. Este proceso se puede aplicar, con pequeñas adaptaciones, a cualquier otro proyecto Java basados en Maven. 
+
+Si usas otras tecnologías, como NodeJs, hay que adaptar cada una de las fases a su equivalente en NodeJs. Vamos a verlo en la siguiente sección.
+
 
 ****
 Referencias
@@ -1292,5 +1305,13 @@ Referencias
 
 ****
 
+////
+// Ejemplo 2: Hola Mundo en NodeJs
+////
+
 include::node-example.adoc[]
+
+////
+// Aplicación NodeJs con Docker
+////
 include::node-pipeline.adoc[]

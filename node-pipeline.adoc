@@ -26,7 +26,7 @@ Codificación, idioma, tabla de contenidos, tipo de documento
 
 === Despliegue en un contenedor Docker
 
-Para realizar el despliegue de la app Hola Mundo en NodeJs como un contenedor, primero tenemos que https://www.callicoder.com/spring-boot-docker-example/[dockerizar] la aplicación, luego publicar la imagen de contenedor en un registro como Google Container Registry, y por último ejecutar el contenedor en la instancia de despliegue.
+Para realizar el despliegue de la app Hola Mundo en NodeJs como un contenedor, primero tenemos que https://semaphoreci.com/community/tutorials/dockerizing-a-node-js-web-application[dockerizar] la aplicación. Una vez construido el contenedor, habrá qeu publicar la imagen de contenedor en un registro como Google Container Registry, y por último ejecutar el contenedor en la instancia de despliegue.
 
 A continuación se describe cómo crear un contenedor Docker de la aplicación NodeJs. Los pasos se realizan en local, y al final configuraremos el pipeline de Jenkins para que se realicen automáticamente. 
 
