@@ -1166,7 +1166,7 @@ La aplicación debe estar accesible en el puerto 8080 en tu máquina de Jenkins.
     }
 ----
 
-==== Publicación en el regisro
+==== Publicación en el registro
 
 El siguiente paso es *publicar la imagen* en el registro.
 
@@ -1223,7 +1223,7 @@ Los pasos para el despliegue de la nueva imagen del contenedor consistirán en e
 - `docker rm` para eliminar el contenedor existente, que puede estar basado en una imagen de una versión anterior
 - `docker run` para ejecutar el contenedor, que automáticamente  hará un `docker pull` de la imagen actualizada del registro. Lo lanzaremos en el puerto 80 ya que el 8080 está ocupado por el despliegue que hicimos sin contenedor. 
 
-Estas acciones debemos añadirlas a un `stage` del pipeline de Jenkins que se encargará de desplegar el nuevo contenedor automáticamente. En el siguiente código, sustituye `DNS_DEPLOY_INSTANCE` por el nombre DNS de tu instancia de depliegue. También puedes definirla como una variable de entorno al inicio del pipeline.
+Estas acciones debemos añadirlas a un `stage` del pipeline de Jenkins que se encargará de desplegar el nuevo contenedor automáticamente. En el siguiente código, sustituye `DNS_DEPLOY_INSTANCE` por el nombre DNS de tu instancia de despliegue. También puedes definirla como una variable de entorno al inicio del pipeline.
 
 [source,groovy]
 ----

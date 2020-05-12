@@ -498,7 +498,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_informe_de_cobertura">7.2. Informe de cobertura</a></li>
 <li><a href="#_análisis_estático_de_código">7.3. Análisis estático de código</a></li>
 <li><a href="#_despliegue_en_la_vm_2">7.4. Despliegue en la VM</a></li>
-<li><a href="#_despliegue_en_un_contenedor_docker">7.5. Despliegue en un contenedor Docker</a></li>
+</ul>
+</li>
+<li><a href="#_aplicación_nodejs_con_docker">8. Aplicación NodeJs con Docker</a>
+<ul class="sectlevel2">
+<li><a href="#_creación_del_dockerfile_2">8.1. Creación del <code>Dockerfile</code></a></li>
+<li><a href="#_publicación_de_la_imagen_en_el_registro">8.2. Publicación de la imagen en el registro</a></li>
+<li><a href="#_despliegue_en_vm">8.3. Despliegue en VM</a></li>
+<li><a href="#_integración_y_despliegue_contínuos_con_jenkins">8.4. Integración y despliegue contínuos con Jenkins</a></li>
 </ul>
 </li>
 </ul>
@@ -2421,7 +2428,7 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 </div>
 </div>
 <div class="sect3">
-<h4 id="_publicación_en_el_regisro">6.4.2. Publicación en el regisro</h4>
+<h4 id="_publicación_en_el_registro">6.4.2. Publicación en el registro</h4>
 <div class="paragraph">
 <p>El siguiente paso es <strong>publicar la imagen</strong> en el registro.</p>
 </div>
@@ -2527,7 +2534,7 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 </ul>
 </div>
 <div class="paragraph">
-<p>Estas acciones debemos añadirlas a un <code>stage</code> del pipeline de Jenkins que se encargará de desplegar el nuevo contenedor automáticamente. En el siguiente código, sustituye <code>DNS_DEPLOY_INSTANCE</code> por el nombre DNS de tu instancia de depliegue. También puedes definirla como una variable de entorno al inicio del pipeline.</p>
+<p>Estas acciones debemos añadirlas a un <code>stage</code> del pipeline de Jenkins que se encargará de desplegar el nuevo contenedor automáticamente. En el siguiente código, sustituye <code>DNS_DEPLOY_INSTANCE</code> por el nombre DNS de tu instancia de despliegue. También puedes definirla como una variable de entorno al inicio del pipeline.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2672,10 +2679,10 @@ docker rmi $(docker images -q)</code></pre>
 <h2 id="_ejemplo_2_hola_mundo_en_nodejs">7. Ejemplo 2. <em>Hola mundo</em> en NodeJs</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A continuación se muestra un ejemplo de <strong>integración y despliegue continuos en Jenkins de un proyecto NodeJs</strong>. Los pasos a realizar son similares al ejemplo anterior con Java, el decir, el pipeline tendrá las mismas fases; eso si, adaptaremos las ordenes o comandos a ejecutar, ya que ahora se trata de un proyecto NodeJs en lugar de Java-Maven.</p>
+<p>A continuación se muestra un ejemplo de <strong>integración y despliegue continuos en Jenkins de un proyecto NodeJs</strong>. Los pasos a realizar son similares al ejemplo anterior con Java, el decir, el pipeline tendrá las mismas fases; eso si, adaptaremos las ordenes o comandos a ejecutar a la tecnología NodeJs.</p>
 </div>
 <div class="paragraph">
-<p>Al igual con el proyecto anterior en Java, en primer lugar trabajaremos con la aplicación NodeJS sin <em>dockerizar</em>, y después <em>dockerizaremos</em> la aplicación. La mayoría de los pasos siempre los ejecutaremos en local, y tras comprobar que funcionan correctamente, los automatizaremos en Jenkins.</p>
+<p>Al igual con el ejemplo anterior en Java, en primer lugar trabajaremos con la aplicación NodeJS sin <em>dockerizar</em>, y después <em>dockerizaremos</em> la aplicación. La mayoría de los pasos siempre los ejecutaremos primero en local, y tras comprobar que funcionan correctamente, los automatizaremos en Jenkins.</p>
 </div>
 <div class="sidebarblock">
 <div class="content">
@@ -2685,7 +2692,7 @@ docker rmi $(docker images -q)</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Nos vamos a basar en  el proyecto <em>HelloWorld</em> en NodeJs, disponible en <a href="https://github.com/ualcnsa/nodeapp" class="bare">https://github.com/ualcnsa/nodeapp</a>.</p>
+<p>Nos vamos a basar en  el proyecto <em>HelloWorld</em> en NodeJs, disponible en <a href="https://github.com/ualcnsa/nodeapp" class="bare">https://github.com/ualcnsa/nodeapp</a>. Si deseas poder hacer cambios sobre el mismo, crea un <em>fork</em> y trabaja con tu <em>fork</em> a partir de ahora.</p>
 </div>
 <div class="paragraph">
 <p>Veamos los archivos que componen la aplicación:</p>
@@ -2703,7 +2710,7 @@ docker rmi $(docker images -q)</code></pre>
 <p><strong>mocha</strong>: framework de testing para node (Se podría haber elegido otro framework de testiong como Jasmin, Jest, Tape etc.)</p>
 </li>
 <li>
-<p><strong>supertest</strong>: Proporciona abstracción a alto nivel para testing HTTP</p>
+<p><strong>supertest</strong>: proporciona abstracción a alto nivel para testing HTTP</p>
 </li>
 </ul>
 </div>
@@ -2740,7 +2747,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="olist arabic">
 <ol class="arabic" start="2">
 <li>
-<p>El archivo raiz del proyecto <code>index.js</code></p>
+<p>El archivo raíz del proyecto <code>index.js</code> es un sencillo <em>hola mundo</em>.</p>
 </li>
 </ol>
 </div>
@@ -2770,7 +2777,7 @@ docker rmi $(docker images -q)</code></pre>
 <p><strong>Primer test</strong></p>
 </div>
 <div class="paragraph">
-<p>Nuestro primer test va a navegar a la raiz de la aplicación (<code>/</code>) y verifiar qeu la página responde con el texto <code>hello world</code>.</p>
+<p>Nuestro primer test va a navegar a la raiz de la aplicación (<code>/</code>) y verificar que la página responde con el texto esperado <code>hello world</code>.</p>
 </div>
 <div class="paragraph">
 <p>Se guardará en la carpeta <code>/test/</code> con el nombre <code>test.js</code>.</p>
@@ -2842,12 +2849,12 @@ docker rmi $(docker images -q)</code></pre>
 <div class="title">Fig. 62. Nodeapp pipeline</div>
 </div>
 <div class="paragraph">
-<p>Vamos a <strong>publicar los resultados de los test</strong> en un gráfico.</p>
+<p>La evolución de las métricas del proyecto es uno de los indicadores que habitualmente muestra Jenkins como <em>feedback</em> para los desarrolladores. Vamos a <strong>publicar los resultados de los test</strong> en un gráfico.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Editamos <code>package.json</code> y añadimos el script <code>test-jenkins</code> para generar los resultados de los test que usará Jenkins, y la dependencia necesaria para ello:</p>
+<p>Editamos <code>package.json</code> y añadimos el script <code>test-jenkins</code> para generar los resultados de los test en formato xml que usará Jenkins para generar el gráfico, y la dependencia necesaria para ello:</p>
 </li>
 </ol>
 </div>
@@ -2890,7 +2897,7 @@ docker rmi $(docker images -q)</code></pre>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>Añade al <code>.gitignore</code> la carpeta <code>/coverage</code>, ya que su contenido se generará al lanzar los tests.</p>
+<p>Añade al <code>.gitignore</code> la carpeta <code>/coverage</code>, ya que su contenido se generará al lanzar los tests y no se debe guardar en el repositorio.</p>
 </div>
 </td>
 </tr>
@@ -2899,7 +2906,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="olist arabic">
 <ol class="arabic" start="2">
 <li>
-<p>Actualizamos el pipeline, la fase test:</p>
+<p>Actualizamos el pipeline, la fase <code>Test</code>:</p>
 </li>
 </ol>
 </div>
@@ -2980,7 +2987,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p>Añadir a <code>package.json</code> un script para cobertura y la dependencia a <a href="https://istanbul.js.org/">IstanbulJS</a>, que permite obtener la cobertura con Mocha</p>
+<p>Añadir a <code>package.json</code> un script para cobertura y la dependencia a <a href="https://istanbul.js.org/">IstanbulJS</a>, que permite obtener la cobertura con Mocha.</p>
 </li>
 <li>
 <p>Modificar la fase <em>Test</em> de Jenkins para que llame al script de cobertura y publique, en el bloque <code>post</code>, el informe de cobertura generado.</p>
@@ -2988,7 +2995,7 @@ docker rmi $(docker images -q)</code></pre>
 </ul>
 </div>
 <div class="paragraph">
-<p>1.Modifica <code>package.json</code>, añadiendo el nuevo script</p>
+<p>1.Modifica <code>package.json</code>, añadiendo el nuevo script y la dependencia:</p>
 </div>
 <div class="listingblock">
 <div class="title">package.json: cobertura y dependencia a IstanbulJS</div>
@@ -3075,7 +3082,7 @@ docker rmi $(docker images -q)</code></pre>
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Llama al nuevo script</td>
+<td>Llama al nuevo script que calcula la cobertura</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -3095,7 +3102,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="olist arabic">
 <ol class="arabic" start="3">
 <li>
-<p>Para poder visualizar correctamente el <em>Coverage Report</em>, hay que cambiar la <a href="https://wiki.jenkins.io/display/JENKINS/Configuring+Content+Security+Policy#ConfiguringContentSecurityPolicy-TheDefaultRuleSet">configuración de seguridad</a> de Jenkins predeterminada, que es muy restrictiva para prevenir de archivos HTML/JS maliciosos. Para modificar la configuración, abre la consola de scritps (<em>Manage Jenkins / Script Console</em>), y ejecuta estas líneas:</p>
+<p>Para poder visualizar correctamente el <em>Coverage Report</em>, hay que cambiar la <a href="https://wiki.jenkins.io/display/JENKINS/Configuring+Content+Security+Policy#ConfiguringContentSecurityPolicy-TheDefaultRuleSet">configuración de seguridad</a> de Jenkins predeterminada, que es muy restrictiva para prevenir de archivos HTML/JS maliciosos que podrían instalarse como parte de un Plugin. Para modificar la configuración, abre la consola de scritps (<em>Manage Jenkins / Script Console</em>), y ejecuta estas líneas:</p>
 </li>
 </ol>
 </div>
@@ -3112,7 +3119,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="title">Fig. 70. Script Console: permisos para visualizar el informe de cobertura</div>
 </div>
 <div class="paragraph">
-<p>Tras ello ya podrás visualizar correctamente. Pero ten en cuenta que cada vez que reinicies Jenkins esta configuración  se pierde y vuelve a la configuración predeterminada.</p>
+<p>Tras ello ya podrás visualizar correctamente el informe de cobertura. Pero ten en cuenta que cada vez que reinicies Jenkins esta configuración  se pierde y vuelve a la configuración predeterminada.</p>
 </div>
 </div>
 <div class="sect2">
@@ -3126,7 +3133,7 @@ docker rmi $(docker images -q)</code></pre>
 <p><em>Formatters</em> o formateadores, escanean y reformatean rápidamente los archivos de código. Uno de los más populares es <a href="https://prettier.io/">Prettier</a>, que como cualquier buen formateador, corregirá automaticamente las inconsistencias que encuentre.</p>
 </li>
 <li>
-<p><em>Linters</em> pueden trabajar en aspectos de formato pero sobre todo en otros problemas más complejos. Se basan en una serie de reglas para escanear el código, o descripciones de comportamientos a vigilar, y muestran todas las violaciones que encuentran. El más popular para JavaScript es <a href="https://eslint.org/">ESLint</a></p>
+<p><em>Linters</em> pueden trabajar en aspectos de formato pero también otros problemas más complejos. Se basan en una serie de reglas para escanear el código, o descripciones de comportamientos a vigilar, y muestran todas las violaciones que encuentran. El más popular para JavaScript es <a href="https://eslint.org/">ESLint</a>.</p>
 </li>
 </ul>
 </div>
@@ -3192,7 +3199,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="json"><span class="w">   </span><span class="nl">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="err">...</span><span class="w">
-      </span><span class="nl">"lint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eslint *.js -f checkstyle -o coverage/eslint-result.xml"</span><span class="w">
+      </span><span class="nl">"lint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eslint *.js test/*.js -f checkstyle -o coverage/eslint-result.xml"</span><span class="w">
    </span><span class="p">}</span><span class="err">,</span><span class="w">
    </span><span class="err">...</span><span class="w">
    </span><span class="nl">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
@@ -3215,12 +3222,12 @@ docker rmi $(docker images -q)</code></pre>
 </ol>
 </div>
 <div class="paragraph">
-<p>El parámetro <code>-s</code> se utiliza para que no muestre mensajes de error. Habrá generado el archivo <code>coverage/eslint-result.xml</code>.</p>
+<p>El parámetro <code>-s</code> se utiliza para que no muestre mensajes de error. Habrá generado el archivo <code>coverage/eslint-result.xml</code> en formato similar al informe de <em>CheckStyle</em> para poder importarlo correctamente en Jenkins.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="5">
 <li>
-<p>En Jenkins, añade una nueva fase <code>Analysis</code> en el pipeline, en la que llames a <code>lint</code> y publiques el informe con el formato <em>CheckStyle</em>.</p>
+<p>En Jenkins, añade una nueva fase <code>Analysis</code> en el pipeline, en la que llames a <code>lint</code> y publiques el informe generado por <strong>ESLint</strong> con el formato <em>CheckStyle</em>.</p>
 </li>
 </ol>
 </div>
@@ -3258,7 +3265,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="olist arabic">
 <ol class="arabic" start="7">
 <li>
-<p>La fase de análisis falla (está en rojo) porque cuando ESLint detecta un error, finaliza con error (<code>EXIT 1</code>). Si te fijas en el informe, los 2 errores detectados han sido en el archivo <code>test.js</code> (y pueden ser falsos positivos). Para evitarlo, elimina <code>test/*.js</code> del script <code>lint</code> en <code>package.json</code>.</p>
+<p>No te preocupes si la fase de análisis que acabas de añadir falla (está en rojo). Es así porque cuando ESLint detecta un error, finaliza con error (<code>EXIT 1</code>). Si te fijas en el informe, los 2 errores detectados han sido en el archivo <code>test.js</code> (y pueden ser falsos positivos). Para evitarlo, elimina <code>test/*.js</code> del script <code>lint</code> en <code>package.json</code>.</p>
 </li>
 </ol>
 </div>
@@ -3275,21 +3282,21 @@ docker rmi $(docker images -q)</code></pre>
 <div class="sect2">
 <h3 id="_despliegue_en_la_vm_2">7.4. Despliegue en la VM</h3>
 <div class="paragraph">
-<p>Para desplegar la aplicación hello world en  l instancia de despliegue vamos a clonar el repositorio y a continuación ejecutaremos en ella la orden de Node para ponerla en marcha.</p>
+<p>Para desplegar la aplicación <em>hello world</em> en la instancia de despliegue vamos a clonar el repositorio y a continuación ejecutaremos en ella la orden de Node para ponerla en marcha.</p>
 </div>
 <div class="paragraph">
-<p>Recuerda que ya he hemos realizado una configuración previa sobre la instancia de despliegue, que constituyen los  <strong>prerrequisitos</strong>:</p>
+<p>Recuerda que ya he hemos realizado una configuración previa sobre la instancia de despliegue, que constituyen los  <strong>prerrequisitos</strong> para esta sección:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Instalar NodeJS</p>
+<p>Con anterioridad ya instalamos NodeJS en la instancia de despliegue.</p>
 </li>
 <li>
-<p>Copiar la clave pública de despliegue para que Jenkins, que tiene la clave privada de despliegue, pueda hacer ssh sobre ella y ejecutar comandos.</p>
+<p>También habíamos copiado la clave pública de despliegue para que Jenkins, que tiene la clave privada asociada, pueda hacer <code>ssh</code> y ejecutar comandos sobre ella.</p>
 </li>
 <li>
-<p>Además, para ayudarnos a lanzar <code>npm start</code> desde Jenkins, como un proceso demonio en background, usaremos <a href="https://www.npmjs.com/package/forever"><strong>forever</strong></a>. Instalalo en la  instancia de despliegue:</p>
+<p>Como requisito adicional, para ayudarnos a lanzar <code>npm start</code> desde Jenkins, como un proceso demonio en background, usaremos <a href="https://www.npmjs.com/package/forever"><strong>forever</strong></a>. Debes instalar <code>forever</code> en la  instancia de despliegue:</p>
 <div class="literalblock">
 <div class="content">
 <pre>sudo npm install forever -g</pre>
@@ -3304,7 +3311,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Copia este nueva fase en tu pipeline, sustituyendo DEPLOY_MACHINE por el nombre DNS de tu instancia, y usa el nombre del repositorio adecuado:</p>
+<p>Copia este nueva fase en tu pipeline, sustituyendo DEPLOY_MACHINE por el nombre DNS de tu instancia, y usa el nombre del repositorio git adecuado:</p>
 </li>
 </ol>
 </div>
@@ -3335,7 +3342,7 @@ docker rmi $(docker images -q)</code></pre>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Detiene el proceso <code>node</code> si existe de un despliegue anterior, usando <code>forever stop</code>.</td>
+<td>Detiene la ejecución de <code>forever</code> si existe de un despliegue anterior, usando <code>forever stop</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -3343,7 +3350,7 @@ docker rmi $(docker images -q)</code></pre>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Ejecuta la aplicación con <code>forever start</code> en el puerto 8080, que ejecuta el proceso en background como demonio.</td>
+<td>Ejecuta la aplicación con <code>forever start</code> en el puerto <code>8080</code>, que ejecuta el proceso en background como demonio.</td>
 </tr>
 </table>
 </div>
@@ -3362,160 +3369,135 @@ docker rmi $(docker images -q)</code></pre>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_despliegue_en_un_contenedor_docker">7.5. Despliegue en un contenedor Docker</h3>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_aplicación_nodejs_con_docker">8. Aplicación NodeJs con Docker</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>Para realizar el despliegue de la app Hola Mundo en NodeJs como un contenedor, primero tenemos que <a href="https://semaphoreci.com/community/tutorials/dockerizing-a-node-js-web-application">dockerizar</a> la aplicación. Una vez construido el contenedor, habrá qeu publicar la imagen de contenedor en un registro como Google Container Registry, y por último ejecutar el contenedor en la instancia de despliegue.</p>
+<p>Para realizar el despliegue de la app Hola Mundo en NodeJs como un contenedor, primero tenemos que <a href="https://nodejs.org/fr/docs/guides/nodejs-docker-webapp/">dockerizar</a> la aplicación. Una vez construido el contenedor, habrá qeu publicar la imagen de contenedor en un registro como Google Container Registry, y por último ejecutar el contenedor en la instancia de despliegue.</p>
 </div>
 <div class="paragraph">
 <p>A continuación se describe cómo crear un contenedor Docker de la aplicación NodeJs. Los pasos se realizan en local, y al final configuraremos el pipeline de Jenkins para que se realicen automáticamente.</p>
 </div>
-<div class="sect3">
-<h4 id="_creación_del_dockerfile_2">7.5.1. Creación del <code>Dockerfile</code></h4>
+<div class="sect2">
+<h3 id="_creación_del_dockerfile_2">8.1. Creación del <code>Dockerfile</code></h3>
 <div class="paragraph">
-<p>Para [crear el contendedor de Docker] que empaquete la aplicación NodeJs, vamos a definir el siguiente archivo <code>Dockerfile</code> que debe estar en la carpeta raíz del proyecto:</p>
+<p>Para crear el contendedor de Docker que empaquete la aplicación NodeJs, vamos a definir el siguiente archivo <code>Dockerfile</code> que debe estar en la carpeta raíz del proyecto:</p>
 </div>
 <div class="listingblock">
 <div class="title">Dockerfile</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="docker"><span class="c"># Start with a base image containing Java runtime</span>
-<span class="k">FROM</span><span class="s"> openjdk:8-jdk-alpine</span>
-<span class="c"># Make port 8080 available to the world outside this container</span>
-<span class="k">EXPOSE</span><span class="s"> 8080</span>
-<span class="c"># The application's jar file</span>
-<span class="k">ARG</span><span class="s"> JAR_FILE=target/*.jar</span>
-<span class="c"># Copy the application's jar to the container</span>
-<span class="k">COPY</span><span class="s"> ${JAR_FILE} app.jar</span>
-<span class="c"># Run the jar file</span>
-<span class="k">ENTRYPOINT</span><span class="s"> ["java","-jar","/app.jar"]</span></code></pre>
+<pre class="rouge highlight"><code data-lang="docker"><span class="k">FROM</span><span class="s"> node:10-alpine</span>
+
+<span class="c"># Create app directory</span>
+<span class="k">WORKDIR</span><span class="s"> /usr/src/app</span>
+
+<span class="c"># Install app dependencies</span>
+<span class="c"># A wildcard is used to ensure both package.json AND package-lock.json are copied</span>
+<span class="c"># where available (npm@5+)</span>
+<span class="k">COPY</span><span class="s"> package*.json ./</span>
+
+<span class="k">RUN </span>npm <span class="nb">install</span>
+<span class="c"># If you are building your code for production</span>
+<span class="c"># RUN npm ci --only=production</span>
+
+<span class="c"># Bundle app source</span>
+<span class="k">COPY</span><span class="s"> . .</span>
+
+<span class="k">EXPOSE</span><span class="s"> 3000</span>
+<span class="k">CMD</span><span class="s"> [ "node", "index.js" ]</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>El Dockerfile es muy sencillo, contiene los pasos básicos para ejecutar una aplicación String Boot en un contenedor: partiendo de una imagen de <code>openjdk</code>, copia el archivo <code>target/*.jar</code> en el contenedor con el nombre <code>app.jar</code> y lo ejecuta mediante el comando <code>ENTRYPOINT</code> para que no haya ninguna shell sobre el proceso <code>java</code>.</p>
+<p>El Dockerfile es muy sencillo, contiene los <a href="https://nodejs.org/fr/docs/guides/nodejs-docker-webapp/#creating-a-dockerfile">pasos básicos</a> para ejecutar una aplicación en un contenedor.</p>
 </div>
 <div class="paragraph">
-<p>Puedes construir la imagen del contenedor:</p>
+<p>Crea además un archivo <code>.dockerignore</code> en la misma carpeta que tu Dockerfile con el siguiente contenido:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>node_modules/
+.git/
+.gitignore
+npm-debug.log</pre>
+</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Construye el proyecto PetClinic con maven en tu equipo local:</p>
+<p>Puedes construir la imagen del contenedor:</p>
 </li>
 </ol>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash">./mvnw clean package</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker build <span class="nt">-t</span> &lt;your username&gt;/nodeapp .</code></pre>
 </div>
 </div>
-<div class="imageblock text-center thumb">
-<div class="content">
-<img src="images/mvn-package-petclinic.png" alt="mvn package petclinic">
-</div>
-<div class="title">Fig. 74. Resultado de la construcción local con Maven</div>
-</div>
-<div class="olist arabic">
-<ol class="arabic" start="2">
-<li>
-<p>Construye el contenedor con <code>docker build</code>:</p>
-</li>
-</ol>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="bash">docker build <span class="nt">-t</span> petclinic-docker .</code></pre>
-</div>
-</div>
-<div class="imageblock text-center thumb">
-<div class="content">
-<img src="images/docker-build-petclinic.png" alt="docker build petclinic">
-</div>
-<div class="title">Fig. 75. Docker build</div>
-</div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
 <div class="paragraph">
-<p>Para trabajar con contenedores Docker en tu equipo local, debes tener Docker instalado. Recuerda iniciar Docker Desktop en Windows, o iniciar el servicio Docker en Linux o Mac. Comprueba que está funcionado ejecutando el comando <code>docker ps</code></p>
-</div>
-</td>
-</tr>
-</table>
+<p>Tras ello, ejecuta: <code>docker images</code>. La imagen debe aparecer en la lista de imágenes de Docker en tu equipo:</p>
 </div>
 <div class="paragraph">
 <p>Prueba la ejecución del contenedor en local:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash">docker run <span class="nt">-it</span> <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> petclinic-docker</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker run <span class="nt">-p</span> 3000:3000 <span class="nt">-d</span> <span class="nt">--name</span> hello-node &lt;your username&gt;/nodeapp</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Comprueba que se ha iniciado la aplicación en <a href="http://localhost:8080" class="bare">http://localhost:8080</a>.</p>
+<p>Comprueba que se ha iniciado la aplicación en <a href="http://localhost:3000" class="bare">http://localhost:3000</a>.</p>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Comprueba que el contenedor está ejecutándose con <code>docker ps</code></p>
+</li>
+<li>
+<p>Detén el contenedor con <code>docker stop &lt;ID&gt;</code></p>
+</li>
+<li>
+<p>Comprueba que ya no está ejecutándose, pero el contenedor sigue existiendo, lo puedes ver con <code>docker ps -a</code></p>
+</li>
+<li>
+<p>Podrías volver a arrancarlo con <code>docker start &lt;ID&gt;</code>, pero en su lugar, elimina el contenedor con <code>docker rm &lt;ID&gt;</code></p>
+</li>
+<li>
+<p>La imagen sigue existiendo, puedes verlo con <code>docker images</code></p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_publicación_de_la_imagen_en_el_registro">8.2. Publicación de la imagen en el registro</h3>
+<div class="paragraph">
+<p>Una vez creada la imagen con <code>docker build</code> y probada su ejecución con <code>docker run</code>, el siguiente paso será publicar la imagen en un registro de contenedores, mediante <code>docker push</code>. De nuevo vamos a usar Google Cloud <a href="https://cloud.google.com/container-registry?hl=es">Container Registry</a>.</p>
 </div>
 <div class="paragraph">
-<p>Para el contenedor con CTRL+C.</p>
-</div>
-<div class="paragraph">
-<p>Una vez creada la imagen con <code>docker build</code> y probada su ejecución con <code>docker run</code>, el siguiente paso será publicar la imagen en un registro de contenedores, mediante <code>docker push</code>. Podemos usar <a href="https://hub.docker.com/">DockerHub</a> pero en este caso vamos a usar Google Cloud <a href="https://cloud.google.com/container-registry?hl=es">Container Registry</a>.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_autenticación_en_container_registry_2">7.5.2. Autenticación en Container Registry</h4>
-<div class="paragraph">
-<p>Para poder hacer <code>push</code> debemos tener permisos de escritura, y por tanto debemos autenticarnos en el servicio Container Registry.</p>
-</div>
-<div class="paragraph">
-<p><a href="https://cloud.google.com/container-registry/docs/advanced-authentication">Authentication</a> <em>allows you to connect to Container Registry with your credentials. To push or pull images, you must configure the permissions that are required to access the registry.</em></p>
-</div>
-<div class="paragraph">
-<p><em>Using <a href="https://cloud.google.com/container-registry/docs/advanced-authentication#json-key">JSON key file</a> as authentication method:</em></p>
-</div>
-<div class="paragraph">
-<p><em>To create a new service account and a service account key for use with Container Registry repositories only:</em></p>
+<p>Para poder hacer <code>push</code> debemos tener permisos de escritura, y por tanto debemos autenticarnos en el servicio Container Registry. Este proceso ya se hizo en la para el ejemplo de Java en la sección <em>Autenticación en Container Registry</em>. Ahora, simplemente comprueba que mantienes el login del Container Registry.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p><em>Create the service account for interacting with repositories:</em></p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>In Google Cloud Console, open the <a href="https://console.cloud.google.com/apis/credentials/serviceaccountkey?" class="bare">https://console.cloud.google.com/apis/credentials/serviceaccountkey?</a><em>ga=2.71233296.1082389881.1588672109-358507209.1586347394[Create service account key page].</em></p>
-</li>
-<li>
-<p><em>From the Service account list, select New service account</em></p>
-</li>
-<li>
-<p><em>In the Service account name field, enter a name</em></p>
-</li>
-<li>
-<p><em>From the Role list, select the appropriate Container Registry role for the service account: Cloud Storage / Storage Administrator</em></p>
-</li>
-<li>
-<p><em>Click Create. A JSON file that contains your key downloads to your computer.</em></p>
-</li>
-</ol>
+<p>Comprueba el login al registro:</p>
+<div class="literalblock">
+<div class="content">
+<pre>docker login https://gcr.io</pre>
+</div>
 </div>
 </li>
 </ol>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
-<img src="images/cloud-containers-registry-key-create.png" alt="cloud containers registry key create">
+<img src="images/docker-login-done.png" alt="docker login done">
 </div>
-<div class="title">Fig. 76. Creación Service Account Key for pull/push on Container Registry</div>
-</div>
-<div class="olist arabic">
-<ol class="arabic" start="2">
-<li>
-<p>Guarda el archivo <code>.json</code> en la carpeta <code>secret</code> de tu proyecto PetClinic.</p>
-</li>
-</ol>
+<div class="title">Fig. 74. Comprobar docker login</div>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -3525,56 +3507,19 @@ docker rmi $(docker images -q)</code></pre>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>No olvides añadir la carpeta <code>secret/</code> al archivo <code>.gitignore</code> para evitar publicar en GitHub tu archivo de credenciales.</p>
+<p>Si <code>docker login</code> te da error, revisa los pasos de la sección anterior de <em>Autenticación en Container Registry</em>. No es necesario que vuelvas a generar el archivo de credenciales, simplemente copia ese archivo .json en el proyecto actual y úsalo para hacer login.</p>
+</div>
+<div class="paragraph">
+<p>En tal caso, no olvides añadir el archivo de credenciales al <code>.gitignore</code> para evitar publicar en GitHub tus credenciales.</p>
 </div>
 </td>
 </tr>
 </table>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="3">
+<ol class="arabic" start="2">
 <li>
-<p><em>Use the service account key as your password to authenticate with Docker.</em> Sustituye <code>keyfile.json</code> por el nombre de tu archivo de credenciales:</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>En Linux:</p>
-</li>
-</ol>
-</div>
-</li>
-</ol>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="bash"><span class="nb">cat </span>keyfile.json | docker login <span class="nt">-u</span> _json_key <span class="nt">--password-stdin</span> https://gcr.io</code></pre>
-</div>
-</div>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a" start="2">
-<li>
-<p>En Windows:</p>
-</li>
-</ol>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="bash">docker login <span class="nt">-u</span> _json_key <span class="nt">--password-stdin</span> https://gcr.io &lt; keyfile.json</code></pre>
-</div>
-</div>
-<div class="imageblock text-center thumb">
-<div class="content">
-<img src="images/cloud-containers-registry-login.png" alt="cloud containers registry login">
-</div>
-<div class="title">Fig. 77. Autenticación de Docker contra Container Registry</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_publicación_y_despliegue">7.5.3. Publicación y despliegue</h4>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Construir el contenedor con el nombre completo incluyendo la referencia a Container registry (gcr.io). Primero definimos una variable de entorno con el nombre de nuestro proyecto GCP, y luego construimos de nuevo la imagen con el nombre completo del registro de contenedores:</p>
+<p>Etiqueta el contenedor con el nombre completo incluyendo la referencia a Container registry (gcr.io). Primero definimos una variable de entorno con el nombre de nuestro proyecto GCP, y luego etiquetamos la imagen ya construida con un nuevo nombre completo del registro de contenedores:</p>
 </li>
 </ol>
 </div>
@@ -3582,32 +3527,32 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="bash"><span class="nv">GOOGLE_CLOUD_PROJECT</span><span class="o">=</span>cnsa-2020-user123
 
-docker build <span class="nt">-t</span> gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/petclinic:1.0 .</code></pre>
+docker tag  &lt;your username&gt;/nodeapp gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/nodeapp:1.0</code></pre>
 </div>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="2">
+<ol class="arabic" start="3">
 <li>
-<p>A continuación vamos a publicar con <code>docker push</code>: habilita la API de Container Registry en tu proyecto GCP</p>
+<p>Comprueba que se ha etiquetado correctamente</p>
 </li>
 </ol>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
-<img src="images/container-registry-habilitar-api.png" alt="container registry habilitar api">
+<img src="images/docker-tag-nodeapp.png" alt="docker tag nodeapp">
 </div>
-<div class="title">Fig. 78. Habilitar la API Container Registry</div>
+<div class="title">Fig. 75. Imagen etiquetada</div>
 </div>
 <div class="olist arabic">
-<ol class="arabic" start="3">
+<ol class="arabic" start="4">
 <li>
-<p>Publica la imagen con <code><code>docker push [HOSTNAME]/[PROJECT-ID]/[IMAGE]:[TAG]</code></code>:</p>
+<p>A continuación, publica la imagen en el registro con <code>docker push</code></p>
 </li>
 </ol>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash">docker push gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/petclinic:1.0</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker push gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/nodeapp:1.0</code></pre>
 </div>
 </div>
 <div class="olist arabic">
@@ -3619,43 +3564,36 @@ docker build <span class="nt">-t</span> gcr.io/<span class="nv">$GOOGLE_CLOUD_PR
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
-<img src="images/container-registry-pushed-petclinic.png" alt="container registry pushed petclinic">
+<img src="images/container-registry-pushed-nodeapp.png" alt="container registry pushed nodeapp">
 </div>
-<div class="title">Fig. 79. Lista de imágenes en Container Registry</div>
+<div class="title">Fig. 76. Lista de imágenes en Container Registry</div>
 </div>
 <div class="paragraph">
-<p>La imagen del contenedor PetClinic ya está disponible en el registro privado de nuestro proyecto GCP. Utilizando nuestras credenciales podremos hacer <code>docker pull</code> de dicha imagen para descargarla en cualquier máquina con docker, y ejecutarlo con <code>docker run</code>.</p>
+<p>La imagen del contenedor <strong>nodeapp</strong> ya está disponible en el registro privado de nuestro proyecto GCP. Utilizando nuestras credenciales podremos hacer <code>docker pull</code> de dicha imagen para descargarla en cualquier máquina con docker, y ejecutarlo con <code>docker run</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash"><span class="nv">GOOGLE_CLOUD_PROJECT</span><span class="o">=</span>cnsa-2020-user123
-
-docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span class="nt">--name</span> petclinic  gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/petclinic:1.0</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">docker run <span class="nt">-p</span> 3000:3000 <span class="nt">-t</span> <span class="nt">--name</span> nodeapp gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/nodeapp:1.0</code></pre>
 </div>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_despliegue_en_vm">8.3. Despliegue en VM</h3>
 <div class="paragraph">
-<p>Si conectas a la instancia de despliegue que creamos al principio de esta actividad, y ejecutas el comando <code>docker run</code> anterior, dará un error de autenticación:</p>
-</div>
-<div class="imageblock text-center thumb">
-<div class="content">
-<img src="images/docker-run-petclinic-webapp-error-authentication.png" alt="docker run petclinic webapp error authentication">
-</div>
-<div class="title">Fig. 80. Error de autenticación en Container Registry</div>
-</div>
-<div class="paragraph">
-<p>Para arreglarlo, habrá que copiar en la máquina de despliegue el archivo de credenciales <code>.json</code> con premisos sobre Container Registry. A continuación se muestran los comandos necesarios para ello. Una vez disponible este archivo en la instancia de despliegue ejecutar el comando <code>docker login</code> y tras ello ya si podremos hacer <code>docker pull</code> y <code>docker run</code>.</p>
+<p>Conecta a la instancia de despliegue para ejecutar el contenedor. Antes vamos a comprobar el login al registro. En la máquina de despliegue ya habíamos copiado el archivo de credenciales <code>.json</code> con premisos sobre Container Registry. A continuación se recuerdan los comandos necesarios para ello.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Compiamos el archivo de credenciales</span>
-scp ./secret/file.json ubuntu@DNS_MAQUINA_DEPLOY:~/file.json
-<span class="c"># Conectamos a la máquina de despliegue</span>
+<pre class="rouge highlight"><code data-lang="bash"><span class="c"># Conectamos a la máquina de despliegue</span>
 ssh ubuntu@DNS_MAQUINA_DEPLOY
 <span class="c"># Autenticamos docker contra Container Registry</span>
 <span class="nb">cat </span>keyfile.json | docker login <span class="nt">-u</span> _json_key <span class="nt">--password-stdin</span> https://gcr.io
 <span class="c"># ejecutamos el contenedor desde gcr.io</span>
-docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span class="nt">--name</span> petclinic gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/petclinic:1.0</code></pre>
+docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span class="nt">--name</span> nodeapp gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/nodeapp:1.0</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Hemos publicado el contenedor en el puerto 8080 ya que es el que está abierto en las reglas del firewall de nuestro proyecto GCP.</p>
 </div>
 <div class="paragraph">
 <p>Es posible que la ejecución del contenedor de un error, porque el puerto 8080 ya esté en uso:</p>
@@ -3666,18 +3604,13 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 </div>
 </div>
 <div class="paragraph">
-<p>Para solucionarlo, bien detén el proceso java que está corriendo con la aplicación PetClinic tal y como la desplegamos en la sección anterior (<code><code>if pgrep java; then pkill java; fi</code></code>), o bien utiliza otro puerto, por ejemplo, el 80, que debe estar disponible:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="bash">docker run <span class="nt">-p</span> 80:8080 <span class="nt">-t</span> <span class="nt">--name</span> petclinic gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/petclinic:1.0</code></pre>
+<p>Para solucionarlo, bien detén el proceso o contenedor java que está corriendo con la aplicación PetClinic del ejemplo anterior. O bien utiliza el puerto 80 que también está abierto.</p>
 </div>
 </div>
-</div>
-<div class="sect3">
-<h4 id="_construcción_de_la_imagen_y_despliegue_del_contenedor_con_jenkins">7.5.4. Construcción de la imagen y despliegue del contenedor con Jenkins</h4>
+<div class="sect2">
+<h3 id="_integración_y_despliegue_contínuos_con_jenkins">8.4. Integración y despliegue contínuos con Jenkins</h3>
 <div class="paragraph">
-<p>Hasta ahora hemos realizado todos los pasos manualmente. A continuación, vamos a automatizar en Jenkins todo el proceso:</p>
+<p>A continuación, vamos a automatizar en Jenkins todo el proceso:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -3693,10 +3626,14 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 </ul>
 </div>
 <div class="paragraph">
-<p>En Jenkins, son necesarios los siguientes plugins para trabajar con Docker y pipelines, y con Container Registry: Docker Pipeline (que ya está instalado), <a href="https://plugins.jenkins.io/google-container-registry-auth">Google Container Registry Auth</a>.</p>
+<p>Los plugins de  Jenkins necesarios ya los tenemos configurados el ejemplo en Java.</p>
 </div>
-<div class="paragraph">
-<p>Definimos un nuevo proyecto en Jenkins de tipo pipeline, con el nombre <code><code>PetClinic-Docker-abc123</code></code> sustituyendo abc123 por nuestro nombre de usuario. Son necesarios 3 fases (stages) en el pipeline: <em>build image</em>, <em>push image</em>, y <em>deploy container</em>.</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Definimos un nuevo proyecto en Jenkins de tipo pipeline, con el nombre <code><code>nodeapp-Docker-abc123</code></code> sustituyendo abc123 por nuestro nombre de usuario. Son necesarios 3 fases (stages) en el pipeline: <em>build image</em>, <em>push image</em>, y <em>deploy container</em>.</p>
+</li>
+</ol>
 </div>
 <div class="paragraph">
 <p>Comenzamos por la <strong>construcción de la imagen</strong>:</p>
@@ -3707,37 +3644,48 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
   <span class="n">agent</span> <span class="n">any</span>
   <span class="n">environment</span> <span class="o">{</span>
     <span class="n">CONTAINER_REGISTRY</span> <span class="o">=</span> <span class="s1">'gcr.io'</span>
-    <span class="n">GOOGLE_CLOUD_PROJECT</span> <span class="o">=</span> <span class="s1">'cnsa-2020-abc123'</span>
+    <span class="n">GOOGLE_CLOUD_PROJECT</span> <span class="o">=</span> <span class="s1">'cnsa-2020'</span>
     <span class="n">CREDENTIALS_ID</span> <span class="o">=</span> <span class="s1">'cnsa-2020-gcr'</span>
   <span class="o">}</span>
+
   <span class="n">tools</span> <span class="o">{</span>
-    <span class="n">maven</span> <span class="s2">"Default Maven"</span>
+    <span class="c1">// In Global tools configuration, install Node configured as "nodejs 13"</span>
+    <span class="n">nodejs</span> <span class="s2">"nodejs 13"</span>
   <span class="o">}</span>
+
   <span class="n">stages</span> <span class="o">{</span>
-    <span class="n">stage</span><span class="o">(</span><span class="s2">"Checkout code"</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="n">stage</span><span class="o">(</span><span class="s2">"Git Checkout"</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">steps</span> <span class="o">{</span>
         <span class="c1">// checkout scm</span>
-        <span class="n">git</span> <span class="s1">'https://github.com/ualcnsa/spring-petclinic.git'</span>
+        <span class="n">git</span> <span class="s1">'https://github.com/ualcnsa/nodeapp.git'</span>
       <span class="o">}</span>
     <span class="o">}</span>
-    <span class="n">stage</span><span class="o">(</span><span class="s1">'Compile, Test, Package'</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="n">stage</span><span class="o">(</span><span class="s1">'Install dependencies'</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">steps</span> <span class="o">{</span>
-        <span class="n">sh</span> <span class="s2">"mvn clean package"</span>
+        <span class="n">sh</span> <span class="s1">'npm install'</span>
+      <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="n">stage</span><span class="o">(</span><span class="s1">'Test'</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">steps</span> <span class="o">{</span>
+         <span class="n">sh</span> <span class="s1">'npm run test-jenkins'</span>
       <span class="o">}</span>
       <span class="n">post</span> <span class="o">{</span>
         <span class="n">success</span> <span class="o">{</span>
-          <span class="n">junit</span> <span class="s1">'**/target/surefire-reports/TEST-*.xml'</span>
-          <span class="n">archiveArtifacts</span> <span class="s1">'target/*.jar'</span>
+          <span class="n">junit</span> <span class="s1">'**/test*.xml'</span>
         <span class="o">}</span>
       <span class="o">}</span>
     <span class="o">}</span>
+
     <span class="n">stage</span><span class="o">(</span><span class="s2">"Build image"</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">steps</span> <span class="o">{</span>
         <span class="n">script</span> <span class="o">{</span>
           <span class="n">dockerImage</span> <span class="o">=</span> <span class="n">docker</span><span class="o">.</span><span class="na">build</span><span class="o">(</span>
-            <span class="s2">"${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/petclinic:${env.BUILD_ID}"</span><span class="o">,</span>
+            <span class="s2">"${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/nodeapp:${env.BUILD_ID}"</span><span class="o">,</span>
             <span class="s2">"-f Dockerfile ."</span>
           <span class="o">)</span>
+        <span class="o">}</span>
       <span class="o">}</span>
     <span class="o">}</span>
   <span class="o">}</span>
@@ -3745,15 +3693,15 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 </div>
 </div>
 <div class="paragraph">
-<p>Para probar que la imagen del contenedor se ha creado bien, añade esta fase que hace un despliegue "local" en la propia máquina de Jenkins, es decir, ejecuta un contenedor basado en la imagen que acabamos de crear:</p>
+<p>Para probar que la imagen del contenedor se ha creado bien, añade la siguiente fase que hace un despliegue "local" en la propia máquina de Jenkins, es decir, ejecuta un contenedor basado en la imagen que acabamos de crear:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="groovy">    <span class="n">stage</span><span class="o">(</span><span class="s2">"Run image locally"</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">steps</span> <span class="o">{</span>
-        <span class="n">sh</span> <span class="s2">"docker stop petclinic || true &amp;&amp; docker rm  petclinic || true"</span> <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="n">sh</span> <span class="s2">"docker stop nodeapp || true &amp;&amp; docker rm  nodeapp || true"</span> <i class="conum" data-value="1"></i><b>(1)</b>
         <span class="n">sh</span> <span class="s2">"mkdir -p logs"</span> <i class="conum" data-value="2"></i><b>(2)</b>
-        <span class="n">sh</span> <span class="s2">"nohup docker run -p 8080:8080 -t --name petclinic ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/petclinic:${env.BUILD_ID} &gt; logs/yourservice-docker-${env.BUILD_ID}.log 2&gt;&amp;1 &amp;"</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="n">sh</span> <span class="s2">"nohup docker run -p 8080:3000 -t --name nodeapp ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/nodeapp:${env.BUILD_ID} &gt; logs/nodeapp-docker-${env.BUILD_ID}.log 2&gt;&amp;1 &amp;"</span> <i class="conum" data-value="3"></i><b>(3)</b>
       <span class="o">}</span>
     <span class="o">}</span></code></pre>
 </div>
@@ -3762,7 +3710,7 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Por si ya se ha ejecutado el pipeline anteriormente, es necesario comprobar si el contenedor <code>petclinic</code> ya se está ejecutando, y en tal caso pararlo con <code>docker stop</code> y eliminarlo con <code>docker rm</code></td>
+<td>Por si ya se ha ejecutado el pipeline anteriormente, es necesario comprobar si el contenedor <code>nodeapp</code> ya se está ejecutando, y en tal caso pararlo con <code>docker stop</code> y eliminarlo con <code>docker rm</code></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -3770,12 +3718,12 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Con <code>docker run</code> ejecuta el contenedor <code>petclinic</code> a partir de la imagen recién construida. Para que  el pipeline pueda finalizar y el contenedor siga ejecutándose, se añade <code>nohup</code> y se lanza el comando en background, guardando la salida por consola en el archivo <code>.log</code>.</td>
+<td>Con <code>docker run</code> ejecuta el contenedor <code>nodeapp</code> a partir de la imagen recién construida. Para que el pipeline pueda finalizar y el contenedor siga ejecutándose, se añade <code>nohup</code> y se lanza el comando en background, guardando la salida por consola en el archivo <code>.log</code>.</td>
 </tr>
 </table>
 </div>
 <div class="paragraph">
-<p>La aplicación debe estar accesible en el puerto 8080 en tu máquina de Jenkins. Para asegurarnos que la aplicación se está ejecutando bien, debemos problarlo "manualmente". Para automatizar esta prueba, lo adecuado sería realizar unos tests end-to-end, con <a href="https://www.selenium.dev">Selenium</a>. Esto se explicará en otra actividad, dedicada al testing.</p>
+<p>Tras ello, la aplicación debe estar accesible en el puerto 8080 en tu máquina de Jenkins. Para asegurarnos que la aplicación se está ejecutando bien, debemos problarlo "manualmente". Para automatizar esta prueba, lo adecuado sería realizar unos tests end-to-end, con <a href="https://www.selenium.dev">Selenium</a>. Esto se explicará en otra actividad, dedicada al testing.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3793,33 +3741,14 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Primero, es necesario crear unas credenciales en Jenkins para poder hacer <code>push</code> en Container Registry:</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p><em>Go to jenkins home, click on “credentials” and “(global)”</em></p>
-</li>
-<li>
-<p><em>Click on “Add Credentials” in left menu.</em></p>
-</li>
-<li>
-<p><em>Select <strong>Google Service Account from private key</strong> for the “Kind” field, and enter your project name ( myregistry in this example). Then upload the JSON private key.</em></p>
+<p>Primero, las credenciales en Jenkins para poder hacer <code>push</code> en Container Registry ya están creadas del ejemplo anterior (Si tienes algún problema, consulta la sección correspondiente del ejemplo de Java)</p>
 </li>
 </ol>
-</div>
-</li>
-</ol>
-</div>
-<div class="imageblock text-center thumb">
-<div class="content">
-<img src="images/jenkins-credentials-container-registry.png" alt="jenkins credentials container registry">
-</div>
-<div class="title">Fig. 81. Credenciales en Jenkins para Container Registry</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="2">
 <li>
-<p>Una vez guardadas las credenciales, vamos a definir la fase para publicar la imagen del contenedor:</p>
+<p>Define la fase para publicar la imagen del contenedor:</p>
 </li>
 </ol>
 </div>
@@ -3831,42 +3760,23 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
                 <span class="n">docker</span><span class="o">.</span><span class="na">withRegistry</span><span class="o">(</span><span class="s1">'https://'</span><span class="o">+</span> <span class="n">CONTAINER_REGISTRY</span><span class="o">,</span> <span class="s1">'gcr:'</span><span class="o">+</span> <span class="n">GOOGLE_CLOUD_PROJECT</span><span class="o">)</span> <span class="o">{</span>
                         <span class="n">dockerImage</span><span class="o">.</span><span class="na">push</span><span class="o">(</span><span class="s2">"latest"</span><span class="o">)</span>
                         <span class="n">dockerImage</span><span class="o">.</span><span class="na">push</span><span class="o">(</span><span class="s2">"${env.BUILD_ID}"</span><span class="o">)</span>
-
+                <span class="o">}</span>
             <span class="o">}</span>
         <span class="o">}</span>
     <span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Comprobar que se ha publicado correctamente en el registro.</p>
+<p>Comprueba que se ha publicado correctamente en el registro.</p>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
-<img src="images/jenkins-published-container-registry.png" alt="jenkins published container registry">
+<img src="images/jenkins-published-nodeapp-container-registry.png" alt="jenkins published nodeapp container registry">
 </div>
-<div class="title">Fig. 82. Imagen publicada en Container Registry, etiquetada con el número de build</div>
-</div>
-<div class="paragraph">
-<p>Por último, quedaría el paso de <strong>desplegar al entorno de producción</strong>. Una vez empaquetada como un contenedor, Google Cloud permite desplegar de varias formas:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>en <strong>máquina virtual</strong> con GCE,</p>
-</li>
-<li>
-<p>en plataforma como servicio con <strong>Google App Engine</strong>,</p>
-</li>
-<li>
-<p>en Kubernetes con <strong>GKE</strong>,</p>
-</li>
-<li>
-<p>y en <strong>Cloud Run</strong>, un servicio de Google Cloud específico para el despliegue de contenedores.</p>
-</li>
-</ul>
+<div class="title">Fig. 77. Imagen publicada en Container Registry, etiquetada con el número de build</div>
 </div>
 <div class="paragraph">
-<p>Para nosotros, es la máquina virtual de despliegue es nuestro entorno de producción en el que vamos a desplegar el contenedor.</p>
+<p>Por último, quedaría el paso de <strong>desplegar al entorno de producción</strong>: la máquina virtual de despliegue.</p>
 </div>
 <div class="paragraph">
 <p>Los pasos para el despliegue de la nueva imagen del contenedor consistirán en ejecutar los siguientes comandos sobre la máquina de despliegue:</p>
@@ -3885,7 +3795,7 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 </ul>
 </div>
 <div class="paragraph">
-<p>Estas acciones debemos añadirlas a un <code>stage</code> del pipeline de Jenkins que se encargará de desplegar el nuevo contenedor automáticamente. En el siguiente código, sustituye <code>DNS_DEPLOY_INSTANCE</code> por el nombre DNS de tu instancia de depliegue. También puedes definirla como una variable de entorno al inicio del pipeline.</p>
+<p>Estas acciones debemos añadirlas a un <code>stage</code> del pipeline de Jenkins que se encargará de desplegar el nuevo contenedor automáticamente. En el siguiente código, sustituye <code>DNS_DEPLOY_INSTANCE</code> por el nombre DNS de tu instancia de despliegue. También puedes definirla como una variable de entorno al inicio del pipeline.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3893,8 +3803,8 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
       <span class="n">steps</span><span class="o">{</span>
         <span class="n">sh</span> <span class="s1">'''
           ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "mkdir -p  ~/logs" <i class="conum" data-value="1"></i><b>(1)</b>
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE " if docker ps -q --filter name=petclinic | grep . ; then docker stop petclinic &amp;&amp; docker rm -fv petclinic; fi" <i class="conum" data-value="2"></i><b>(2)</b>
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "nohup docker run -p 80:8080 -t --name petclinic ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/petclinic:latest  &gt; logs/yourservice-docker.log 2&gt;&amp;1 &amp;" <i class="conum" data-value="3"></i><b>(3)</b>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE " if docker ps -q --filter name=nodeapp | grep . ; then docker stop nodeapp &amp;&amp; docker rm -fv nodeapp; fi" <i class="conum" data-value="2"></i><b>(2)</b>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "nohup docker run -p 8080:3000 -t --name nodeapp ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/nodeapp:latest  &gt; logs/nodeapp-docker.log 2&gt;&amp;1 &amp;" <i class="conum" data-value="3"></i><b>(3)</b>
         '''</span>
       <span class="o">}</span>
     <span class="o">}</span></code></pre>
@@ -3908,7 +3818,7 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Ejecuta en la instancia de despliegue el comando que detiene y elimina el contenedor <code>petclinic</code> en caso de que ya se estuviera ejecutando</td>
+<td>Ejecuta en la instancia de despliegue el comando que detiene y elimina el contenedor <code>nodeapp</code> en caso de que ya se estuviera ejecutando</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -3916,30 +3826,8 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 </tr>
 </table>
 </div>
-<div class="admonitionblock tip">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
 <div class="paragraph">
-<p>Algunos comando útiles de docker:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code># Remove all stopped containers
-docker rm $(docker ps -a -q)
-# Remove all images
-docker rmi $(docker images -q)</code></pre>
-</div>
-</div>
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>La aplicación PetClinic debe estar accesible <em>en producción</em>, en el puerto 8080 en la instancia de despliegue. Para asegurarnos, debemos problarlo "manualmente". Para automatizar esta prueba <em>en producción</em>, lo adecuado de nuevo sería realizar unos tests end-to-end, con <a href="https://www.selenium.dev">Selenium</a>. Esto se explicará en otra actividad, dedicada al testing.</p>
+<p>La aplicación nodeapp debe estar accesible <em>en producción</em>, en el puerto 8080 en la instancia de despliegue. Para asegurarnos, debemos problarlo "manualmente". Para automatizar esta prueba <em>en producción</em>, lo adecuado de nuevo sería realizar unos tests end-to-end, con <a href="https://www.selenium.dev">Selenium</a>. Esto se explicará en otra actividad, dedicada al testing.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3959,8 +3847,8 @@ docker rmi $(docker images -q)</code></pre>
 <pre class="rouge highlight"><code data-lang="groovy">    <span class="n">stage</span><span class="o">(</span><span class="s1">'Remove Unused docker image'</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">steps</span><span class="o">{</span>
         <span class="c1">// input message:"Proceed with removing image locally?" </span><i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="n">sh</span> <span class="s1">'if docker ps -q --filter name=petclinic | grep . ; then docker stop petclinic &amp;&amp; docker rm -fv petclinic; fi'</span> <i class="conum" data-value="2"></i><b>(2)</b>
-        <span class="n">sh</span> <span class="s1">'docker rmi ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/petclinic:$BUILD_NUMBER'</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="n">sh</span> <span class="s1">'if docker ps -q --filter name=nodeapp | grep . ; then docker stop nodeapp &amp;&amp; docker rm -fv nodeapp; fi'</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="n">sh</span> <span class="s1">'docker rmi ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/nodeapp:$BUILD_NUMBER'</span> <i class="conum" data-value="3"></i><b>(3)</b>
       <span class="o">}</span>
     <span class="o">}</span></code></pre>
 </div>
@@ -3981,20 +3869,14 @@ docker rmi $(docker images -q)</code></pre>
 </tr>
 </table>
 </div>
-<div class="imageblock text-center thumb">
-<div class="content">
-<img src="images/jenkins-petclinic-full-pipeline-proceed.png" alt="jenkins petclinic full pipeline proceed">
-</div>
-<div class="title">Fig. 83. Input message (paso comentado en el ejemplo)</div>
-</div>
 <div class="paragraph">
 <p>El pipeline completo, con todas sus fases, debe quedar así:</p>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
-<img src="images/jenkins-petclinic-full-pipeline.png" alt="jenkins petclinic full pipeline">
+<img src="images/jenkins-nodeapp-full-pipeline.png" alt="jenkins nodeapp full pipeline">
 </div>
-<div class="title">Fig. 84. Pipeline completo</div>
+<div class="title">Fig. 78. Pipeline completo</div>
 </div>
 <div class="sidebarblock">
 <div class="content">
@@ -4004,13 +3886,13 @@ docker rmi $(docker images -q)</code></pre>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p><a href="https://medium.com/@gustavo.guss/jenkins-starting-with-pipeline-doing-a-node-js-test-72c6057b67d4">Jenkins Starting with Pipeline doing a Node.js test</a> @ Medium</p>
+<p><a href="https://nodejs.org/es/docs/guides/nodejs-docker-webapp/">Dockerizing a Node.js web app</a> @ NodeJs Docs</p>
 </li>
 <li>
-<p><a href="https://tutorials.releaseworksacademy.com/learn/building-your-first-docker-image-with-jenkins-2-guide-for-developers">Building your first Docker image with Jenkins</a> @  Releaseworks Academy Tutorials</p>
+<p><a href="https://medium.com/@sssanjaya/a-simple-docker-setup-for-simple-hello-world-nodejs-application-bcf79bb608a0">A simple docker setup for hello world nodejs application</a> @ Medium</p>
 </li>
 <li>
-<p><a href="https://medium.com/@mosheezderman/how-to-set-up-ci-cd-pipeline-for-a-node-js-app-with-jenkins-c51581cc783c">https://medium.com/@mosheezderman/how-to-set-up-ci-cd-pipeline-for-a-node-js-app-with-jenkins-c51581cc783c</a> @ Medium</p>
+<p><a href="https://semaphoreci.com/community/tutorials/dockerizing-a-node-js-web-application">Dockerizing a Node.js Web Application</a> @ SemaphoreCI</p>
 </li>
 </ol>
 </div>
@@ -4020,10 +3902,9 @@ docker rmi $(docker images -q)</code></pre>
 </div>
 </div>
 </div>
-</div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-12 18:27:16 +0200
+Last updated 2020-05-12 21:51:29 +0200
 </div>
 </div>
 <style>

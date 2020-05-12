@@ -365,7 +365,7 @@ Se habrá creado un archivo `.eslintrc.json`, que incluirá esta línea:
 ----
    "scripts": {
       ...
-      "lint": "eslint *.js -f checkstyle -o coverage/eslint-result.xml"
+      "lint": "eslint *.js test/*.js -f checkstyle -o coverage/eslint-result.xml"
    },
    ...
    "devDependencies": {
@@ -421,21 +421,21 @@ image::eslint-jenkins-pass-grapth.png[role="thumb", align="center"]
 === Despliegue en la VM
 
 
-Para desplegar la aplicación hello world en  l instancia de despliegue vamos a clonar el repositorio y a continuación ejecutaremos en ella la orden de Node para ponerla en marcha. 
+Para desplegar la aplicación _hello world_ en la instancia de despliegue vamos a clonar el repositorio y a continuación ejecutaremos en ella la orden de Node para ponerla en marcha. 
 
-Recuerda que ya he hemos realizado una configuración previa sobre la instancia de despliegue, que constituyen los  *prerrequisitos*: 
+Recuerda que ya he hemos realizado una configuración previa sobre la instancia de despliegue, que constituyen los  *prerrequisitos* para esta sección: 
 
-- Instalar NodeJS
+- Con anterioridad ya instalamos NodeJS en la instancia de despliegue.
 
-- Copiar la clave pública de despliegue para que Jenkins, que tiene la clave privada de despliegue, pueda hacer ssh sobre ella y ejecutar comandos. 
+- También habíamos copiado la clave pública de despliegue para que Jenkins, que tiene la clave privada asociada, pueda hacer `ssh` y ejecutar comandos sobre ella.
 
-- Además, para ayudarnos a lanzar `npm start` desde Jenkins, como un proceso demonio en background, usaremos https://www.npmjs.com/package/forever[*forever*]. Instalalo en la  instancia de despliegue: 
+- Como requisito adicional, para ayudarnos a lanzar `npm start` desde Jenkins, como un proceso demonio en background, usaremos https://www.npmjs.com/package/forever[*forever*]. Debes instalar `forever` en la  instancia de despliegue: 
 
     sudo npm install forever -g
 
 Una vez revisados los prerrequisitos, añade la fase de despliegue al pipeline en Jenkins:
 
-. Copia este nueva fase en tu pipeline, sustituyendo DEPLOY_MACHINE por el nombre DNS de tu instancia, y usa el nombre del repositorio adecuado: 
+. Copia este nueva fase en tu pipeline, sustituyendo DEPLOY_MACHINE por el nombre DNS de tu instancia, y usa el nombre del repositorio git adecuado: 
 
 [source,groovy]
 ----
@@ -456,9 +456,9 @@ Una vez revisados los prerrequisitos, añade la fase de despliegue al pipeline e
   }
 ----
 <1> Clona el repositorio si no existe en la máquina de despliegue, si existe hace un `pull`
-<2> Detiene el proceso `node` si existe de un despliegue anterior, usando `forever stop`.
+<2> Detiene la ejecución de `forever` si existe de un despliegue anterior, usando `forever stop`.
 <3> Instala las dependencias
-<4> Ejecuta la aplicación con `forever start` en el puerto 8080, que ejecuta el proceso en background como demonio.
+<4> Ejecuta la aplicación con `forever start` en el puerto `8080`, que ejecuta el proceso en background como demonio.
 
 ****
 Referencias
