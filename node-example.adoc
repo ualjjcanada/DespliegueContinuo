@@ -419,16 +419,49 @@ image::eslint-jenkins-pass-grapth.png[role="thumb", align="center"]
 === Despliegue en la VM
 
 
-=== Deploy en un contenedor Docker
+Para desplegar la aplicación hello world en  l instancia de despliegue vamos a clonar el repositorio y a continuación ejecutaremos en ella la orden de Node para ponerla en marcha. 
 
+Recuerda que ya he hemos realizado una configuración previa sobre la instancia de despliegue, que constituyen los  *prerrequisitos*: 
+
+- Instalar NodeJS
+
+- Copiar la clave pública de despliegue para que Jenkins, que tiene la clave privada de despliegue, pueda hacer ssh sobre ella y ejecutar comandos. 
+
+- Además, para ayudarnos a lanzar `npm start` desde Jenkins, como un proceso demonio en background, usaremos https://www.npmjs.com/package/forever[*forever*]. Instalalo en la  instancia de despliegue: 
+
+    sudo npm install forever -g
+
+Una vez revisados los prerrequisitos, añade la fase de despliegue al pipeline en Jenkins:
+
+. Copia este nueva fase en tu pipeline, sustituyendo DEPLOY_MACHINE por el nombre DNS de tu instancia, y usa el nombre del repositorio adecuado: 
+
+[source,groovy]
+----
+  stage('Deploy'){
+    steps {
+      sh '''
+        ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "if [ ! -d 'nodeapp' ] ; then
+          git clone https://github.com/ualcnsa/nodeapp.git
+        else
+          cd nodeapp
+          git pull origin master
+        fi" <1>
+        ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "if pgrep node; then forever stopall; fi" <2>
+        ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "cd nodeapp && npm install" <3>
+        ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "cd nodeapp && PORT=8080 forever start index.js"
+      '''
+    }
+  }
+----
+<1> Clona el repositorio si no existe en la máquina de despliegue, si existe hace un `pull`
+<2> Detiene el proceso `node` si existe de un despliegue anterior, usando `forever stop`.
+<3> Instala las dependencias
+<4> Ejecuta la aplicación con `forever start` en el puerto 8080, que ejecuta el proceso en background como demonio.
 
 ****
 Referencias
 
-. https://medium.com/@gustavo.guss/jenkins-starting-with-pipeline-doing-a-node-js-test-72c6057b67d4[Jenkins Starting with Pipeline doing a Node.js test] @ Medium
-
-. https://tutorials.releaseworksacademy.com/learn/building-your-first-docker-image-with-jenkins-2-guide-for-developers[Building your first Docker image with Jenkins] @  Releaseworks Academy Tutorials 
-
-. https://medium.com/@mosheezderman/how-to-set-up-ci-cd-pipeline-for-a-node-js-app-with-jenkins-c51581cc783c[https://medium.com/@mosheezderman/how-to-set-up-ci-cd-pipeline-for-a-node-js-app-with-jenkins-c51581cc783c] @ Medium
+. https://codelabs.developers.google.com/codelabs/cloud-create-a-nodejs-vm/[Running Node.js on a Virtual Machine codelab]
 
 ****
+

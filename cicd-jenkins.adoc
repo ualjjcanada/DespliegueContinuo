@@ -1293,3 +1293,4 @@ Referencias
 ****
 
 include::node-example.adoc[]
+include::node-pipeline.adoc[]

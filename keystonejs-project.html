@@ -438,7 +438,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-<body class="article toc2 toc-right data-line-1">
+<body class="book toc2 toc-right">
 <div id="header">
 <h1>Despliegue continuo y entrega continua. Proyecto</h1>
 <div id="toc" class="toc2">
@@ -462,7 +462,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_creación_de_proyecto_jenkins_con_pipelines">4.1. Creación de proyecto Jenkins con pipelines</a></li>
 <li><a href="#_despliegue_en_la_vm">4.2. Despliegue en la VM</a></li>
 <li><a href="#_deploy_en_un_docker_container">4.3. Deploy en un Docker container</a></li>
-<li><a href="#_deploy_con_docker_compose">4.4. Deploy con Docker Compose ¿?</a></li>
+<li><a href="#_deploy_con_docker_compose">4.4. Deploy con Docker Compose</a></li>
 </ul>
 </li>
 <li><a href="#_evolución_del_proyecto">5. Evolución del proyecto</a></li>
@@ -472,101 +472,228 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph data-line-29">
+<div class="paragraph">
 <p>Computación en la nube servicios y aplicaciones.
-Version 1.0, Marzo-2020.
+Version 1.0, Mayo-2020.
 Joaquín Cañadas &lt;<a href="mailto:jjcanada@ual.es">jjcanada@ual.es</a>&gt;</p>
 </div>
-<div class="quoteblock abstract data-line-40">
+<div class="quoteblock abstract">
 <blockquote>
 Tema 3. Despliegue Continuo. Proyecto con KeystoneJs 5
 </blockquote>
 </div>
-<div class="ulist data-line-46">
+<div class="ulist">
 <div class="title">Objetivos</div>
 <ul>
-<li class="data-line-46">
+<li>
 <p>Usar del framework KeystoneJs para el desarrollo rápido de un proyecto</p>
 </li>
-<li class="data-line-47">
+<li>
 <p>Implementación de integración continua y despliegue continuo (CI/CD) de un proyecto NodeJs</p>
 </li>
 </ul>
 </div>
-<div class="paragraph data-line-50">
+<div class="sidebarblock">
+<div class="content">
 <div class="title">Realización y entrega</div>
+<div class="paragraph">
 <p>La realización de estas actividades se realizará de forma individual. Serán la base para actividades posteriores que ser harán en equipo.
 La entrega será mediante el envío de un informe y el acceso al profesor a los servicios configurados, para la revisión y evaluación de los mismos.</p>
 </div>
 </div>
 </div>
-<div class="sect1 data-line-56">
+</div>
+</div>
+<div class="sect1">
 <h2 id="_prerequisitos">1. Prerequisitos</h2>
 <div class="sectionbody">
-<div class="paragraph data-line-58">
+<div class="paragraph">
 <p>Haber realizado las actividades de la primera parte del tema, y disponer de las máquinas virtuales en Google Cloud con Jenkins y el entorno de despliegue.</p>
 </div>
 </div>
 </div>
-<div class="sect1 data-line-61">
+<div class="sect1">
 <h2 id="_proyecto_nodejs_con_keystonejs">2. Proyecto NodeJs con KeystoneJS</h2>
 <div class="sectionbody">
-<div class="paragraph data-line-63">
+<div class="paragraph">
 <p>Vamos a crear un proyecto de aplicacion web completa con Keystone 5 (<a href="https://www.keystonejs.com/" class="bare">https://www.keystonejs.com/</a>), una framework escalable, extensible y de código abierto para la construcción de apliaciones NodeJs.</p>
 </div>
-<div class="sect2 data-line-65">
+<div class="sect2">
 <h3 id="_primeros_pasos">2.1. Primeros pasos</h3>
-
+<div class="paragraph">
+<p>Realiza el <a href="https://www.keystonejs.com/quick-start/">Getting Started</a> de KeystoneJS. Usa MongoDB como base de datos.</p>
 </div>
-<div class="sect2 data-line-67">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Para crear una aplicación, ejecuta el siguiente comando:</p>
+<div class="literalblock">
+<div class="content">
+<pre>npm init keystone-app my-app</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Dale un nombre a la aplicación.</p>
+</li>
+<li>
+<p>Selecciona el tipo de proyecto inicial: <code>Starter (Users + Authentication)</code></p>
+</li>
+<li>
+<p>Base de datos: <code>Mongo</code></p>
+</li>
+<li>
+<p>Localización de la base de datos: deja el valor predeterminado</p>
+</li>
+<li>
+<p>Test Database connection: <code>Yes</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Tras unos minutos, el proyecto estará creado y listo para ejecutar.</p>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_ejecución_en_local">2.2. Ejecución en local</h3>
-
+<div class="paragraph">
+<p>Ejecuta la aplicación en el servidor de desarrollo:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>cd my-app
+npm run dev</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>La primera vez que ejecutes la aplicación mostrará por consola el usuario y password de administrador. Guardalo en un lugar seguro.</p>
+</div>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/keystone-run-dev-first-time.png" alt="keystone run dev first time">
+</div>
+<div class="title">Fig. 1. Imagen publicada en Container Registry, etiquetada con el número de build</div>
+</div>
+<div class="paragraph">
+<p>La aplicación esta disponible aquí: <a href="http://localhost:3000/" class="bare">http://localhost:3000/</a></p>
+</div>
+<div class="paragraph">
+<p>Tiene 3 componentes principales:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Application</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Your simple todo application is up and running:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>http://localhost:3000</pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Admin UI</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Your application also has an Admin UI, which lets you directly manipulate the data in your database:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>http://localhost:3000/admin</pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>GraphQL API</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Both your application and the Admin UI are powered by a GraphQL API. Keystone provides a web interface for this API at this URL:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>http://localhost:3000/admin/graphiql</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Prueba la aplicación recien creada.</p>
 </div>
 </div>
 </div>
-<div class="sect1 data-line-70">
+</div>
+<div class="sect1">
 <h2 id="_pruebas_automatizadas">3. Pruebas automatizadas</h2>
 <div class="sectionbody">
-<div class="sect2 data-line-72">
+<div class="sect2">
 <h3 id="_pruebas_unitarias_con">3.1. Pruebas unitarias con &#8230;&#8203;</h3>
 
 </div>
-<div class="sect2 data-line-74">
+<div class="sect2">
 <h3 id="_pruebas_end_to_end_con_selenium">3.2. Pruebas end-to-end con Selenium / &#8230;&#8203;</h3>
 
 </div>
 </div>
 </div>
-<div class="sect1 data-line-77">
+<div class="sect1">
 <h2 id="_cicd_de_proyecto_creado_con_keystonejs">4. CI/CD de proyecto creado con KeystoneJs</h2>
 <div class="sectionbody">
-<div class="paragraph data-line-79">
+<div class="paragraph">
 <p>Vamos a usar Jenkins para construir y desplegar el proyecto de webapp creada con Keystone.</p>
 </div>
-<div class="sect2 data-line-81">
+<div class="sect2">
 <h3 id="_creación_de_proyecto_jenkins_con_pipelines">4.1. Creación de proyecto Jenkins con pipelines</h3>
-<div class="paragraph data-line-83">
+<div class="paragraph">
 <p>Configuramos el Pipeline.</p>
 </div>
 </div>
-<div class="sect2 data-line-85">
+<div class="sect2">
 <h3 id="_despliegue_en_la_vm">4.2. Despliegue en la VM</h3>
 
 </div>
-<div class="sect2 data-line-87">
+<div class="sect2">
 <h3 id="_deploy_en_un_docker_container">4.3. Deploy en un Docker container</h3>
-
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://www.keystonejs.com/guides/deployment/#docker">Dockerizar</a> una app Keystone</p>
+</li>
+</ol>
 </div>
-<div class="sect2 data-line-89">
-<h3 id="_deploy_con_docker_compose">4.4. Deploy con Docker Compose ¿?</h3>
-
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Referencias</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://www.docker.com/blog/intro-guide-to-dockerfile-best-practices/">Intro Guide to Dockerfile Best Practices</a></p>
+</li>
+</ol>
 </div>
 </div>
 </div>
-<div class="sect1 data-line-91">
+</div>
+<div class="sect2">
+<h3 id="_deploy_con_docker_compose">4.4. Deploy con Docker Compose</h3>
+<div class="paragraph">
+<p>Ejemplo de <a href="https://stackoverflow.com/questions/59425330/keystonejs-docker-compose-cant-connect-mongo-db">docker-compose</a> con KeystoneJS y Mongo.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_evolución_del_proyecto">5. Evolución del proyecto</h2>
 <div class="sectionbody">
-<div class="paragraph data-line-93">
+<div class="paragraph">
 <p>El objetivo es implementar nuevas características en nuestro proyecto, y que cuando subimos nuevo código al repositorio, el proyecto se construye en Jenkins y si todo va bien, y se despliega automáticamente.</p>
 </div>
 </div>
@@ -574,7 +701,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-08 14:22:34 +0200
+Last updated 2020-05-12 02:34:45 +0200
 </div>
 </div>
 <link rel="stylesheet" href="./highlight/styles/github.min.css">

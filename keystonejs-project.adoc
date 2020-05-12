@@ -14,11 +14,14 @@ Codificación, idioma, tabla de contenidos, tipo de documento
 ////
 :experimental:
 
-:source-highlighter: highlightjs
-:highlightjsdir: ./highlight
+:source-highlighter: rouge
+:rouge-linenums-mode: inline
+
+// :highlightjsdir: ./highlight
 
 :figure-caption: Fig.
 :imagesdir: images
+
 
 
 ////
@@ -27,7 +30,7 @@ Nombre y título del trabajo
 = Despliegue continuo y entrega continua. Proyecto
 
 Computación en la nube servicios y aplicaciones.
-Version 1.0, Marzo-2020.
+Version 1.0, Mayo-2020.
 Joaquín Cañadas <jjcanada@ual.es>
 
 // Entrar en modo no numerado de apartados
@@ -47,8 +50,10 @@ COLOCA A CONTINUACION LOS OBJETIVOS
 * Implementación de integración continua y despliegue continuo (CI/CD) de un proyecto NodeJs
 
 .Realización y entrega
+****
 La realización de estas actividades se realizará de forma individual. Serán la base para actividades posteriores que ser harán en equipo. 
 La entrega será mediante el envío de un informe y el acceso al profesor a los servicios configurados, para la revisión y evaluación de los mismos. 
+****
 
 // Entrar en modo numerado de apartados
 :numbered:
@@ -64,15 +69,72 @@ Vamos a crear un proyecto de aplicacion web completa con Keystone 5 (https://www
 
 === Primeros pasos
 
+Realiza el https://www.keystonejs.com/quick-start/[Getting Started] de KeystoneJS. Usa MongoDB como base de datos. 
+
+. Para crear una aplicación, ejecuta el siguiente comando: 
+
+     npm init keystone-app my-app 
+
+. Dale un nombre a la aplicación.
+
+. Selecciona el tipo de proyecto inicial: `Starter (Users + Authentication)`
+
+. Base de datos: `Mongo`
+
+. Localización de la base de datos: deja el valor predeterminado
+
+. Test Database connection: `Yes`
+
+Tras unos minutos, el proyecto estará creado y listo para ejecutar.
+
 === Ejecución en local
 
+Ejecuta la aplicación en el servidor de desarrollo: 
+
+    cd my-app
+    npm run dev
+
+La primera vez que ejecutes la aplicación mostrará por consola el usuario y password de administrador. Guardalo en un lugar seguro. 
+
+.Imagen publicada en Container Registry, etiquetada con el número de build
+image::keystone-run-dev-first-time.png[role="thumb", align="center"]
+
+La aplicación esta disponible aquí: http://localhost:3000/
+
+La aplicación inicial tiene 3 componentes principales:
+
+. Application
+
+Your simple application is up and running:
+
+    http://localhost:3000
+
+. Admin UI
+
+Your application also has an Admin UI, which lets you directly manipulate the data in your database:
+
+    http://localhost:3000/admin
+
+. GraphQL API
+
+Both your application and the Admin UI are powered by a GraphQL API. Keystone provides a web interface for this API at this URL:
+
+    http://localhost:3000/admin/graphiql
+
+
+Prueba la aplicación recién creada. Utiliza el usuario y contraseña para acceder, crear usuarios, etc.  
 
 == Pruebas automatizadas
 
-=== Pruebas unitarias con ...
+=== Pruebas end-to-end con Selenium
 
-=== Pruebas end-to-end con Selenium / ...
+. Descarga Selenium IDE para Firefox o Chrome. 
 
+. Graba unas pruebas sobre la aplicación Keystone:  login correcto, login incorrecto, creación de un usuario, etc. Ejecutalas en Selenium IDE.
+
+. Exporta las pruebas a formato _JavaScript with Mocha_. Guarda los archivos generados `*.spec.js` en una nueva carpeta `test` de la aplicación.
+
+. G
 
 == CI/CD de proyecto creado con KeystoneJs 
 
@@ -84,9 +146,113 @@ Configuramos el Pipeline.
 
 === Despliegue en la VM
 
+En la máquina de despliegue, ejecuta la aplicación Keystone en modo producción: `npm run start`. 
+
+Aparecerá un error: 
+----
+Error: The cookieSecret config option is required when running Keystone in a production environment. Update your app or environment config so 
+this value is supplied to the Keystone constructor. See [https://www.keystonejs.com/keystonejs/keystone/#config] for details
+----
+Consulta la documentación para resolverlo. 
+
 === Deploy en un Docker container
 
-=== Deploy con Docker Compose ¿?
+https://www.keystonejs.com/guides/deployment/#docker[Dockeriza] la app Keystone:
+
+. Crea un arhivo `.dockerignore`:
+
+----
+.git/
+docs/
+dist/
+node_modules/
+package-lock.json
+.env.secret
+----
+
+[start=2]
+. Construye la imagen del contenedor en varias fases, usando varios `FROM` en el Dockerfile. Cada `FROM` inicia una nueva fase en la construcción, que puede referenciarse más adelante. Como muestra el siguiente código, la primera fase realiza el build de la aplicación y la segunda fase usa una imagen limpia y ligera sobre la que se copia la carpeta con el código listo para ser desplegado.
+
+
+.Dockerfile
+[source, docker]
+----
+# https://docs.docker.com/samples/library/node/
+ARG NODE_VERSION=12.10.0
+# https://github.com/Yelp/dumb-init/releases
+ARG DUMB_INIT_VERSION=1.2.2
+
+# Build container
+FROM node:${NODE_VERSION}-alpine AS build
+ARG DUMB_INIT_VERSION
+
+WORKDIR /home/node
+
+RUN apk add --no-cache build-base python2 yarn && \
+    wget -O dumb-init -q https://github.com/Yelp/dumb-init/releases/download/v${DUMB_INIT_VERSION}/dumb-init_${DUMB_INIT_VERSION}_amd64 && \
+    chmod +x dumb-init
+ADD . /home/node
+RUN yarn install && yarn build && yarn cache clean
+
+# Runtime container
+FROM node:${NODE_VERSION}-alpine
+
+WORKDIR /home/node
+
+COPY --from=build /home/node /home/node
+
+EXPOSE 3000
+CMD ["./dumb-init", "yarn", "start"]
+
+----
+
+Desafortunadamente, al construir la imagen del contenedor se producen un error asociado a la construcción y ejecución en entorno _production_: 
+
+    Error: The cookieSecret config option is required when running Keystone in a production environment. Update your app or environment config so this value is supplied to the Keystone constructor. See [https://www.keystonejs.com/keystonejs/keystone/#config] for details.
+
+Este error está relacionado con la configuración en producción sobre SSL. 
+
+Es necesario configurar un proxy inverso con SSL. La solución, sin saber realmente si va a funcionar o no, implica:
+ - Disponer de una pareja de certificados SSL, se pueden generar con Let’s Encrypt.
+ - https://medium.com/faun/setting-up-ssl-certificates-for-nginx-in-docker-environ-e7eec5ebb418[Setting up SSL certificates for Nginx in Docker Environment]
+ - Los dos pasos anteriores se explican en este tutorial: https://medium.com/@pentacent/nginx-and-lets-encrypt-with-docker-in-less-than-5-minutes-b4b8a60d3a71[Nginx and Let’s Encrypt with Docker] 
+
+ 
+
+=== Configuring Ngnix
+
+While node is perfectly capable of serving our application, for better performance and security, it’s recommended to put a real HTTP server in front. An HTTP server configured as a reverse-proxy protects our application from slow clients and speeds up connections thanks to caching.
+
+We’ll use Nginx, a general-purpose HTTP server in our setup.
+
+Create a configuration file for Ngnix, the file is called `reverse-proxy.conf` and is at the root directory of your project, next to the other Dockefiles:
+
+.reverse-proxy.conf
+[source, conf]
+----
+# reverse-proxy.conf
+
+server {
+    listen 8020;
+    server_name example.org;
+
+    location / {
+        proxy_pass http://drkiq:8010;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+----
+
+.Referencias
+****
+. https://www.docker.com/blog/intro-guide-to-dockerfile-best-practices/[Intro Guide to Dockerfile Best Practices]
+****
+
+=== Deploy con Docker Compose
+
+Ejemplo de https://stackoverflow.com/questions/59425330/keystonejs-docker-compose-cant-connect-mongo-db[docker-compose] con KeystoneJS y Mongo.
+
 
 == Evolución del proyecto
 
