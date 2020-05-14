@@ -1061,7 +1061,7 @@ ssh ubuntu@DNS_MAQUINA_DEPLOY
 # Autenticamos docker contra Container Registry
 cat keyfile.json | docker login -u _json_key --password-stdin https://gcr.io
 # ejecutamos el contenedor desde gcr.io
-docker run -p 8080:8080 -t --name petclinic gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0
+docker run -d -p 8080:8080 -t --name petclinic gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0
 ---- 
 
 Es posible que la ejecución del contenedor de un error, porque el puerto 8080 ya esté en uso:
@@ -1145,14 +1145,12 @@ Para probar que la imagen del contenedor se ha creado bien, añade esta fase que
     stage("Run image locally") {
       steps {
         sh "docker stop petclinic || true && docker rm  petclinic || true" <1>
-        sh "mkdir -p logs" <2>
-        sh "nohup docker run -p 8080:8080 -t --name petclinic ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/petclinic:${env.BUILD_ID} > logs/yourservice-docker-${env.BUILD_ID}.log 2>&1 &" <3>
+        sh "docker run -d -p 8080:8080 -t --name petclinic ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/petclinic:${env.BUILD_ID}" <2>
       }
     }
 ----
-<1> Por si ya se ha ejecutado el pipeline anteriormente, es necesario comprobar si el contenedor `petclinic` ya se está ejecutando, y en tal caso pararlo con `docker stop` y eliminarlo con `docker rm`
-<2> Crea la carpeta `logs` con el parámetro `-p` para que no falle la creación si la carpeta ya existe.
-<3> Con `docker run` ejecuta el contenedor `petclinic` a partir de la imagen recién construida. Para que  el pipeline pueda finalizar y el contenedor siga ejecutándose, se añade `nohup` y se lanza el comando en background, guardando la salida por consola en el archivo `.log`.
+<1> Por si ya se ha ejecutado el pipeline anteriormente, y no se ha eliminado el contenedor de la ejecución anterior, es necesario comprobar si el contenedor `petclinic` ya se está ejecutando y, en tal caso, pararlo con `docker stop` y eliminarlo con `docker rm`
+<2> Con `docker run` ejecuta el contenedor `petclinic` a partir de la imagen recién construida. Para que  el pipeline pueda finalizar y el contenedor siga ejecutándose, se añade `-d` que indica modo _detached_ que ejecuta el contenedor en background.
 
 La aplicación debe estar accesible en el puerto 8080 en tu máquina de Jenkins. Para asegurarnos que la aplicación se está ejecutando bien, debemos problarlo "manualmente". Para automatizar esta prueba, lo adecuado sería realizar unos tests end-to-end, con https://www.selenium.dev[Selenium]. Esto se explicará en otra actividad, dedicada al testing.
 
@@ -1230,16 +1228,16 @@ Estas acciones debemos añadirlas a un `stage` del pipeline de Jenkins que se en
     stage('Deploy to Production') {
       steps{
         sh '''
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "mkdir -p  ~/logs" <1>
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE " if docker ps -q --filter name=petclinic | grep . ; then docker stop petclinic && docker rm -fv petclinic; fi" <2>
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "nohup docker run -p 80:8080 -t --name petclinic ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/petclinic:latest  > logs/yourservice-docker.log 2>&1 &" <3>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "if docker ps -q --filter name=petclinic | grep . ; then docker stop petclinic ; fi" <1>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "if docker ps -a -q --filter name=petclinic | grep . ; then docker rm -fv petclinic ; fi" <2>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "docker run -d -p 80:8080 -t --name petclinic ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/petclinic:latest" <3>
         '''
       }
     }    
 ----
-<1> Ejecuta en la instancia de despliegue el comando para crear la carpeta `logs` si esta no existe
-<2> Ejecuta en la instancia de despliegue el comando que detiene y elimina el contenedor `petclinic` en caso de que ya se estuviera ejecutando 
-<3> Ejecuta en la instancia de despliegue el comando para ejecutar el contenedor basado en la última versión de la imagen, lanzándolo en background y con `nohup` para que el pipeline finalice y el contenedor permanezca en ejecución.
+<1> Ejecuta en la instancia de despliegue el comando `docker stop` que detiene el contenedor `petclinic` en caso de que ya se estuviera ejecutando de un despliegue anterior. Esto se comprueba con `docker ps ...`.
+<2> Ejecuta en la instancia de despliegue el comando `docker rm` que elimina el contenedor `petclinic` en caso de que exista de un despliegue anterior. Esto se comprueba con `docker ps -a ...`. Estos dos pasos, parar el contenedor y eliminar el contenedor, son necesarios realizarlos antes de volver a lanzar un nuevo contenedor con el mismo nombre. Se ejecuta en dos pasos para evitar errores en caso de que el contenedor exista pero no esté en ejecución, lo que podría dar lugar a un error en el despliegue.
+<3> Ejecuta en la instancia de despliegue el comando para ejecutar el contenedor basado en la última versión de la imagen, lanzándolo con `-d` que indica modo _detached_ que ejecuta el contenedor en background, para que el pipeline finalice y el contenedor permanezca en ejecución.
 
 [TIP]
 ====
@@ -1251,7 +1249,7 @@ docker rm $(docker ps -a -q)
 docker rmi $(docker images -q)
 ```
 ====
-
+  
 La aplicación PetClinic debe estar accesible _en producción_, en el puerto 8080 en la instancia de despliegue. Para asegurarnos, debemos problarlo "manualmente". Para automatizar esta prueba _en producción_, lo adecuado de nuevo sería realizar unos tests end-to-end, con https://www.selenium.dev[Selenium]. Esto se explicará en otra actividad, dedicada al testing.
 
 [source,groovy]

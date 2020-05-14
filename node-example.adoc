@@ -376,7 +376,7 @@ Se habrá creado un archivo `.eslintrc.json`, que incluirá esta línea:
 ----
 
 [start=4]
-. Lanzaló en local: 
+. Lánzalo en local: 
 
     npm run lint -s
 
@@ -450,7 +450,7 @@ Una vez revisados los prerrequisitos, añade la fase de despliegue al pipeline e
         fi" <1>
         ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "if pgrep node; then forever stopall; fi" <2>
         ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "cd nodeapp && npm install" <3>
-        ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "cd nodeapp && PORT=8080 forever start index.js"
+        ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "cd nodeapp && PORT=8080 forever start index.js" <4>
       '''
     }
   }

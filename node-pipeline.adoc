@@ -25,7 +25,7 @@ Codificación, idioma, tabla de contenidos, tipo de documento
 
 == Aplicación NodeJs con Docker
 
-Para realizar el despliegue de la app Hola Mundo en NodeJs como un contenedor, primero tenemos que https://nodejs.org/fr/docs/guides/nodejs-docker-webapp/[dockerizar] la aplicación. Una vez construido el contenedor, habrá qeu publicar la imagen de contenedor en un registro como Google Container Registry, y por último ejecutar el contenedor en la instancia de despliegue.
+Para realizar el despliegue de la app Hola Mundo en NodeJs como un contenedor, primero tenemos que https://nodejs.org/fr/docs/guides/nodejs-docker-webapp/[dockerizar] la aplicación. Una vez construido el contenedor, habrá que publicar la imagen de contenedor en un registro como Google Container Registry, y por último ejecutar el contenedor en la instancia de despliegue.
 
 A continuación se describe cómo crear un contenedor Docker de la aplicación NodeJs. Los pasos se realizan en local, y al final configuraremos el pipeline de Jenkins para que se realicen automáticamente. 
 
@@ -180,7 +180,7 @@ Error starting userland proxy: listen tcp 0.0.0.0:8080: bind: address already in
 
 Para solucionarlo, bien detén el proceso o contenedor java que está corriendo con la aplicación PetClinic del ejemplo anterior. O bien utiliza el puerto 80 que también está abierto. 
 
-=== Integración y despliegue contínuos con Jenkins
+=== Integración y despliegue continuos con Jenkins
 
 A continuación, vamos a automatizar en Jenkins todo el proceso: 
 
@@ -255,14 +255,12 @@ Para probar que la imagen del contenedor se ha creado bien, añade la siguiente 
     stage("Run image locally") {
       steps {
         sh "docker stop nodeapp || true && docker rm  nodeapp || true" <1>
-        sh "mkdir -p logs" <2>
-        sh "nohup docker run -p 8080:3000 -t --name nodeapp ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/nodeapp:${env.BUILD_ID} > logs/nodeapp-docker-${env.BUILD_ID}.log 2>&1 &" <3>
+        sh "docker run -d -p 8080:3000 -t --name nodeapp ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/nodeapp:${env.BUILD_ID}" <2>
       }
     }
 ----
 <1> Por si ya se ha ejecutado el pipeline anteriormente, es necesario comprobar si el contenedor `nodeapp` ya se está ejecutando, y en tal caso pararlo con `docker stop` y eliminarlo con `docker rm`
-<2> Crea la carpeta `logs` con el parámetro `-p` para que no falle la creación si la carpeta ya existe.
-<3> Con `docker run` ejecuta el contenedor `nodeapp` a partir de la imagen recién construida. Para que el pipeline pueda finalizar y el contenedor siga ejecutándose, se añade `nohup` y se lanza el comando en background, guardando la salida por consola en el archivo `.log`.
+<2> Con `docker run` ejecuta el contenedor `nodeapp` a partir de la imagen recién construida. Para que el pipeline pueda finalizar y el contenedor siga ejecutándose, se añade `-d` que indica modo _detached_ que ejecuta el contenedor en background.
 
 Tras ello, la aplicación debe estar accesible en el puerto 8080 en tu máquina de Jenkins. Para asegurarnos que la aplicación se está ejecutando bien, debemos problarlo "manualmente". Para automatizar esta prueba, lo adecuado sería realizar unos tests end-to-end, con https://www.selenium.dev[Selenium]. Esto se explicará en otra actividad, dedicada al testing.
 
@@ -317,16 +315,15 @@ Estas acciones debemos añadirlas a un `stage` del pipeline de Jenkins que se en
     stage('Deploy to Production') {
       steps{
         sh '''
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "mkdir -p  ~/logs" <1>
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE " if docker ps -q --filter name=nodeapp | grep . ; then docker stop nodeapp && docker rm -fv nodeapp; fi" <2>
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "nohup docker run -p 8080:3000 -t --name nodeapp ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/nodeapp:latest  > logs/nodeapp-docker.log 2>&1 &" <3>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "if docker ps -q --filter name=nodeapp | grep . ; then docker stop nodeapp ; fi" <1>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "if docker ps -a -q --filter name=nodeapp | grep . ; then docker rm -fv nodeapp ; fi" <1>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "docker run -d -p 8080:3000 -t --name nodeapp ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/nodeapp:latest" <2>
         '''
       }
     }    
 ----
-<1> Ejecuta en la instancia de despliegue el comando para crear la carpeta `logs` si esta no existe
-<2> Ejecuta en la instancia de despliegue el comando que detiene y elimina el contenedor `nodeapp` en caso de que ya se estuviera ejecutando 
-<3> Ejecuta en la instancia de despliegue el comando para ejecutar el contenedor basado en la última versión de la imagen, lanzándolo en background y con `nohup` para que el pipeline finalice y el contenedor permanezca en ejecución.
+<1> Ejecuta en la instancia de despliegue el comando que detiene y elimina el contenedor `nodeapp` en caso de que ya se estuviera ejecutando 
+<2> Ejecuta en la instancia de despliegue el comando para ejecutar el contenedor basado en la última versión de la imagen, lanzándolo en background y con `-d` para que el pipeline finalice y el contenedor permanezca en ejecución.
 
 La aplicación nodeapp debe estar accesible _en producción_, en el puerto 8080 en la instancia de despliegue. Para asegurarnos, debemos problarlo "manualmente". Para automatizar esta prueba _en producción_, lo adecuado de nuevo sería realizar unos tests end-to-end, con https://www.selenium.dev[Selenium]. Esto se explicará en otra actividad, dedicada al testing.
 
@@ -372,5 +369,7 @@ Referencias
 . https://medium.com/@sssanjaya/a-simple-docker-setup-for-simple-hello-world-nodejs-application-bcf79bb608a0[A simple docker setup for hello world nodejs application] @ Medium
 
 . https://semaphoreci.com/community/tutorials/dockerizing-a-node-js-web-application[Dockerizing a Node.js Web Application] @ SemaphoreCI
+
+. https://www.docker.com/blog/keep-nodejs-rockin-in-docker/[Top 4 Tactics To Keep Node.js Rockin’ in Docker]
 
 ****

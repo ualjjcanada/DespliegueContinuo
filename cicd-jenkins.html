@@ -2287,7 +2287,7 @@ ssh ubuntu@DNS_MAQUINA_DEPLOY
 <span class="c"># Autenticamos docker contra Container Registry</span>
 <span class="nb">cat </span>keyfile.json | docker login <span class="nt">-u</span> _json_key <span class="nt">--password-stdin</span> https://gcr.io
 <span class="c"># ejecutamos el contenedor desde gcr.io</span>
-docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span class="nt">--name</span> petclinic gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/petclinic:1.0</code></pre>
+docker run <span class="nt">-d</span> <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span class="nt">--name</span> petclinic gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/petclinic:1.0</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2391,8 +2391,7 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 <pre class="rouge highlight"><code data-lang="groovy">    <span class="n">stage</span><span class="o">(</span><span class="s2">"Run image locally"</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">steps</span> <span class="o">{</span>
         <span class="n">sh</span> <span class="s2">"docker stop petclinic || true &amp;&amp; docker rm  petclinic || true"</span> <i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="n">sh</span> <span class="s2">"mkdir -p logs"</span> <i class="conum" data-value="2"></i><b>(2)</b>
-        <span class="n">sh</span> <span class="s2">"nohup docker run -p 8080:8080 -t --name petclinic ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/petclinic:${env.BUILD_ID} &gt; logs/yourservice-docker-${env.BUILD_ID}.log 2&gt;&amp;1 &amp;"</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="n">sh</span> <span class="s2">"docker run -d -p 8080:8080 -t --name petclinic ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/petclinic:${env.BUILD_ID}"</span> <i class="conum" data-value="2"></i><b>(2)</b>
       <span class="o">}</span>
     <span class="o">}</span></code></pre>
 </div>
@@ -2401,15 +2400,11 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Por si ya se ha ejecutado el pipeline anteriormente, es necesario comprobar si el contenedor <code>petclinic</code> ya se está ejecutando, y en tal caso pararlo con <code>docker stop</code> y eliminarlo con <code>docker rm</code></td>
+<td>Por si ya se ha ejecutado el pipeline anteriormente, y no se ha eliminado el contenedor de la ejecución anterior, es necesario comprobar si el contenedor <code>petclinic</code> ya se está ejecutando y, en tal caso, pararlo con <code>docker stop</code> y eliminarlo con <code>docker rm</code></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Crea la carpeta <code>logs</code> con el parámetro <code>-p</code> para que no falle la creación si la carpeta ya existe.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Con <code>docker run</code> ejecuta el contenedor <code>petclinic</code> a partir de la imagen recién construida. Para que  el pipeline pueda finalizar y el contenedor siga ejecutándose, se añade <code>nohup</code> y se lanza el comando en background, guardando la salida por consola en el archivo <code>.log</code>.</td>
+<td>Con <code>docker run</code> ejecuta el contenedor <code>petclinic</code> a partir de la imagen recién construida. Para que  el pipeline pueda finalizar y el contenedor siga ejecutándose, se añade <code>-d</code> que indica modo <em>detached</em> que ejecuta el contenedor en background.</td>
 </tr>
 </table>
 </div>
@@ -2541,9 +2536,9 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 <pre class="rouge highlight"><code data-lang="groovy">    <span class="n">stage</span><span class="o">(</span><span class="s1">'Deploy to Production'</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">steps</span><span class="o">{</span>
         <span class="n">sh</span> <span class="s1">'''
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "mkdir -p  ~/logs" <i class="conum" data-value="1"></i><b>(1)</b>
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE " if docker ps -q --filter name=petclinic | grep . ; then docker stop petclinic &amp;&amp; docker rm -fv petclinic; fi" <i class="conum" data-value="2"></i><b>(2)</b>
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "nohup docker run -p 80:8080 -t --name petclinic ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/petclinic:latest  &gt; logs/yourservice-docker.log 2&gt;&amp;1 &amp;" <i class="conum" data-value="3"></i><b>(3)</b>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "if docker ps -q --filter name=petclinic | grep . ; then docker stop petclinic ; fi" <i class="conum" data-value="1"></i><b>(1)</b>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "if docker ps -a -q --filter name=petclinic | grep . ; then docker rm -fv petclinic ; fi" <i class="conum" data-value="2"></i><b>(2)</b>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "docker run -d -p 80:8080 -t --name petclinic ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/petclinic:latest" <i class="conum" data-value="3"></i><b>(3)</b>
         '''</span>
       <span class="o">}</span>
     <span class="o">}</span></code></pre>
@@ -2553,15 +2548,15 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Ejecuta en la instancia de despliegue el comando para crear la carpeta <code>logs</code> si esta no existe</td>
+<td>Ejecuta en la instancia de despliegue el comando <code>docker stop</code> que detiene el contenedor <code>petclinic</code> en caso de que ya se estuviera ejecutando de un despliegue anterior. Esto se comprueba con <code>docker ps &#8230;&#8203;</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Ejecuta en la instancia de despliegue el comando que detiene y elimina el contenedor <code>petclinic</code> en caso de que ya se estuviera ejecutando</td>
+<td>Ejecuta en la instancia de despliegue el comando <code>docker rm</code> que elimina el contenedor <code>petclinic</code> en caso de que exista de un despliegue anterior. Esto se comprueba con <code>docker ps -a &#8230;&#8203;</code>. Estos dos pasos, parar el contenedor y eliminar el contenedor, son necesarios realizarlos antes de volver a lanzar un nuevo contenedor con el mismo nombre. Se ejecuta en dos pasos para evitar errores en caso de que el contenedor exista pero no esté en ejecución, lo que podría dar lugar a un error en el despliegue.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Ejecuta en la instancia de despliegue el comando para ejecutar el contenedor basado en la última versión de la imagen, lanzándolo en background y con <code>nohup</code> para que el pipeline finalice y el contenedor permanezca en ejecución.</td>
+<td>Ejecuta en la instancia de despliegue el comando para ejecutar el contenedor basado en la última versión de la imagen, lanzándolo con <code>-d</code> que indica modo <em>detached</em> que ejecuta el contenedor en background, para que el pipeline finalice y el contenedor permanezca en ejecución.</td>
 </tr>
 </table>
 </div>
@@ -3700,8 +3695,7 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 <pre class="rouge highlight"><code data-lang="groovy">    <span class="n">stage</span><span class="o">(</span><span class="s2">"Run image locally"</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">steps</span> <span class="o">{</span>
         <span class="n">sh</span> <span class="s2">"docker stop nodeapp || true &amp;&amp; docker rm  nodeapp || true"</span> <i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="n">sh</span> <span class="s2">"mkdir -p logs"</span> <i class="conum" data-value="2"></i><b>(2)</b>
-        <span class="n">sh</span> <span class="s2">"nohup docker run -p 8080:3000 -t --name nodeapp ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/nodeapp:${env.BUILD_ID} &gt; logs/nodeapp-docker-${env.BUILD_ID}.log 2&gt;&amp;1 &amp;"</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="n">sh</span> <span class="s2">"docker -d run -p 8080:3000 -t --name nodeapp ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/nodeapp:${env.BUILD_ID}"</span> <i class="conum" data-value="2"></i><b>(2)</b>
       <span class="o">}</span>
     <span class="o">}</span></code></pre>
 </div>
@@ -3714,11 +3708,7 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Crea la carpeta <code>logs</code> con el parámetro <code>-p</code> para que no falle la creación si la carpeta ya existe.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Con <code>docker run</code> ejecuta el contenedor <code>nodeapp</code> a partir de la imagen recién construida. Para que el pipeline pueda finalizar y el contenedor siga ejecutándose, se añade <code>nohup</code> y se lanza el comando en background, guardando la salida por consola en el archivo <code>.log</code>.</td>
+<td>Con <code>docker run</code> ejecuta el contenedor <code>nodeapp</code> a partir de la imagen recién construida. Para que el pipeline pueda finalizar y el contenedor siga ejecutándose, se añade <code>-d</code> que indica modo <em>detached</em> que ejecuta el contenedor en background.</td>
 </tr>
 </table>
 </div>
@@ -3802,9 +3792,9 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 <pre class="rouge highlight"><code data-lang="groovy">    <span class="n">stage</span><span class="o">(</span><span class="s1">'Deploy to Production'</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">steps</span><span class="o">{</span>
         <span class="n">sh</span> <span class="s1">'''
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "mkdir -p  ~/logs" <i class="conum" data-value="1"></i><b>(1)</b>
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE " if docker ps -q --filter name=nodeapp | grep . ; then docker stop nodeapp &amp;&amp; docker rm -fv nodeapp; fi" <i class="conum" data-value="2"></i><b>(2)</b>
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "nohup docker run -p 8080:3000 -t --name nodeapp ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/nodeapp:latest  &gt; logs/nodeapp-docker.log 2&gt;&amp;1 &amp;" <i class="conum" data-value="3"></i><b>(3)</b>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE " if docker ps -q --filter name=nodeapp | grep . ; then docker stop nodeapp ; fi" <i class="conum" data-value="1"></i><b>(1)</b>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE " if docker ps -a -q --filter name=nodeapp | grep . ; then docker rm -fv nodeapp ; fi" <i class="conum" data-value="1"></i><b>(1)</b>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "docker run -d -p 8080:3000 -t --name nodeapp ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/nodeapp:latest" <i class="conum" data-value="2"></i><b>(2)</b>
         '''</span>
       <span class="o">}</span>
     <span class="o">}</span></code></pre>
@@ -3814,15 +3804,11 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Ejecuta en la instancia de despliegue el comando para crear la carpeta <code>logs</code> si esta no existe</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
 <td>Ejecuta en la instancia de despliegue el comando que detiene y elimina el contenedor <code>nodeapp</code> en caso de que ya se estuviera ejecutando</td>
 </tr>
 <tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Ejecuta en la instancia de despliegue el comando para ejecutar el contenedor basado en la última versión de la imagen, lanzándolo en background y con <code>nohup</code> para que el pipeline finalice y el contenedor permanezca en ejecución.</td>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Ejecuta en la instancia de despliegue el comando para ejecutar el contenedor basado en la última versión de la imagen, lanzándolo en background y con <code>-d</code> para que el pipeline finalice y el contenedor permanezca en ejecución.</td>
 </tr>
 </table>
 </div>
@@ -3894,6 +3880,9 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 <li>
 <p><a href="https://semaphoreci.com/community/tutorials/dockerizing-a-node-js-web-application">Dockerizing a Node.js Web Application</a> @ SemaphoreCI</p>
 </li>
+<li>
+<p><a href="https://www.docker.com/blog/keep-nodejs-rockin-in-docker/">Top 4 Tactics To Keep Node.js Rockin’ in Docker</a></p>
+</li>
 </ol>
 </div>
 </div>
@@ -3904,7 +3893,7 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-12 21:58:35 +0200
+Last updated 2020-05-14 22:18:03 +0200
 </div>
 </div>
 <style>
