@@ -29,7 +29,7 @@ Nombre y título del trabajo
 = Despliegue continuo y entrega continua
 
 Computación en la nube servicios y aplicaciones.
-Version 1.1, Mayo-2020.
+Version 1.2.
 Joaquín Cañadas <jjcanada@ual.es>
 
 // Entrar en modo no numerado de apartados
@@ -45,13 +45,13 @@ Tema 3. Despliegue Continuo
 COLOCA A CONTINUACION LOS OBJETIVOS
 ////
 .Objetivos
-* Crear una infraestructura de CI/CD en GCP
+* Crear una infraestructura de CI/CD en GCP con Máquinas Virtuales gestionadas con Terraform
 * Diseñar proyectos Jenkins para la construcción y despliegue automatizado de aplicaciones en Java y NodeJs
 
 .Realización y entrega
 ****
-La realización de estas actividades se realizará de forma individual. Serán la base para actividades posteriores que ser harán en equipo. 
-La entrega será mediante el envío de un informe y el acceso al profesor a los servicios configurados, para la revisión y evaluación de los mismos. 
+La realización de estas actividades se realizará de forma **individual**. Serán la base para actividades posteriores que ser harán en equipo. 
+La entrega será mediante el envío de un informe y el acceso al profesor a los servicios configurados por cada estudiante, para la revisión y evaluación de los mismos. 
 ****
 
 // Entrar en modo numerado de apartados
@@ -76,7 +76,7 @@ Además, se debe disponer de crédito en GCP, proporcionado por el profesor, y d
 
 Si ya dispones de crédito en GCP, podrás usarlo ahora. En cualquier caso, para esta asignatura disponemos de un nuevo cupón educativo de 50$ por estudiante, que no necesita tarjeta de crédito para su activación. Actívalo en la dirección que habrá recibido en tu email, usando tu email __@inlumine.ual.es__.
 
-*Crea un nuevo proyecto* GCP con el nombre *cnsa2020-__abc123__* (sustituyendo __abc123__ por tu nombre de usuario), y dale permisos al profesor. Para ello, revisa las instrucciones que vimos en la asignatura del primer cuatrimestre. El crédito del cada cupón dura 12 meses, así que este nuevo proyecto asígnalo a la cuenta de facturación de la asignatura del primer cuatrimestre, ya que es mejor consumir ese crédito porque caduca antes. Si se consume el crédito del primer cupón, simplemente tendrás que cambiar tu proyecto *cnsa2020-__abc123__* a la nueva cuenta de facturación del nuevo cupón.
+*Crea un nuevo proyecto* GCP con el nombre *cnsa2021-__abc123__* (sustituyendo __abc123__ por tu nombre de usuario), y dale permisos al profesor. Para ello, revisa las instrucciones que vimos en la asignatura del primer cuatrimestre. El crédito del cada cupón dura 12 meses, así que este nuevo proyecto asígnalo a la cuenta de facturación de la asignatura del primer cuatrimestre, ya que es mejor consumir ese crédito porque caduca antes. Si se consume el crédito del primer cupón, simplemente tendrás que cambiar tu proyecto *cnsa2021-__abc123__* a la nueva cuenta de facturación del nuevo cupón.
 
 === Terraform
 
@@ -104,7 +104,7 @@ choco install gcloudsdk -y
 
 Para poder usar servicios adicionales, como DNS gratuito, debes darte de alta en https://education.github.com/pack[Github Student Education Pack].
 
-Si ya dispones de una cuenta de GitHub, y no quieres crear una cuenta nueva, simplemente debes añadir tu email __@inlumine.ual.es__ a la lista de emails de tu cuenta actual. Para ello, sigue las https://help.github.com/en/github/setting-up-and-managing-your-github-user-account/adding-an-email-address-to-your-github-account[instrucciones]. Tras añadir tu email, haz clic en el enlace https://education.github.com/benefits[Get the pack].
+Si ya dispones de una cuenta de GitHub, y no quieres crear una cuenta nueva, simplemente debes añadir tu email __@inlumine.ual.es__ a la lista de emails de tu cuenta actual. Para ello, sigue las https://help.github.com/en/github/setting-up-and-managing-your-github-user-account/adding-an-email-address-to-your-github-account[instrucciones]. Tras añadir tu email, haz clic en el enlace https://education.github.com/pack[Get the pack].
 
 == Creación de la infraestructura en Google Cloud
 
@@ -113,8 +113,10 @@ Utilizando una plantilla de terraform crea 2 instancias de máquina virtuales en
 . Instancia para instalar Jenkins mediante un contenedor Docker.
 . Instancia de despliegue (VM Deploy) con Docker y Docker Composer instalados.
 
-Utiliza la plantilla de terraform disponible en el repositorio https://github.com/ualcnsa/terraformGoogleCloudSample. 
+.Máquinas virtuales creadas con Terraform
+image::terraform-vm-schema.png[role="thumb", align="center"]
 
+Para crearlas, utiliza la plantilla de terraform disponible en el repositorio https://github.com/ualcnsa/terraformGoogleCloudSample. 
 En primer lugar realiza un __fork__ del repositorio, para hacer las modificaciones al mismo que sean necesarias. Después modifica las variables correspondientes para usar tu proyecto en la plantilla.
 
 === Estructura del proyecto terraform
@@ -157,7 +159,7 @@ provider "google" {
   region      = "us-central1"
 }
 ----
-<1> Sustituye este valor por el nombre de tu proyecto (__cnsa2020-abc123__)
+<1> Sustituye este valor por el nombre de tu proyecto (__cnsa2021-abc123__)
 
 Para que terraform pueda conectar al __provider__ Google Cloud desde tu máquina local, debes proporcionar un archivo con credenciales. Descarga el archivo `.json` de aquí: https://console.cloud.google.com/apis/credentials/serviceaccountkey
 
@@ -174,7 +176,7 @@ export GOOGLE_CLOUD_KEYFILE_JSON=*path/file.json*
 
 [WARNING]
 ====
-Recuerda *no subir nunca tu archivo json de credenciales* a un repositorio público como GitHub. Para ello, añade el nombre el archivo de credenciales  al `.gitignore`. En ese archivo va tu clave privada que sustituye a tu usuario y contraseña para crear recursos en GCP. Hay robots que continuamente buscan PRIVATE KEYS y API TOKENS en repositorios públicos como GitHub. Si un __hacker__ accede a ese archivo, lo usará para crear servicios hasta gastar tu crédito por completo, fundamentalmente para minar bitcoins.
+Recuerda: *NUNCA subas tu archivo de credenciales json* a un repositorio público como GitHub. Para evitarlo, añade el nombre el archivo de credenciales  al *`.gitignore`*. En el archivo de credenciales va tu clave privada que sustituye a tu usuario y contraseña para crear recursos en GCP. Hay robots que continuamente buscan PRIVATE KEYS y API TOKENS en repositorios públicos como GitHub. Si un __hacker__ accede a ese archivo, lo usará para crear servicios hasta gastar tu crédito por completo, fundamentalmente para minar bitcoins.
 ====
 
 === Ejecución de terraform
@@ -218,6 +220,11 @@ Cuando desees eliminar todos los recursos que hemos creado con esta plantilla, s
 
 
 == Cloud DNS
+
+[TIP]
+====
+*Este apartado es optativo*, se evalúa con el 5% de la actividad pero no es obligatorio que lo realices. 
+====
 
 Google Cloud ha asignado una IP pública estática a cada una de tus instancias (la IP no cambiará al apagar la instancia y volver a encenderla). A continuación, vamos a asignar nombres de DNS a esas IPs con Cloud DNS y uno de los servicios de DNS disponibles en el Student Pack de GitHub. 
 
@@ -284,7 +291,7 @@ Vamos a usar la primera instancia para instalar Jenkins. En lugar de realizar un
 
 === Construcción de la imagen del contenedor Jenkins
 
-La imagen pública del contenedor de Jenkins está disponible en https://hub.docker.com/_/jenkins/[DockerHub]. Esta imagen genérica necesita instalarle algunos plugins y herramientas. En concreto, hay que instalarle el propio Docker para permitir que Jenkins ejecute tareas de docker, como por ejemplo `docker build` para construir imágenes de contenedores. 
+La imagen pública del contenedor de Jenkins está disponible en https://hub.docker.com/r/jenkins/jenkins[DockerHub], con el nombre jenkins/jenkins:lts. Esta imagen genérica necesita instalarle algunos plugins y herramientas. En concreto, hay que instalarle el propio Docker para permitir que Jenkins ejecute tareas de docker, como por ejemplo `docker build` para construir imágenes de contenedores. 
 
 Por tanto, vamos a crear una imagen personalizada del contenedor de Jenkins basándonos en la imagen pública e instalándo Docker dentro del contenedor.
 Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia máquina donde lo vamos a ejecutar, es decir en la instancia de jenkins. 
