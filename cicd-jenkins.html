@@ -505,7 +505,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_creación_del_dockerfile_2">8.1. Creación del <code>Dockerfile</code></a></li>
 <li><a href="#_publicación_de_la_imagen_en_el_registro">8.2. Publicación de la imagen en el registro</a></li>
 <li><a href="#_despliegue_en_vm">8.3. Despliegue en VM</a></li>
-<li><a href="#_integración_y_despliegue_contínuos_con_jenkins">8.4. Integración y despliegue contínuos con Jenkins</a></li>
+<li><a href="#_integración_y_despliegue_continuos_con_jenkins_2">8.4. Integración y despliegue continuos con Jenkins</a></li>
 </ul>
 </li>
 </ul>
@@ -516,7 +516,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sectionbody">
 <div class="paragraph">
 <p>Computación en la nube servicios y aplicaciones.
-Version 1.1, Mayo-2020.
+Version 1.2.
 Joaquín Cañadas &lt;<a href="mailto:jjcanada@ual.es">jjcanada@ual.es</a>&gt;</p>
 </div>
 <div class="quoteblock abstract">
@@ -528,7 +528,7 @@ Tema 3. Despliegue Continuo
 <div class="title">Objetivos</div>
 <ul>
 <li>
-<p>Crear una infraestructura de CI/CD en GCP</p>
+<p>Crear una infraestructura de CI/CD en GCP con Máquinas Virtuales gestionadas con Terraform</p>
 </li>
 <li>
 <p>Diseñar proyectos Jenkins para la construcción y despliegue automatizado de aplicaciones en Java y NodeJs</p>
@@ -539,8 +539,8 @@ Tema 3. Despliegue Continuo
 <div class="content">
 <div class="title">Realización y entrega</div>
 <div class="paragraph">
-<p>La realización de estas actividades se realizará de forma individual. Serán la base para actividades posteriores que ser harán en equipo.
-La entrega será mediante el envío de un informe y el acceso al profesor a los servicios configurados, para la revisión y evaluación de los mismos.</p>
+<p>La realización de estas actividades se realizará de forma <strong>individual</strong>. Serán la base para actividades posteriores que ser harán en equipo.
+La entrega será mediante el envío de un informe y el acceso al profesor a los servicios configurados por cada estudiante, para la revisión y evaluación de los mismos.</p>
 </div>
 </div>
 </div>
@@ -580,7 +580,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <p>Si ya dispones de crédito en GCP, podrás usarlo ahora. En cualquier caso, para esta asignatura disponemos de un nuevo cupón educativo de 50$ por estudiante, que no necesita tarjeta de crédito para su activación. Actívalo en la dirección que habrá recibido en tu email, usando tu email <em>@inlumine.ual.es</em>.</p>
 </div>
 <div class="paragraph">
-<p><strong>Crea un nuevo proyecto</strong> GCP con el nombre <strong>cnsa2020-<em>abc123</em></strong> (sustituyendo <em>abc123</em> por tu nombre de usuario), y dale permisos al profesor. Para ello, revisa las instrucciones que vimos en la asignatura del primer cuatrimestre. El crédito del cada cupón dura 12 meses, así que este nuevo proyecto asígnalo a la cuenta de facturación de la asignatura del primer cuatrimestre, ya que es mejor consumir ese crédito porque caduca antes. Si se consume el crédito del primer cupón, simplemente tendrás que cambiar tu proyecto <strong>cnsa2020-<em>abc123</em></strong> a la nueva cuenta de facturación del nuevo cupón.</p>
+<p><strong>Crea un nuevo proyecto</strong> GCP con el nombre <strong>cnsa2021-<em>abc123</em></strong> (sustituyendo <em>abc123</em> por tu nombre de usuario), y dale permisos al profesor. Para ello, revisa las instrucciones que vimos en la asignatura del primer cuatrimestre. El crédito del cada cupón dura 12 meses, así que este nuevo proyecto asígnalo a la cuenta de facturación de la asignatura del primer cuatrimestre, ya que es mejor consumir ese crédito porque caduca antes. Si se consume el crédito del primer cupón, simplemente tendrás que cambiar tu proyecto <strong>cnsa2021-<em>abc123</em></strong> a la nueva cuenta de facturación del nuevo cupón.</p>
 </div>
 </div>
 <div class="sect2">
@@ -617,7 +617,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <p>Para poder usar servicios adicionales, como DNS gratuito, debes darte de alta en <a href="https://education.github.com/pack">Github Student Education Pack</a>.</p>
 </div>
 <div class="paragraph">
-<p>Si ya dispones de una cuenta de GitHub, y no quieres crear una cuenta nueva, simplemente debes añadir tu email <em>@inlumine.ual.es</em> a la lista de emails de tu cuenta actual. Para ello, sigue las <a href="https://help.github.com/en/github/setting-up-and-managing-your-github-user-account/adding-an-email-address-to-your-github-account">instrucciones</a>. Tras añadir tu email, haz clic en el enlace <a href="https://education.github.com/benefits">Get the pack</a>.</p>
+<p>Si ya dispones de una cuenta de GitHub, y no quieres crear una cuenta nueva, simplemente debes añadir tu email <em>@inlumine.ual.es</em> a la lista de emails de tu cuenta actual. Para ello, sigue las <a href="https://help.github.com/en/github/setting-up-and-managing-your-github-user-account/adding-an-email-address-to-your-github-account">instrucciones</a>. Tras añadir tu email, haz clic en el enlace <a href="https://education.github.com/pack">Get the pack</a>.</p>
 </div>
 </div>
 </div>
@@ -638,11 +638,15 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 </li>
 </ol>
 </div>
-<div class="paragraph">
-<p>Utiliza la plantilla de terraform disponible en el repositorio <a href="https://github.com/ualcnsa/terraformGoogleCloudSample" class="bare">https://github.com/ualcnsa/terraformGoogleCloudSample</a>.</p>
+<div class="imageblock text-center thumb">
+<div class="content">
+<img src="images/terraform-vm-schema.png" alt="terraform vm schema">
+</div>
+<div class="title">Fig. 1. Máquinas virtuales creadas con Terraform</div>
 </div>
 <div class="paragraph">
-<p>En primer lugar realiza un <em>fork</em> del repositorio, para hacer las modificaciones al mismo que sean necesarias. Después modifica las variables correspondientes para usar tu proyecto en la plantilla.</p>
+<p>Para crearlas, utiliza la plantilla de terraform disponible en el repositorio <a href="https://github.com/ualcnsa/terraformGoogleCloudSample" class="bare">https://github.com/ualcnsa/terraformGoogleCloudSample</a>.
+En primer lugar realiza un <em>fork</em> del repositorio, para hacer las modificaciones al mismo que sean necesarias. Después modifica las variables correspondientes para usar tu proyecto en la plantilla, tal y como se describe a continuación.</p>
 </div>
 <div class="sect2">
 <h3 id="_estructura_del_proyecto_terraform">2.1. Estructura del proyecto terraform</h3>
@@ -707,7 +711,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Sustituye este valor por el nombre de tu proyecto (<em>cnsa2020-abc123</em>)</td>
+<td>Sustituye este valor por el nombre de tu proyecto (<em>cnsa2021-abc123</em>)</td>
 </tr>
 </table>
 </div>
@@ -718,7 +722,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <img src="images/crear-clave-cuenta-servicio.png" alt="crear clave cuenta servicio">
 </div>
-<div class="title">Fig. 1. Descarga de archivo de credenciales Google Cloud</div>
+<div class="title">Fig. 2. Descarga de archivo de credenciales Google Cloud</div>
 </div>
 <div class="colist arabic">
 <table>
@@ -748,7 +752,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 </td>
 <td class="content">
 <div class="paragraph">
-<p>Recuerda <strong>no subir nunca tu archivo json de credenciales</strong> a un repositorio público como GitHub. Para ello, añade el nombre el archivo de credenciales  al <code>.gitignore</code>. En ese archivo va tu clave privada que sustituye a tu usuario y contraseña para crear recursos en GCP. Hay robots que continuamente buscan PRIVATE KEYS y API TOKENS en repositorios públicos como GitHub. Si un <em>hacker</em> accede a ese archivo, lo usará para crear servicios hasta gastar tu crédito por completo, fundamentalmente para minar bitcoins.</p>
+<p>Recuerda: <strong>NUNCA subas tu archivo de credenciales json</strong> a un repositorio público como GitHub. Para evitarlo, añade el nombre el archivo de credenciales  al <strong><code>.gitignore</code></strong>. En el archivo de credenciales va tu clave privada que sustituye a tu usuario y contraseña para crear recursos en GCP. Hay robots que continuamente buscan PRIVATE KEYS y API TOKENS en repositorios públicos como GitHub. Si un <em>hacker</em> accede a ese archivo, lo usará para crear servicios hasta gastar tu crédito por completo, fundamentalmente para minar bitcoins.</p>
 </div>
 </td>
 </tr>
@@ -774,7 +778,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <img src="images/terraform-init-ok.png" alt="terraform init ok">
 </div>
-<div class="title">Fig. 2. <code>terraform init</code> correcto</div>
+<div class="title">Fig. 3. <code>terraform init</code> correcto</div>
 </div>
 <div class="paragraph">
 <p>Si por el contrario recibes algún mensaje de error, revisa el motivo del error:</p>
@@ -799,7 +803,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <img src="images/terraform-plan-ok.png" alt="terraform plan ok">
 </div>
-<div class="title">Fig. 3. <code>terraform plan</code> correcto</div>
+<div class="title">Fig. 4. <code>terraform plan</code> correcto</div>
 </div>
 </div>
 <div class="sect3">
@@ -837,6 +841,20 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="sect1">
 <h2 id="_cloud_dns">3. Cloud DNS</h2>
 <div class="sectionbody">
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>Este apartado, Cloud DNS, es optativo</strong>. Se evalúa con el 5% de la actividad pero no es obligatorio que lo realices.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>Google Cloud ha asignado una IP pública estática a cada una de tus instancias (la IP no cambiará al apagar la instancia y volver a encenderla). A continuación, vamos a asignar nombres de DNS a esas IPs con Cloud DNS y uno de los servicios de DNS disponibles en el Student Pack de GitHub.</p>
 </div>
@@ -852,7 +870,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <img src="images/tech-domain-disponible.png" alt="tech domain disponible">
 </div>
-<div class="title">Fig. 4. Comprobar si el dominio está disponible en get.tech</div>
+<div class="title">Fig. 5. Comprobar si el dominio está disponible en get.tech</div>
 </div>
 <div class="paragraph">
 <p>A continuación, inicia sesión con tu cuenta de github, y verás que tienes el descuento por un año. Procede a la compra gratuita. Además, tendrás que registrarte para poder acceder posteriormente a la configuración. Debes completar los datos de registro ya que te identifican como propietario del nombre de dominio. Si lo deseas, usa como dirección <em>Universidad de Almería, Ctra. Sacramento s/n, 04120, Almería, Spain</em>.</p>
@@ -874,7 +892,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <img src="images/cloud-dns.png" alt="cloud dns" width="360">
 </div>
-<div class="title">Fig. 5. Cloud DNS</div>
+<div class="title">Fig. 6. Cloud DNS</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="2">
@@ -887,7 +905,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <img src="images/cloud-dns-crear-zona.png" alt="cloud dns crear zona">
 </div>
-<div class="title">Fig. 6. Cloud DNS, crear zona</div>
+<div class="title">Fig. 7. Cloud DNS, crear zona</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="3">
@@ -900,13 +918,13 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <img src="images/cloud-dns-crear-conjunto-de-registros.png" alt="cloud dns crear conjunto de registros">
 </div>
-<div class="title">Fig. 7. Cloud DNS. Crear conjunto de registros, instancia Jenkins</div>
+<div class="title">Fig. 8. Cloud DNS. Crear conjunto de registros, instancia Jenkins</div>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
 <img src="images/cloud-dns-crear-conjunto-de-registros2.png" alt="cloud dns crear conjunto de registros2">
 </div>
-<div class="title">Fig. 8. Cloud DNS. Crear conjunto de registros, instancia de despliegue de apps</div>
+<div class="title">Fig. 9. Cloud DNS. Crear conjunto de registros, instancia de despliegue de apps</div>
 </div>
 <div class="paragraph">
 <p>Tras la creación, debes tener un resultado similar a este:</p>
@@ -915,7 +933,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <img src="images/cloud-dns-detalles-zona.png" alt="cloud dns detalles zona">
 </div>
-<div class="title">Fig. 9. Cloud DNS. Detalles de la Zona</div>
+<div class="title">Fig. 10. Cloud DNS. Detalles de la Zona</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="4">
@@ -928,7 +946,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <img src="images/get-tech-manage-orders.png" alt="get tech manage orders">
 </div>
-<div class="title">Fig. 10. get.tech. Acceso al pedido</div>
+<div class="title">Fig. 11. get.tech. Acceso al pedido</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="5">
@@ -941,7 +959,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="content">
 <img src="images/get-tech-manage-servers.png" alt="get tech manage servers">
 </div>
-<div class="title">Fig. 11. get.tech. Nombres de los servidores</div>
+<div class="title">Fig. 12. get.tech. Nombres de los servidores</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="6">
@@ -962,7 +980,7 @@ La entrega será mediante el envío de un informe y el acceso al profesor a los 
 <div class="sect2">
 <h3 id="_construcción_de_la_imagen_del_contenedor_jenkins">4.1. Construcción de la imagen del contenedor Jenkins</h3>
 <div class="paragraph">
-<p>La imagen pública del contenedor de Jenkins está disponible en <a href="https://hub.docker.com/_/jenkins/">DockerHub</a>. Esta imagen genérica necesita instalarle algunos plugins y herramientas. En concreto, hay que instalarle el propio Docker para permitir que Jenkins ejecute tareas de docker, como por ejemplo <code>docker build</code> para construir imágenes de contenedores.</p>
+<p>La imagen pública del contenedor de Jenkins está disponible en <a href="https://hub.docker.com/r/jenkins/jenkins">DockerHub</a>, con el nombre <code>jenkins/jenkins:lts</code>. Esta imagen genérica necesita instalarle algunos plugins y herramientas. En concreto, hay que instalarle el propio Docker para permitir que Jenkins ejecute tareas de docker, como por ejemplo <code>docker build</code> para construir imágenes de contenedores.</p>
 </div>
 <div class="paragraph">
 <p>Por tanto, vamos a crear una imagen personalizada del contenedor de Jenkins basándonos en la imagen pública e instalándo Docker dentro del contenedor.
@@ -1019,13 +1037,13 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 <div class="content">
 <img src="images/docker-build-tag.png" alt="docker build tag">
 </div>
-<div class="title">Fig. 12. <code>docker build</code> de Jenkins con Docker</div>
+<div class="title">Fig. 13. <code>docker build</code> de Jenkins con Docker</div>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
 <img src="images/docker-build-tag-successfully.png" alt="docker build tag successfully">
 </div>
-<div class="title">Fig. 13. <code>docker build</code> successful</div>
+<div class="title">Fig. 14. <code>docker build</code> successful</div>
 </div>
 <div class="paragraph">
 <p>Comprueba que la imagen ha sido creada, y está disponible en tu máquina: <code>docker image ls</code></p>
@@ -1034,7 +1052,7 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 <div class="content">
 <img src="images/docker-image-ls.png" alt="docker image ls">
 </div>
-<div class="title">Fig. 14. <code>docker image ls</code></div>
+<div class="title">Fig. 15. <code>docker image ls</code></div>
 </div>
 </div>
 <div class="sect2">
@@ -1109,7 +1127,7 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 <div class="content">
 <img src="images/docker-ps-jenkins.png" alt="docker ps jenkins">
 </div>
-<div class="title">Fig. 15. <code>docker ps</code></div>
+<div class="title">Fig. 16. <code>docker ps</code></div>
 </div>
 </div>
 <div class="sect2">
@@ -1128,7 +1146,7 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 <div class="content">
 <img src="images/jenkins-unlock.png" alt="jenkins unlock">
 </div>
-<div class="title">Fig. 16. Contraseña inicial de Jenkins</div>
+<div class="title">Fig. 17. Contraseña inicial de Jenkins</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="2">
@@ -1141,7 +1159,7 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 <div class="content">
 <img src="images/jenkins-install-suggested-plugins.png" alt="jenkins install suggested plugins">
 </div>
-<div class="title">Fig. 17. Install suggested plugins</div>
+<div class="title">Fig. 18. Install suggested plugins</div>
 </div>
 <div class="paragraph">
 <p>Tras unos minutos, introduce los datos del  usuario administrador de Jenkins. Introduce un nombre de usuario y contraseña.</p>
@@ -1156,7 +1174,7 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 <div class="content">
 <img src="images/jenkins-welcome.png" alt="jenkins welcome">
 </div>
-<div class="title">Fig. 18. Bienvenida a Jenkins</div>
+<div class="title">Fig. 19. Bienvenida a Jenkins</div>
 </div>
 </div>
 <div class="sect2">
@@ -1168,7 +1186,7 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 <div class="content">
 <img src="images/jenkins-new-hello-docker.png" alt="jenkins new hello docker">
 </div>
-<div class="title">Fig. 19. Nuevo proyecto, freestyle</div>
+<div class="title">Fig. 20. Nuevo proyecto, freestyle</div>
 </div>
 <div class="paragraph">
 <p>En la sección <strong>Build</strong>, añade un bloque <strong>Execute shell</strong>. Pega estos comandos:</p>
@@ -1188,13 +1206,13 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/jenkins-new-hello-docker-console-output.png" alt="jenkins new hello docker console output">
 </div>
-<div class="title">Fig. 20. Build now. Resultado del build</div>
+<div class="title">Fig. 21. Build now. Resultado del build</div>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
 <img src="images/jenkins-new-hello-docker-console-success.png" alt="jenkins new hello docker console success">
 </div>
-<div class="title">Fig. 21. Salida por consola</div>
+<div class="title">Fig. 22. Salida por consola</div>
 </div>
 <div class="paragraph">
 <p>Por consola se visualiza el resultado de ejecutar los comandos dentro del contenedor. Como puedes ver, <code>git</code> y <code>java</code> están instalados, venían ya en la imagen de jenkins:lts de la que hemos partido en la definición del Dockerfile. Además, <code>docker</code> también está disponible, se ha instalado correctamente mediante la definición incluida en el Dockerfile.</p>
@@ -1212,7 +1230,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/jenkins-plugins-github-integration.png" alt="jenkins plugins github integration">
 </div>
-<div class="title">Fig. 22. Instalación del plugin Github integration</div>
+<div class="title">Fig. 23. Instalación del plugin Github integration</div>
 </div>
 <div class="paragraph">
 <p>Repite los pasos para los plugins <em>Green Balls</em> y  <em>NodeJS</em>.</p>
@@ -1221,7 +1239,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/jenkins-plugins-nodejs.png" alt="jenkins plugins nodejs">
 </div>
-<div class="title">Fig. 23. Instalación del plugin NodeJS</div>
+<div class="title">Fig. 24. Instalación del plugin NodeJS</div>
 </div>
 <div class="paragraph">
 <p>Marca <em>Restart Jenkins</em> para completar la instalación. Tras unos segundos, vuelve a iniciar sesión y tendrás los plugins instalados.</p>
@@ -1230,7 +1248,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/jenkins-plugins-restart.png" alt="jenkins plugins restart">
 </div>
-<div class="title">Fig. 24. Reiniciar para completar la instalación</div>
+<div class="title">Fig. 25. Reiniciar para completar la instalación</div>
 </div>
 </div>
 <div class="sect2">
@@ -1255,7 +1273,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/jenkins-tool-nodejs.png" alt="jenkins tool nodejs">
 </div>
-<div class="title">Fig. 25. Configuración de herramienta NodeJS</div>
+<div class="title">Fig. 26. Configuración de herramienta NodeJS</div>
 </div>
 <div class="paragraph">
 <p>De la misma forma, instala la última versión de Maven.</p>
@@ -1270,7 +1288,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/deploy-schema-full.png" alt="deploy schema full">
 </div>
-<div class="title">Fig. 26. Esquema de despliegue con Jenkins</div>
+<div class="title">Fig. 27. Esquema de despliegue con Jenkins</div>
 </div>
 <div class="paragraph">
 <p>Para ello, los pasos que se detallan a continuación permiten:</p>
@@ -1304,7 +1322,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/ssh-from-developer-to-jenkins.png" alt="ssh from developer to jenkins">
 </div>
-<div class="title">Fig. 27. Conexión SSH a la instancia Jenkins</div>
+<div class="title">Fig. 28. Conexión SSH a la instancia Jenkins</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="2">
@@ -1329,7 +1347,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/jenkins-ls-deploy-keys.png" alt="jenkins ls deploy keys">
 </div>
-<div class="title">Fig. 28. Pareja de claves <em>id_rsa_deploy</em></div>
+<div class="title">Fig. 29. Pareja de claves <em>id_rsa_deploy</em></div>
 </div>
 </div>
 <div class="sect3">
@@ -1348,7 +1366,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/jenkins-cat-public-key.png" alt="jenkins cat public key">
 </div>
-<div class="title">Fig. 29. Copia el contenido de <em>id_rsa_deploy.pub</em></div>
+<div class="title">Fig. 30. Copia el contenido de <em>id_rsa_deploy.pub</em></div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="8">
@@ -1367,7 +1385,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/ssh-from-developer-to-deploy.png" alt="ssh from developer to deploy">
 </div>
-<div class="title">Fig. 30. Conexión SSH a la instancia Jenkins</div>
+<div class="title">Fig. 31. Conexión SSH a la instancia Jenkins</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="11">
@@ -1392,7 +1410,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/jenkins-ssh-to-deploy.png" alt="jenkins ssh to deploy">
 </div>
-<div class="title">Fig. 31. Conexión SSH desde la instancia Jenkins a la de despliegue</div>
+<div class="title">Fig. 32. Conexión SSH desde la instancia Jenkins a la de despliegue</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="14">
@@ -1436,7 +1454,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/ssh-host-autentication.png" alt="ssh host autentication">
 </div>
-<div class="title">Fig. 32. Validar la clave del host: <strong>yes</strong></div>
+<div class="title">Fig. 33. Validar la clave del host: <strong>yes</strong></div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="16">
@@ -1452,7 +1470,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/ssh-known_hosts.png" alt="ssh known hosts">
 </div>
-<div class="title">Fig. 33. Contenido del archivo <strong>known_hosts</strong> en el contenedor</div>
+<div class="title">Fig. 34. Contenido del archivo <strong>known_hosts</strong> en el contenedor</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="18">
@@ -1465,7 +1483,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/ssh-known_hosts-local.png" alt="ssh known hosts local">
 </div>
-<div class="title">Fig. 34. Contenido del archivo <strong>known_hosts</strong> en la carpeta local</div>
+<div class="title">Fig. 35. Contenido del archivo <strong>known_hosts</strong> en la carpeta local</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="19">
@@ -1496,7 +1514,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/jenksin-hello-docker-ssh-to-deploy.png" alt="jenksin hello docker ssh to deploy">
 </div>
-<div class="title">Fig. 35. Modificación del proyecto para que ejecute un comando sobre la instancia de despliegue</div>
+<div class="title">Fig. 36. Modificación del proyecto para que ejecute un comando sobre la instancia de despliegue</div>
 </div>
 <div class="paragraph">
 <p>Tras ejecutar el proyecto en Jenkins, el resultado debe ser correcto.</p>
@@ -1505,7 +1523,7 @@ docker <span class="nt">-v</span></code></pre>
 <div class="content">
 <img src="images/jenksin-hello-docker-ssh-to-deploy-output.png" alt="jenksin hello docker ssh to deploy output">
 </div>
-<div class="title">Fig. 36. Salida por consola. El comando se ha ejecutado correctamente.</div>
+<div class="title">Fig. 37. Salida por consola. El comando se ha ejecutado correctamente.</div>
 </div>
 </div>
 </div>
@@ -1553,7 +1571,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/petclinic-homepage.png" alt="petclinic homepage">
 </div>
-<div class="title">Fig. 37. Página principal de PetClinic</div>
+<div class="title">Fig. 38. Página principal de PetClinic</div>
 </div>
 <div class="paragraph">
 <p>En su configuración predeterminada, Petclinic utiliza una base de datos en memoria (H2) que se inicia con datos predeterminados, y los nuevos datos que se guarden se pierden al reiniciar la aplicación.</p>
@@ -1605,7 +1623,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/new-item-pipeline-petclinic.png" alt="new item pipeline petclinic">
 </div>
-<div class="title">Fig. 38. New Item, PetClinic pipeline</div>
+<div class="title">Fig. 39. New Item, PetClinic pipeline</div>
 </div>
 <div class="paragraph">
 <p>En el bloque Pipeline, pega la configuración siguiente:</p>
@@ -1680,7 +1698,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/petclinic-pipeline-build-1.png" alt="petclinic pipeline build 1">
 </div>
-<div class="title">Fig. 39. Construcción del pipeline PetClinic</div>
+<div class="title">Fig. 40. Construcción del pipeline PetClinic</div>
 </div>
 <div class="paragraph">
 <p>Si realizamos una segunda ejecución, ya aparecerá la gráfica de evolución de los tests de JUnit.</p>
@@ -1705,13 +1723,13 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/jacoco-local-results.png" alt="jacoco local results">
 </div>
-<div class="title">Fig. 40. Archivos generados por Jacoco</div>
+<div class="title">Fig. 41. Archivos generados por Jacoco</div>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
 <img src="images/jacoco-local-html.png" alt="jacoco local html">
 </div>
-<div class="title">Fig. 41. Informe html de la cobertura Jacoco</div>
+<div class="title">Fig. 42. Informe html de la cobertura Jacoco</div>
 </div>
 <div class="paragraph">
 <p>Y si haces clic en el nombre de una clase, verás el código coloreado:</p>
@@ -1720,7 +1738,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/plugins-jacoco-class-details.png" alt="plugins jacoco class details">
 </div>
-<div class="title">Fig. 42. Detalle la cobertura de las lineas de código</div>
+<div class="title">Fig. 43. Detalle la cobertura de las lineas de código</div>
 </div>
 <div class="colist arabic">
 <table>
@@ -1752,13 +1770,13 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/plugins-jacoco-install.png" alt="plugins jacoco install">
 </div>
-<div class="title">Fig. 43. Instalación del plugin Jacoco</div>
+<div class="title">Fig. 44. Instalación del plugin Jacoco</div>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
 <img src="images/plugins-code-coverage-api-install.png" alt="plugins code coverage api install">
 </div>
-<div class="title">Fig. 44. Instalación del plugin Code Coverage API</div>
+<div class="title">Fig. 45. Instalación del plugin Code Coverage API</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="2">
@@ -1798,7 +1816,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/plugins-jacoco-dashboard-result.png" alt="plugins jacoco dashboard result">
 </div>
-<div class="title">Fig. 45. Informe de cobertura en el dashboard</div>
+<div class="title">Fig. 46. Informe de cobertura en el dashboard</div>
 </div>
 <div class="paragraph">
 <p>Haciendo clic sobre la gráfica accedes a los detalles:</p>
@@ -1807,7 +1825,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/plugins-jacoco-details-result.png" alt="plugins jacoco details result">
 </div>
-<div class="title">Fig. 46. Detalle de de cobertura</div>
+<div class="title">Fig. 47. Detalle de de cobertura</div>
 </div>
 </div>
 <div class="sect2">
@@ -1847,7 +1865,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/checkstyle-report-html.png" alt="checkstyle report html">
 </div>
-<div class="title">Fig. 47. Informe de CheckStyle</div>
+<div class="title">Fig. 48. Informe de CheckStyle</div>
 </div>
 <div class="paragraph">
 <p>Sería labor del equipo de desarrollo revisar los errores detectados y tratar de corregirlos, siempre que realmente supongan una mejora para la calidad del código.</p>
@@ -1883,13 +1901,13 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/checkstyle-report-dashboard.png" alt="checkstyle report dashboard">
 </div>
-<div class="title">Fig. 48. Pipeline con la nueva fase de Análisis</div>
+<div class="title">Fig. 49. Pipeline con la nueva fase de Análisis</div>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
 <img src="images/checkstyle-report-details.png" alt="checkstyle report details">
 </div>
-<div class="title">Fig. 49. Detalles del informe de CheckStyle</div>
+<div class="title">Fig. 50. Detalles del informe de CheckStyle</div>
 </div>
 <div class="sidebarblock">
 <div class="content">
@@ -2045,7 +2063,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/mvn-package-petclinic.png" alt="mvn package petclinic">
 </div>
-<div class="title">Fig. 50. Resultado de la construcción local con Maven</div>
+<div class="title">Fig. 51. Resultado de la construcción local con Maven</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="2">
@@ -2063,7 +2081,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/docker-build-petclinic.png" alt="docker build petclinic">
 </div>
-<div class="title">Fig. 51. Docker build</div>
+<div class="title">Fig. 52. Docker build</div>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -2141,7 +2159,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/cloud-containers-registry-key-create.png" alt="cloud containers registry key create">
 </div>
-<div class="title">Fig. 52. Creación Service Account Key for pull/push on Container Registry</div>
+<div class="title">Fig. 53. Creación Service Account Key for pull/push on Container Registry</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="2">
@@ -2199,7 +2217,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 <div class="content">
 <img src="images/cloud-containers-registry-login.png" alt="cloud containers registry login">
 </div>
-<div class="title">Fig. 53. Autenticación de Docker contra Container Registry</div>
+<div class="title">Fig. 54. Autenticación de Docker contra Container Registry</div>
 </div>
 </div>
 <div class="sect2">
@@ -2229,7 +2247,7 @@ docker build <span class="nt">-t</span> gcr.io/<span class="nv">$GOOGLE_CLOUD_PR
 <div class="content">
 <img src="images/container-registry-habilitar-api.png" alt="container registry habilitar api">
 </div>
-<div class="title">Fig. 54. Habilitar la API Container Registry</div>
+<div class="title">Fig. 55. Habilitar la API Container Registry</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="3">
@@ -2254,7 +2272,7 @@ docker build <span class="nt">-t</span> gcr.io/<span class="nv">$GOOGLE_CLOUD_PR
 <div class="content">
 <img src="images/container-registry-pushed-petclinic.png" alt="container registry pushed petclinic">
 </div>
-<div class="title">Fig. 55. Lista de imágenes en Container Registry</div>
+<div class="title">Fig. 56. Lista de imágenes en Container Registry</div>
 </div>
 <div class="paragraph">
 <p>La imagen del contenedor PetClinic ya está disponible en el registro privado de nuestro proyecto GCP. Utilizando nuestras credenciales podremos hacer <code>docker pull</code> de dicha imagen para descargarla en cualquier máquina con docker, y ejecutarlo con <code>docker run</code>.</p>
@@ -2273,7 +2291,7 @@ docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span
 <div class="content">
 <img src="images/docker-run-petclinic-webapp-error-authentication.png" alt="docker run petclinic webapp error authentication">
 </div>
-<div class="title">Fig. 56. Error de autenticación en Container Registry</div>
+<div class="title">Fig. 57. Error de autenticación en Container Registry</div>
 </div>
 <div class="paragraph">
 <p>Para arreglarlo, habrá que copiar en la máquina de despliegue el archivo de credenciales <code>.json</code> con premisos sobre Container Registry. A continuación se muestran los comandos necesarios para ello. Una vez disponible este archivo en la instancia de despliegue ejecutar el comando <code>docker login</code> y tras ello ya si podremos hacer <code>docker pull</code> y <code>docker run</code>.</p>
@@ -2451,7 +2469,7 @@ docker run <span class="nt">-d</span> <span class="nt">-p</span> 8080:8080 <span
 <div class="content">
 <img src="images/jenkins-credentials-container-registry.png" alt="jenkins credentials container registry">
 </div>
-<div class="title">Fig. 57. Credenciales en Jenkins para Container Registry</div>
+<div class="title">Fig. 58. Credenciales en Jenkins para Container Registry</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="2">
@@ -2481,7 +2499,7 @@ docker run <span class="nt">-d</span> <span class="nt">-p</span> 8080:8080 <span
 <div class="content">
 <img src="images/jenkins-published-container-registry.png" alt="jenkins published container registry">
 </div>
-<div class="title">Fig. 58. Imagen publicada en Container Registry, etiquetada con el número de build</div>
+<div class="title">Fig. 59. Imagen publicada en Container Registry, etiquetada con el número de build</div>
 </div>
 </div>
 <div class="sect3">
@@ -2629,7 +2647,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/jenkins-petclinic-full-pipeline-proceed.png" alt="jenkins petclinic full pipeline proceed">
 </div>
-<div class="title">Fig. 59. Input message (paso comentado en el ejemplo)</div>
+<div class="title">Fig. 60. Input message (paso comentado en el ejemplo)</div>
 </div>
 <div class="paragraph">
 <p>El pipeline completo, con todas sus fases, debe quedar así:</p>
@@ -2638,7 +2656,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/jenkins-petclinic-full-pipeline.png" alt="jenkins petclinic full pipeline">
 </div>
-<div class="title">Fig. 60. Pipeline completo</div>
+<div class="title">Fig. 61. Pipeline completo</div>
 </div>
 <div class="paragraph">
 <p>Enhorabuena!! Has conseguido definir un pipeline completo de integración y despliegue continuos, y con contenedores. Este proceso se puede aplicar, con pequeñas adaptaciones, a cualquier otro proyecto Java basados en Maven.</p>
@@ -2795,7 +2813,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/node-mocha-passed.png" alt="node mocha passed">
 </div>
-<div class="title">Fig. 61. npm test</div>
+<div class="title">Fig. 62. npm test</div>
 </div>
 <div class="sect2">
 <h3 id="_creación_del_pipeline_en_jenkins">7.1. Creación del pipeline en Jenkins</h3>
@@ -2841,7 +2859,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/jenkins-node-pipeline1.png" alt="jenkins node pipeline1">
 </div>
-<div class="title">Fig. 62. Nodeapp pipeline</div>
+<div class="title">Fig. 63. Nodeapp pipeline</div>
 </div>
 <div class="paragraph">
 <p>La evolución de las métricas del proyecto es uno de los indicadores que habitualmente muestra Jenkins como <em>feedback</em> para los desarrolladores. Vamos a <strong>publicar los resultados de los test</strong> en un gráfico.</p>
@@ -2926,7 +2944,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/jenkins-nodeapp-pipeline-test-result-trend.png" alt="jenkins nodeapp pipeline test result trend">
 </div>
-<div class="title">Fig. 63. Publicado el gráfico de tendencia de los test</div>
+<div class="title">Fig. 64. Publicado el gráfico de tendencia de los test</div>
 </div>
 <div class="sidebarblock">
 <div class="content">
@@ -2953,7 +2971,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/jenkins-webhook-github.png" alt="jenkins webhook github">
 </div>
-<div class="title">Fig. 64. Nuevo Webhook</div>
+<div class="title">Fig. 65. Nuevo Webhook</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="3">
@@ -2966,7 +2984,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/jenkins-webhook-build-triger.png" alt="jenkins webhook build triger">
 </div>
-<div class="title">Fig. 65. Activar el Webhook en build trigers</div>
+<div class="title">Fig. 66. Activar el Webhook en build trigers</div>
 </div>
 <div class="paragraph">
 <p>A partir de ahora, cuando el repositorio en GitHub reciba un push notificará a Jenkins para que lance la construcción automáticamente.</p>
@@ -3013,7 +3031,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/node-mocha-coverage-jenkins-ok.png" alt="node mocha coverage jenkins ok">
 </div>
-<div class="title">Fig. 66. Ejecución de cobertura</div>
+<div class="title">Fig. 67. Ejecución de cobertura</div>
 </div>
 <div class="paragraph">
 <p>Como resultado, en la carpeta <code>coverage</code> del proyecto se ha generado el informe de cobertura.</p>
@@ -3022,13 +3040,13 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/node-mocha-coverage-results.png" alt="node mocha coverage results" width="160">
 </div>
-<div class="title">Fig. 67. Informe de cobertura</div>
+<div class="title">Fig. 68. Informe de cobertura</div>
 </div>
 <div class="imageblock text-center thumb">
 <div class="content">
 <img src="images/node-mocha-coverage-index.png" alt="node mocha coverage index">
 </div>
-<div class="title">Fig. 68. Informe de cobertura en html</div>
+<div class="title">Fig. 69. Informe de cobertura en html</div>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -3092,7 +3110,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/jenkins-node-coverage-report-link.png" alt="jenkins node coverage report link">
 </div>
-<div class="title">Fig. 69. Enlace al informe de cobertura en html</div>
+<div class="title">Fig. 70. Enlace al informe de cobertura en html</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="3">
@@ -3111,7 +3129,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/maven-script-console-site.png" alt="maven script console site">
 </div>
-<div class="title">Fig. 70. Script Console: permisos para visualizar el informe de cobertura</div>
+<div class="title">Fig. 71. Script Console: permisos para visualizar el informe de cobertura</div>
 </div>
 <div class="paragraph">
 <p>Tras ello ya podrás visualizar correctamente el informe de cobertura. Pero ten en cuenta que cada vez que reinicies Jenkins esta configuración  se pierde y vuelve a la configuración predeterminada.</p>
@@ -3162,7 +3180,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/eslint-init.png" alt="eslint init">
 </div>
-<div class="title">Fig. 71. ESLint init</div>
+<div class="title">Fig. 72. ESLint init</div>
 </div>
 <div class="paragraph">
 <p>Se habrá creado un archivo <code>.eslintrc.json</code>, que incluirá esta línea:</p>
@@ -3207,7 +3225,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="olist arabic">
 <ol class="arabic" start="4">
 <li>
-<p>Lanzaló en local:</p>
+<p>Lánzalo en local:</p>
 <div class="literalblock">
 <div class="content">
 <pre>npm run lint -s</pre>
@@ -3255,7 +3273,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/eslint-jenkins-link.png" alt="eslint jenkins link">
 </div>
-<div class="title">Fig. 72. Enlace al informe <em>ESLint</em></div>
+<div class="title">Fig. 73. Enlace al informe <em>ESLint</em></div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="7">
@@ -3271,7 +3289,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="content">
 <img src="images/eslint-jenkins-pass-grapth.png" alt="eslint jenkins pass grapth">
 </div>
-<div class="title">Fig. 73. Fase <em>ESLint</em> <em>passed</em></div>
+<div class="title">Fig. 74. Fase <em>ESLint</em> <em>passed</em></div>
 </div>
 </div>
 <div class="sect2">
@@ -3323,7 +3341,7 @@ docker rmi $(docker images -q)</code></pre>
         fi" <i class="conum" data-value="1"></i><b>(1)</b>
         ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "if pgrep node; then forever stopall; fi" <i class="conum" data-value="2"></i><b>(2)</b>
         ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "cd nodeapp &amp;&amp; npm install" <i class="conum" data-value="3"></i><b>(3)</b>
-        ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "cd nodeapp &amp;&amp; PORT=8080 forever start index.js"
+        ssh -i ~/.ssh/id_rsa_deploy ubuntu@DEPLOY_MACHINE "cd nodeapp &amp;&amp; PORT=8080 forever start index.js" <i class="conum" data-value="4"></i><b>(4)</b>
       '''</span>
     <span class="o">}</span>
   <span class="o">}</span></code></pre>
@@ -3359,6 +3377,9 @@ docker rmi $(docker images -q)</code></pre>
 <li>
 <p><a href="https://codelabs.developers.google.com/codelabs/cloud-create-a-nodejs-vm/">Running Node.js on a Virtual Machine codelab</a></p>
 </li>
+<li>
+<p><a href="https://medium.com/@mosheezderman/how-to-set-up-ci-cd-pipeline-for-a-node-js-app-with-jenkins-c51581cc783c">How to set up CI/CD Pipeline for a node.js app with Jenkins</a></p>
+</li>
 </ol>
 </div>
 </div>
@@ -3370,7 +3391,7 @@ docker rmi $(docker images -q)</code></pre>
 <h2 id="_aplicación_nodejs_con_docker">8. Aplicación NodeJs con Docker</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Para realizar el despliegue de la app Hola Mundo en NodeJs como un contenedor, primero tenemos que <a href="https://nodejs.org/fr/docs/guides/nodejs-docker-webapp/">dockerizar</a> la aplicación. Una vez construido el contenedor, habrá qeu publicar la imagen de contenedor en un registro como Google Container Registry, y por último ejecutar el contenedor en la instancia de despliegue.</p>
+<p>Para realizar el despliegue de la app Hola Mundo en NodeJs como un contenedor, primero tenemos que <a href="https://nodejs.org/fr/docs/guides/nodejs-docker-webapp/">dockerizar</a> la aplicación. Una vez construido el contenedor, habrá que publicar la imagen de contenedor en un registro como Google Container Registry, y por último ejecutar el contenedor en la instancia de despliegue.</p>
 </div>
 <div class="paragraph">
 <p>A continuación se describe cómo crear un contenedor Docker de la aplicación NodeJs. Los pasos se realizan en local, y al final configuraremos el pipeline de Jenkins para que se realicen automáticamente.</p>
@@ -3492,7 +3513,7 @@ npm-debug.log</pre>
 <div class="content">
 <img src="images/docker-login-done.png" alt="docker login done">
 </div>
-<div class="title">Fig. 74. Comprobar docker login</div>
+<div class="title">Fig. 75. Comprobar docker login</div>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -3536,7 +3557,7 @@ docker tag  &lt;your username&gt;/nodeapp gcr.io/<span class="nv">$GOOGLE_CLOUD_
 <div class="content">
 <img src="images/docker-tag-nodeapp.png" alt="docker tag nodeapp">
 </div>
-<div class="title">Fig. 75. Imagen etiquetada</div>
+<div class="title">Fig. 76. Imagen etiquetada</div>
 </div>
 <div class="olist arabic">
 <ol class="arabic" start="4">
@@ -3561,7 +3582,7 @@ docker tag  &lt;your username&gt;/nodeapp gcr.io/<span class="nv">$GOOGLE_CLOUD_
 <div class="content">
 <img src="images/container-registry-pushed-nodeapp.png" alt="container registry pushed nodeapp">
 </div>
-<div class="title">Fig. 76. Lista de imágenes en Container Registry</div>
+<div class="title">Fig. 77. Lista de imágenes en Container Registry</div>
 </div>
 <div class="paragraph">
 <p>La imagen del contenedor <strong>nodeapp</strong> ya está disponible en el registro privado de nuestro proyecto GCP. Utilizando nuestras credenciales podremos hacer <code>docker pull</code> de dicha imagen para descargarla en cualquier máquina con docker, y ejecutarlo con <code>docker run</code>.</p>
@@ -3603,7 +3624,7 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 </div>
 </div>
 <div class="sect2">
-<h3 id="_integración_y_despliegue_contínuos_con_jenkins">8.4. Integración y despliegue contínuos con Jenkins</h3>
+<h3 id="_integración_y_despliegue_continuos_con_jenkins_2">8.4. Integración y despliegue continuos con Jenkins</h3>
 <div class="paragraph">
 <p>A continuación, vamos a automatizar en Jenkins todo el proceso:</p>
 </div>
@@ -3695,7 +3716,7 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 <pre class="rouge highlight"><code data-lang="groovy">    <span class="n">stage</span><span class="o">(</span><span class="s2">"Run image locally"</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">steps</span> <span class="o">{</span>
         <span class="n">sh</span> <span class="s2">"docker stop nodeapp || true &amp;&amp; docker rm  nodeapp || true"</span> <i class="conum" data-value="1"></i><b>(1)</b>
-        <span class="n">sh</span> <span class="s2">"docker -d run -p 8080:3000 -t --name nodeapp ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/nodeapp:${env.BUILD_ID}"</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="n">sh</span> <span class="s2">"docker run -d -p 8080:3000 -t --name nodeapp ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/nodeapp:${env.BUILD_ID}"</span> <i class="conum" data-value="2"></i><b>(2)</b>
       <span class="o">}</span>
     <span class="o">}</span></code></pre>
 </div>
@@ -3763,7 +3784,7 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 <div class="content">
 <img src="images/jenkins-published-nodeapp-container-registry.png" alt="jenkins published nodeapp container registry">
 </div>
-<div class="title">Fig. 77. Imagen publicada en Container Registry, etiquetada con el número de build</div>
+<div class="title">Fig. 78. Imagen publicada en Container Registry, etiquetada con el número de build</div>
 </div>
 <div class="paragraph">
 <p>Por último, quedaría el paso de <strong>desplegar al entorno de producción</strong>: la máquina virtual de despliegue.</p>
@@ -3792,8 +3813,8 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 <pre class="rouge highlight"><code data-lang="groovy">    <span class="n">stage</span><span class="o">(</span><span class="s1">'Deploy to Production'</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">steps</span><span class="o">{</span>
         <span class="n">sh</span> <span class="s1">'''
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE " if docker ps -q --filter name=nodeapp | grep . ; then docker stop nodeapp ; fi" <i class="conum" data-value="1"></i><b>(1)</b>
-          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE " if docker ps -a -q --filter name=nodeapp | grep . ; then docker rm -fv nodeapp ; fi" <i class="conum" data-value="1"></i><b>(1)</b>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "if docker ps -q --filter name=nodeapp | grep . ; then docker stop nodeapp ; fi" <i class="conum" data-value="1"></i><b>(1)</b>
+          ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "if docker ps -a -q --filter name=nodeapp | grep . ; then docker rm -fv nodeapp ; fi" <i class="conum" data-value="1"></i><b>(1)</b>
           ssh -i ~/.ssh/id_rsa_deploy ubuntu@DNS_DEPLOY_INSTANCE "docker run -d -p 8080:3000 -t --name nodeapp ${CONTAINER_REGISTRY}/${GOOGLE_CLOUD_PROJECT}/nodeapp:latest" <i class="conum" data-value="2"></i><b>(2)</b>
         '''</span>
       <span class="o">}</span>
@@ -3862,7 +3883,7 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 <div class="content">
 <img src="images/jenkins-nodeapp-full-pipeline.png" alt="jenkins nodeapp full pipeline">
 </div>
-<div class="title">Fig. 78. Pipeline completo</div>
+<div class="title">Fig. 79. Pipeline completo</div>
 </div>
 <div class="sidebarblock">
 <div class="content">
@@ -3893,7 +3914,7 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-14 22:18:03 +0200
+Last updated 2021-02-22 02:19:42 +0100
 </div>
 </div>
 <style>

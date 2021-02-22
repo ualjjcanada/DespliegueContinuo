@@ -117,7 +117,7 @@ Utilizando una plantilla de terraform crea 2 instancias de máquina virtuales en
 image::terraform-vm-schema.png[role="thumb", align="center"]
 
 Para crearlas, utiliza la plantilla de terraform disponible en el repositorio https://github.com/ualcnsa/terraformGoogleCloudSample. 
-En primer lugar realiza un __fork__ del repositorio, para hacer las modificaciones al mismo que sean necesarias. Después modifica las variables correspondientes para usar tu proyecto en la plantilla.
+En primer lugar realiza un __fork__ del repositorio, para hacer las modificaciones al mismo que sean necesarias. Después modifica las variables correspondientes para usar tu proyecto en la plantilla, tal y como se describe a continuación.
 
 === Estructura del proyecto terraform
 
@@ -223,7 +223,7 @@ Cuando desees eliminar todos los recursos que hemos creado con esta plantilla, s
 
 [TIP]
 ====
-*Este apartado es optativo*, se evalúa con el 5% de la actividad pero no es obligatorio que lo realices. 
+*Este apartado, Cloud DNS, es optativo*. Se evalúa con el 5% de la actividad pero no es obligatorio que lo realices. 
 ====
 
 Google Cloud ha asignado una IP pública estática a cada una de tus instancias (la IP no cambiará al apagar la instancia y volver a encenderla). A continuación, vamos a asignar nombres de DNS a esas IPs con Cloud DNS y uno de los servicios de DNS disponibles en el Student Pack de GitHub. 
@@ -291,7 +291,7 @@ Vamos a usar la primera instancia para instalar Jenkins. En lugar de realizar un
 
 === Construcción de la imagen del contenedor Jenkins
 
-La imagen pública del contenedor de Jenkins está disponible en https://hub.docker.com/r/jenkins/jenkins[DockerHub], con el nombre jenkins/jenkins:lts. Esta imagen genérica necesita instalarle algunos plugins y herramientas. En concreto, hay que instalarle el propio Docker para permitir que Jenkins ejecute tareas de docker, como por ejemplo `docker build` para construir imágenes de contenedores. 
+La imagen pública del contenedor de Jenkins está disponible en https://hub.docker.com/r/jenkins/jenkins[DockerHub], con el nombre `jenkins/jenkins:lts`. Esta imagen genérica necesita instalarle algunos plugins y herramientas. En concreto, hay que instalarle el propio Docker para permitir que Jenkins ejecute tareas de docker, como por ejemplo `docker build` para construir imágenes de contenedores. 
 
 Por tanto, vamos a crear una imagen personalizada del contenedor de Jenkins basándonos en la imagen pública e instalándo Docker dentro del contenedor.
 Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia máquina donde lo vamos a ejecutar, es decir en la instancia de jenkins. 
