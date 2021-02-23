@@ -698,7 +698,7 @@ En primer lugar realiza un <em>fork</em> del repositorio, para hacer las modific
 
 <span class="k">variable</span> <span class="s2">"gcp_project"</span> <span class="p">{</span>
   <span class="c1"># Configurar el nombre del proyecto en GCP</span>
-  <span class="nx">default</span> <span class="p">=</span> <span class="s2">"cnsa-2020"</span> <i class="conum" data-value="1"></i><b>(1)</b>
+  <span class="nx">default</span> <span class="p">=</span> <span class="s2">"cnsa-2021"</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="p">}</span>
 
 <span class="k">provider</span> <span class="s2">"google"</span> <span class="p">{</span>
@@ -2231,7 +2231,7 @@ java <span class="nt">-jar</span> target/<span class="k">*</span>.jar <i class="
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash"><span class="nv">GOOGLE_CLOUD_PROJECT</span><span class="o">=</span>cnsa-2020-user123
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">GOOGLE_CLOUD_PROJECT</span><span class="o">=</span>cnsa-2021-user123
 
 docker build <span class="nt">-t</span> gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/petclinic:1.0 .</code></pre>
 </div>
@@ -2279,7 +2279,7 @@ docker build <span class="nt">-t</span> gcr.io/<span class="nv">$GOOGLE_CLOUD_PR
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="bash"><span class="nv">GOOGLE_CLOUD_PROJECT</span><span class="o">=</span>cnsa-2020-user123
+<pre class="rouge highlight"><code data-lang="bash"><span class="nv">GOOGLE_CLOUD_PROJECT</span><span class="o">=</span>cnsa-2021-user123
 
 docker run <span class="nt">-p</span> 8080:8080 <span class="nt">-t</span> <span class="nt">--name</span> petclinic  gcr.io/<span class="nv">$GOOGLE_CLOUD_PROJECT</span>/petclinic:1.0</code></pre>
 </div>
@@ -2364,8 +2364,8 @@ docker run <span class="nt">-d</span> <span class="nt">-p</span> 8080:8080 <span
   <span class="n">agent</span> <span class="n">any</span>
   <span class="n">environment</span> <span class="o">{</span>
     <span class="n">CONTAINER_REGISTRY</span> <span class="o">=</span> <span class="s1">'gcr.io'</span>
-    <span class="n">GOOGLE_CLOUD_PROJECT</span> <span class="o">=</span> <span class="s1">'cnsa-2020-abc123'</span>
-    <span class="n">CREDENTIALS_ID</span> <span class="o">=</span> <span class="s1">'cnsa-2020-gcr'</span>
+    <span class="n">GOOGLE_CLOUD_PROJECT</span> <span class="o">=</span> <span class="s1">'cnsa-2021-abc123'</span>
+    <span class="n">CREDENTIALS_ID</span> <span class="o">=</span> <span class="s1">'cnsa-2021-gcr'</span>
   <span class="o">}</span>
   <span class="n">tools</span> <span class="o">{</span>
     <span class="n">maven</span> <span class="s2">"Default Maven"</span>
@@ -3914,7 +3914,7 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-02-22 02:19:42 +0100
+Last updated 2021-02-24 00:26:28 +0100
 </div>
 </div>
 <style>

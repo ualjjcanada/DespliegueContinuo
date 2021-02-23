@@ -151,7 +151,7 @@ El archivo `*provider.tf*` deberás modificarlo:
 
 variable "gcp_project" {
   # Configurar el nombre del proyecto en GCP
-  default = "cnsa-2020" <1>
+  default = "cnsa-2021" <1>
 }
 
 provider "google" {
@@ -1017,7 +1017,7 @@ image::cloud-containers-registry-login.png[role="thumb", align="center"]
 
 [source, bash]
 ----
-GOOGLE_CLOUD_PROJECT=cnsa-2020-user123
+GOOGLE_CLOUD_PROJECT=cnsa-2021-user123
 
 docker build -t gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0 .
 ----
@@ -1047,7 +1047,7 @@ La imagen del contenedor PetClinic ya está disponible en el registro privado de
 
 [source, bash]
 ----
-GOOGLE_CLOUD_PROJECT=cnsa-2020-user123
+GOOGLE_CLOUD_PROJECT=cnsa-2021-user123
 
 docker run -p 8080:8080 -t --name petclinic  gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0
 ---- 
@@ -1108,8 +1108,8 @@ pipeline {
   agent any 
   environment {
     CONTAINER_REGISTRY = 'gcr.io'
-    GOOGLE_CLOUD_PROJECT = 'cnsa-2020-abc123'
-    CREDENTIALS_ID = 'cnsa-2020-gcr'
+    GOOGLE_CLOUD_PROJECT = 'cnsa-2021-abc123'
+    CREDENTIALS_ID = 'cnsa-2021-gcr'
   }
   tools {
     maven "Default Maven" 
