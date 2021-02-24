@@ -449,6 +449,8 @@ image::jenkins-tool-nodejs.png[role="thumb", align="center"]
 
 De la misma forma, instala la última versión de Maven.
 
+.Configuración de herramienta Maven
+image::jenkins-tool-nodejs.png[role="thumb", align="center"]
 
 
 === Creación del primer proyecto Jenkins
