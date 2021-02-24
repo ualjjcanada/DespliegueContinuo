@@ -376,7 +376,7 @@ Los parámetros de `docker run` son:
 
 * `-p 80:8080`: jenkins se ejecutará en el puerto 80 en el host, que está mapeado al puerto 8080 del contenedor
 
-* `-v /var/run/docker.sock:/var/run/docker.sock`: volumen para compartir el docker socket (usando en tu máquina) con el contenedor. 
+* `-v /var/run/docker.sock:/var/run/docker.sock`: volumen para compartir el docker socket (usado en la máquina host) con el contenedor. 
 
 * `-v ~/jenkins_home:/var/jenkins_home`: mapea la carpeta local `~/jenkins_home` con la carpeta `/var/jenkins_home` del contenedor. En el contenedor, la carpeta HOME del usuario _jenkins_ es `/var/jenkins_home`, donde Jenkins guarda todos los archivos que utiliza. Si se tira el contenedor o se actualiza, no se pierden los datos ya que se guardan "fuera" del contenedor. 
 
