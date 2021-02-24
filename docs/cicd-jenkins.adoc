@@ -176,7 +176,9 @@ export GOOGLE_CLOUD_KEYFILE_JSON=*path/file.json*
 
 [WARNING]
 ====
-Recuerda: *NUNCA subas tu archivo de credenciales json* a un repositorio público como GitHub. Para evitarlo, añade el nombre el archivo de credenciales  al *`.gitignore`*. En el archivo de credenciales va tu clave privada que sustituye a tu usuario y contraseña para crear recursos en GCP. Hay robots que continuamente buscan PRIVATE KEYS y API TOKENS en repositorios públicos como GitHub. Si un __hacker__ accede a ese archivo, lo usará para crear servicios hasta gastar tu crédito por completo, fundamentalmente para minar bitcoins.
+Recuerda: *NUNCA subas tu archivo de credenciales json* a un repositorio público como GitHub. Para evitarlo, añade el nombre el archivo de credenciales al *`.gitignore`*. Se recomienda guardar el archivo `.json` en una carpeta llamada `credentials`, porque ya estaría ignorado, puedes verlo en el *`.gitignore`* del repositorio que has forkeado. 
+
+En el archivo de credenciales va tu clave privada que sustituye a tu usuario y contraseña para crear recursos en GCP. Hay robots que continuamente buscan PRIVATE KEYS y API TOKENS en repositorios públicos como GitHub. Si un __hacker__ accede a ese archivo, lo usará para crear servicios hasta gastar tu crédito por completo, fundamentalmente para minar bitcoins.
 ====
 
 === Ejecución de terraform
@@ -205,7 +207,7 @@ image::terraform-plan-ok.png[role="thumb", align="center"]
 
 ==== `terraform apply`
 
-Ejecuta el comando `terraform apply --auto-approve` para ejecutar la plantilla. Comenzará a crear los 7 elementos definidos en la plantilla. Tardará unos *5 minutos* así que ten paciencia. Sobre todo tardará en ejecutar los bloques de inicialización de las instancias, en las que se actualizan los paquetes, se instala Docker y otros paquetes. En todo momento verás en pantalla el `log` de las operaciones que se están realizando.
+Ejecuta el comando `terraform apply --auto-approve` para ejecutar la plantilla. Comenzará a crear los 7 elementos definidos en la plantilla. Tardará unos *5 minutos* o incluso más, así que ten paciencia. Sobre todo tardará en ejecutar los bloques de inicialización de las instancias, en las que se actualizan los paquetes, se instala Docker y otros paquetes. En todo momento verás en pantalla el `log` de las operaciones que se están realizando.
 
 Comprueba que las instancias se han creado correctamente en tu proyecto Google Cloud. 
 
@@ -287,7 +289,7 @@ image::get-tech-manage-servers.png[role="thumb", align="center"]
 
 == Instalación de Jenkins
 
-Vamos a usar la primera instancia para instalar Jenkins. En lugar de realizar una https://github.com/ualhmis/Jenkins2Instalacion/blob/master/jenkins2_2019.adoc[instalación completa sobre el sistema operativo], utilizando los paquetes de Ubuntu, tal como se hace en la asignatura Herramientas y Métodos de Ingeniería del Software, de 3º del Grado en Ingeniería Informática, aquí vas a desplegar Jenkins como un contenedor de  docker. 
+Vamos a usar la primera instancia para instalar Jenkins. En lugar de realizar una https://ualhmis.github.io/Jenkins2Instalacion/[instalación completa sobre el sistema operativo], utilizando los paquetes de Ubuntu, tal como se hace en la asignatura Herramientas y Métodos de Ingeniería del Software, de 3º del Grado en Ingeniería Informática, aquí vas a desplegar Jenkins como un contenedor de  docker. 
 
 === Construcción de la imagen del contenedor Jenkins
 
@@ -415,6 +417,39 @@ Jenkins está listo.
 .Bienvenida a Jenkins
 image::jenkins-welcome.png[role="thumb", align="center"]
 
+=== Instalación de plugins adicionales
+
+Vamos a instalar varios plugins: greenballs, NodeJs, GitHub integration, Docker Pipeline. 
+
+Haz clic en __Manage Jenkins__ > __Manage Plugins__. En la pestaña __Available__ busca __Github integration__, seleccionaló y pulsa en __Download now and install after restart__.
+
+.Instalación del plugin Github integration
+image::jenkins-plugins-github-integration.png[role="thumb", align="center"]
+
+Repite los pasos para los plugins __Green Balls__, __NodeJS__ y __Docker Pipeline__.
+
+.Instalación del plugin NodeJS
+image::jenkins-plugins-nodejs.png[role="thumb", align="center"]
+
+Marca __Restart Jenkins__ para completar la instalación. Tras unos segundos, vuelve a iniciar sesión y tendrás los plugins instalados. 
+
+.Reiniciar para completar la instalación
+image::jenkins-plugins-restart.png[role="thumb", align="center"]
+
+=== Configuración las tools en Jenkins
+
+Tras la instalación del plugin https://plugins.jenkins.io/nodejs/[__NodeJS__], es necesario realizar la siguiente configuración: 
+
+. Ve a __Manage Jenkins__, __Global Tool configuration__.
+. En *NodeJS*, añade un instalador. Dale por nombre "nodejs" y marca instalar automáticamente. 
+. Guarda los cambios.
+
+.Configuración de herramienta NodeJS
+image::jenkins-tool-nodejs.png[role="thumb", align="center"]
+
+De la misma forma, instala la última versión de Maven.
+
+
 
 === Creación del primer proyecto Jenkins
 
@@ -443,38 +478,56 @@ image::jenkins-new-hello-docker-console-success.png[role="thumb", align="center"
 
 Por consola se visualiza el resultado de ejecutar los comandos dentro del contenedor. Como puedes ver, `git` y `java` están instalados, venían ya en la imagen de jenkins:lts de la que hemos partido en la definición del Dockerfile. Además, `docker` también está disponible, se ha instalado correctamente mediante la definición incluida en el Dockerfile.
 
+=== Creación del primer pipeline en Jenkins
 
-=== Instalación de plugins adicionales
+Creamos el primer proyecto de Jenkins tipo pipeline. 
+Podemos ejecutarlo sobre el nodo master.
 
-Vamos a instalar varios plugins: greenballs, NodeJs, GitHub integration. 
+[source,bash,subs="verbatim,quotes"]
+----
+pipeline {
+    agent any
+    tools {
+        maven 'Default Maven'
+    }
 
-Haz clic en __Manage Jenkins__ > __Manage Plugins__. En la pestaña __Available__ busca __Github integration__, seleccionaló y pulsa en __Download now and install after restart__.
+    stages {
+        stage('Build') {
+            steps {
+                sh '''
+                    java -version
+                    mvn -v
+                  '''
+            }
+        }
+    }
+}
+----
 
-.Instalación del plugin Github integration
-image::jenkins-plugins-github-integration.png[role="thumb", align="center"]
+Y la otra alternativa es que el pipeline se ejecute en un contenedor docker que descargará de DockerHub.
 
-Repite los pasos para los plugins __Green Balls__ y  __NodeJS__.
 
-.Instalación del plugin NodeJS
-image::jenkins-plugins-nodejs.png[role="thumb", align="center"]
-
-Marca __Restart Jenkins__ para completar la instalación. Tras unos segundos, vuelve a iniciar sesión y tendrás los plugins instalados. 
-
-.Reiniciar para completar la instalación
-image::jenkins-plugins-restart.png[role="thumb", align="center"]
-
-=== Configuración las tools en Jenkins
-
-Tras la instalación del plugin https://plugins.jenkins.io/nodejs/[__NodeJS__], es necesario realizar la siguiente configuración: 
-
-. Ve a __Manage Jenkins__, __Global Tool configuration__.
-. En *NodeJS*, añade un instalador. Dale por nombre "nodejs" y marca instalar automáticamente. 
-. Guarda los cambios.
-
-.Configuración de herramienta NodeJS
-image::jenkins-tool-nodejs.png[role="thumb", align="center"]
-
-De la misma forma, instala la última versión de Maven.
+[source,bash,subs="verbatim,quotes"]
+----
+pipeline {
+    agent {
+        docker {
+            image 'maven:3.6-jdk-8-alpine'
+            args '-v $HOME/.m2:/root/.m2'
+        }
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh '''
+                    java -version
+                    mvn -v
+                  '''
+            }
+        }
+    }
+}
+---- 
 
 === Conexión con la máquina de despliegue
 
@@ -1085,7 +1138,7 @@ Para solucionarlo, bien detén el proceso java que está corriendo con la aplica
 docker run -p 80:8080 -t --name petclinic gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0
 ----
 
-=== Integración y despliegue continuos con Jenkins
+=== Integración y despliegue continuo con Jenkins
 
 Hasta ahora hemos realizado todos los pasos de construcción, prueba y despliegue manualmente. A continuación, vamos a automatizar en Jenkins todo el proceso, cuyas principales tareas son: 
 
@@ -1094,7 +1147,7 @@ Hasta ahora hemos realizado todos los pasos de construcción, prueba y despliegu
 - la *publicación* de la imagen en el registro, y
 - el *despliegue* del contenedor.
 ****
-En Jenkins, son necesarios los siguientes plugins para trabajar con Docker y pipelines, y con Container Registry: Docker Pipeline ,que ya está instalado, y tendrás que instalar https://plugins.jenkins.io/google-container-registry-auth[Google Container Registry Auth].
+En Jenkins, son necesarios los siguientes plugins para trabajar con Docker y pipelines, y con Container Registry: Docker Pipeline, que ya está instalado, y tendrás que instalar https://plugins.jenkins.io/google-container-registry-auth[Google Container Registry Auth].
 
 Definimos un nuevo proyecto en Jenkins de tipo pipeline, con el nombre ```PetClinic-Docker-abc123``` sustituyendo abc123 por nuestro nombre de usuario. Son necesarios 3 fases (stages) en el pipeline: _build image_, _push image_, y _deploy container_.
 
