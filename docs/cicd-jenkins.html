@@ -1324,7 +1324,7 @@ Podemos ejecutarlo sobre el nodo master.</p>
 <pre class="rouge highlight"><code data-lang="bash">pipeline <span class="o">{</span>
     agent <span class="o">{</span>
         docker <span class="o">{</span>
-            image <span class="s1">'maven:3.6-jdk-8-alpine'</span>
+            image <span class="s1">'maven:3.6-openjdk-8'</span> <i class="conum" data-value="1"></i><b>(1)</b>
             args <span class="s1">'-v $HOME/.m2:/root/.m2'</span>
         <span class="o">}</span>
     <span class="o">}</span>
@@ -1340,6 +1340,14 @@ Podemos ejecutarlo sobre el nodo master.</p>
     <span class="o">}</span>
 <span class="o">}</span></code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Entre las <a href="https://hub.docker.com/_/maven">imágenes de Maven</a> disponibles están <code>3.6-openjdk-11</code>, <code>3.6-openjdk-15</code>, etc</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
@@ -3977,7 +3985,7 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-02-24 18:15:22 +0100
+Last updated 2021-03-03 14:19:37 +0100
 </div>
 </div>
 <style>

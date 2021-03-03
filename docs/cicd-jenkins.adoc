@@ -514,7 +514,7 @@ Y la otra alternativa es que el pipeline se ejecute en un contenedor docker que 
 pipeline {
     agent {
         docker {
-            image 'maven:3.6-jdk-8-alpine'
+            image 'maven:3.6-openjdk-8' <1>
             args '-v $HOME/.m2:/root/.m2'
         }
     }
@@ -530,6 +530,7 @@ pipeline {
     }
 }
 ---- 
+<1> Entre las https://hub.docker.com/_/maven[imágenes de Maven] disponibles están `3.6-openjdk-11`, `3.6-openjdk-15`, etc
 
 === Conexión con la máquina de despliegue
 
