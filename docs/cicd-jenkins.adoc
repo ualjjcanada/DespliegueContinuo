@@ -529,7 +529,7 @@ pipeline {
         }
     }
 }
----- 
+----
 <1> Entre las https://hub.docker.com/_/maven[imágenes de Maven] disponibles están `3.6-openjdk-11`, `3.6-openjdk-15`, etc
 
 === Conexión con la máquina de despliegue
@@ -1003,7 +1003,7 @@ Prueba la ejecución del contenedor en local:
 [source, bash]
 ----
 docker run -it -p 8080:8080 -t petclinic-docker
----- 
+----
 
 Comprueba que se ha iniciado la aplicación en http://localhost:8080.
 
@@ -1023,7 +1023,7 @@ _To create a new service account and a service account key for use with Containe
 
 . _Create the service account for interacting with repositories:_
 
-.. In Google Cloud Console, open the https://console.cloud.google.com/apis/credentials/serviceaccountkey?_ga=2.71233296.1082389881.1588672109-358507209.1586347394[Create service account key page]._
+.. _In Google Cloud Console, open the https://console.cloud.google.com/apis/credentials/serviceaccountkey[Create service account key page]._
 
 .. _From the Service account list, select New service account_
 
@@ -1106,7 +1106,7 @@ La imagen del contenedor PetClinic ya está disponible en el registro privado de
 GOOGLE_CLOUD_PROJECT=cnsa-2021-user123
 
 docker run -p 8080:8080 -t --name petclinic  gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0
----- 
+----
 
 Si conectas a la instancia de despliegue que creamos al principio de esta actividad, y ejecutas el comando `docker run` anterior, dará un error de autenticación:
 
@@ -1125,7 +1125,12 @@ ssh ubuntu@DNS_MAQUINA_DEPLOY
 cat keyfile.json | docker login -u _json_key --password-stdin https://gcr.io
 # ejecutamos el contenedor desde gcr.io
 docker run -d -p 8080:8080 -t --name petclinic gcr.io/$GOOGLE_CLOUD_PROJECT/petclinic:1.0
----- 
+----
+
+[WARNING]
+====
+Si la ejecución de `docker run` te da error, prueba a ejecutarlo con `sudo`. Para evitar tener que escribir siempre `sudo` delante de cualquier comando `docker`, ejecuta: `sudo usermod -aG docker $USER`
+====
 
 Es posible que la ejecución del contenedor de un error, porque el puerto 8080 ya esté en uso:
 
@@ -1174,7 +1179,7 @@ pipeline {
     stage("Checkout code") {
       steps {
         // checkout scm
-        git 'https://github.com/ualcnsa/spring-petclinic.git'
+        git  branch:'main', url:'https://github.com/ualcnsa/spring-petclinic.git'
       }
     }
     stage('Compile, Test, Package') { 
@@ -1194,7 +1199,8 @@ pipeline {
           dockerImage = docker.build(
             "${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/petclinic:${env.BUILD_ID}",
             "-f Dockerfile ."
-          ) 
+          )
+        } 
       }
     }
   }
