@@ -2488,11 +2488,11 @@ docker run <span class="nt">-d</span> <span class="nt">-p</span> 8080:8080 <span
 </div>
 </div>
 <div class="paragraph">
-<p>Para probar que la imagen del contenedor se ha creado bien, añade esta fase que hace un despliegue "local" en la propia máquina de Jenkins, es decir, ejecuta un contenedor basado en la imagen que acabamos de crear:</p>
+<p>Para probar que la imagen del contenedor se ha creado bien, añade esta fase que hace un despliegue en un entorno de "Staging" o "Testing", que en este tutorial va a ser "local" en la propia máquina de Jenkins, es decir, ejecuta un contenedor basado en la imagen que acabamos de crear:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="groovy">    <span class="n">stage</span><span class="o">(</span><span class="s2">"Run image locally"</span><span class="o">)</span> <span class="o">{</span>
+<pre class="rouge highlight"><code data-lang="groovy">    <span class="n">stage</span><span class="o">(</span><span class="s2">"Deploy to Testing (locally)"</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">steps</span> <span class="o">{</span>
         <span class="n">sh</span> <span class="s2">"docker stop petclinic || true &amp;&amp; docker rm  petclinic || true"</span> <i class="conum" data-value="1"></i><b>(1)</b>
         <span class="n">sh</span> <span class="s2">"docker run -d -p 8080:8080 -t --name petclinic ${env.CONTAINER_REGISTRY}/${env.GOOGLE_CLOUD_PROJECT}/petclinic:${env.BUILD_ID}"</span> <i class="conum" data-value="2"></i><b>(2)</b>
@@ -2513,7 +2513,7 @@ docker run <span class="nt">-d</span> <span class="nt">-p</span> 8080:8080 <span
 </table>
 </div>
 <div class="paragraph">
-<p>La aplicación debe estar accesible en el puerto 8080 en tu máquina de Jenkins. Para asegurarnos que la aplicación se está ejecutando bien, debemos problarlo "manualmente". Para automatizar esta prueba, lo adecuado sería realizar unos tests end-to-end, con <a href="https://www.selenium.dev">Selenium</a>. Esto se explicará en otra actividad, dedicada al testing.</p>
+<p>La aplicación debe estar accesible en el puerto <code>8080</code> en tu máquina de Jenkins. Para asegurarnos que la aplicación se está ejecutando bien, debemos problarlo "manualmente". Para automatizar esta prueba, lo adecuado sería realizar unos tests end-to-end, con <a href="https://www.selenium.dev">Selenium</a>. Esto se explicará en otra actividad, dedicada al testing.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2538,13 +2538,13 @@ docker run <span class="nt">-d</span> <span class="nt">-p</span> 8080:8080 <span
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p><em>Go to jenkins home, click on “credentials” and “(global)”</em></p>
+<p><em>Go to jenkins home, Manage Jenkins, click on “Manage credentials” and “(global)”</em></p>
 </li>
 <li>
 <p><em>Click on “Add Credentials” in left menu.</em></p>
 </li>
 <li>
-<p><em>Select <strong>Google Service Account from private key</strong> for the “Kind” field, and enter your project name ( myregistry in this example). Then upload the JSON private key.</em></p>
+<p><em>Select <strong>Google Service Account from private key</strong> for the “Kind” field, and enter your project. Then upload the JSON private key.</em></p>
 </li>
 </ol>
 </div>
@@ -2656,7 +2656,7 @@ docker run <span class="nt">-d</span> <span class="nt">-p</span> 8080:8080 <span
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Ejecuta en la instancia de despliegue el comando <code>docker rm</code> que elimina el contenedor <code>petclinic</code> en caso de que exista de un despliegue anterior. Esto se comprueba con <code>docker ps -a &#8230;&#8203;</code>. Estos dos pasos, parar el contenedor y eliminar el contenedor, son necesarios realizarlos antes de volver a lanzar un nuevo contenedor con el mismo nombre. Se ejecuta en dos pasos para evitar errores en caso de que el contenedor exista pero no esté en ejecución, lo que podría dar lugar a un error en el despliegue.</td>
+<td>Ejecuta en la instancia de despliegue el comando <code>docker rm</code> que elimina el contenedor <code>petclinic</code> en caso de que exista de un despliegue anterior. Esto se comprueba con <code>docker ps -a &#8230;&#8203;</code>. Estos dos pasos, primero parar el contenedor y luego eliminar el contenedor, son necesarios antes de volver a lanzar un nuevo contenedor con el mismo nombre. Se ejecuta en dos pasos para evitar errores en caso de que el contenedor exista pero no esté en ejecución, lo que podría dar lugar a un error en el despliegue.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -2700,7 +2700,7 @@ docker rmi $(docker images -q)</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Por último, es una buena práctica eliminar las imágenes que se van generando en cada build, para liberar espacio en la máquina de Jenkins. Primero paramos y eliminamos el contenedor que desplegamos anteriormente en la fase del pipeline <code>Run image locally</code>; luego eliminamos la imagen.</p>
+<p>Por último, es una buena práctica eliminar las imágenes que se van generando en cada build, para liberar espacio en la máquina de Jenkins. Primero paramos y eliminamos el contenedor que desplegamos anteriormente en la fase del pipeline <code>Deploy to Testing (locally)</code>; luego eliminamos la imagen.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2745,7 +2745,7 @@ docker rmi $(docker images -q)</code></pre>
 <div class="title">Fig. 62. Pipeline completo</div>
 </div>
 <div class="paragraph">
-<p>Enhorabuena!! Has conseguido definir un pipeline completo de integración y despliegue continuos, y con contenedores. Este proceso se puede aplicar, con pequeñas adaptaciones, a cualquier otro proyecto Java basados en Maven.</p>
+<p><strong>ENHORABUENA!!!</strong> Has conseguido definir un pipeline completo de integración y despliegue continuos, y con contenedores. Este proceso se puede aplicar, con pequeñas adaptaciones, a cualquier otro proyecto Java basados en Maven.</p>
 </div>
 <div class="paragraph">
 <p>Si usas otras tecnologías, como NodeJs, hay que adaptar cada una de las fases a su equivalente en NodeJs. Vamos a verlo en la siguiente sección.</p>
@@ -4000,7 +4000,7 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-03-09 17:43:14 +0100
+Last updated 2021-03-09 18:27:34 +0100
 </div>
 </div>
 <style>

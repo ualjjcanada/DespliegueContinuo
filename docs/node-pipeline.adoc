@@ -84,7 +84,7 @@ Prueba la ejecución del contenedor en local:
 [source, bash]
 ----
 docker run -p 3000:3000 -d --name hello-node <your username>/nodeapp 
----- 
+----
 
 Comprueba que se ha iniciado la aplicación en http://localhost:3000.
 
@@ -153,7 +153,7 @@ La imagen del contenedor *nodeapp* ya está disponible en el registro privado de
 [source, bash]
 ----
 docker run -p 3000:3000 -t --name nodeapp gcr.io/$GOOGLE_CLOUD_PROJECT/nodeapp:1.0
----- 
+----
 
 === Despliegue en VM
 
@@ -167,7 +167,7 @@ ssh ubuntu@DNS_MAQUINA_DEPLOY
 cat keyfile.json | docker login -u _json_key --password-stdin https://gcr.io
 # ejecutamos el contenedor desde gcr.io
 docker run -p 8080:3000 -t --name nodeapp gcr.io/$GOOGLE_CLOUD_PROJECT/nodeapp:1.0
----- 
+----
 
 Hemos publicado el contenedor en el puerto 8080 ya que es el que está abierto en las reglas del firewall de nuestro proyecto GCP. 
 

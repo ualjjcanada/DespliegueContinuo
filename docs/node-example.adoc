@@ -41,7 +41,7 @@ Veamos los archivos que componen la aplicación:
 . El archivo `package.json` contienen información básica de la aplicación y las dependencias: 
 
 - *express*: Node framework
-- *mocha*: framework de testing para node (Se podría haber elegido otro framework de testiong como Jasmin, Jest, Tape etc.)
+- *mocha*: framework de testing para NodeJs (existen numerosos framework de testing en NodeJs, como Jasmin, Jest, Tape, etc.)
 - *supertest*: proporciona abstracción a alto nivel para testing HTTP
 
 [source,json]
