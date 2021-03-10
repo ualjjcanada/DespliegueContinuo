@@ -54,6 +54,16 @@ La realización de estas actividades se realizará de forma **individual**. Ser�
 La entrega será mediante el envío de un informe y el acceso al profesor a los servicios configurados por cada estudiante, para la revisión y evaluación de los mismos. 
 ****
 
+[IMPORTANT]
+====
+Para realizar las actividades propuestas, como van a ser conectar a las instancias en GCP, lanzar Terraform, lanzar contenedores Docker, etc, puedes usar distintas formas. Dependiendo del sistema operativo de tu máquina local, te recomiendo los siguientes alternativas:
+- Windows: es recomendable usar un terminal basado en Linux, por ejemplo *Git Bash* (https://git-scm.com).
+- Linux y Mac: el *terminal del S.O* incluye todo lo necesario.
+- Cloud Shell de Google Cloud: la consola web de Google Cloud proporciona la herramienta *Cloud Shell* que permite trabajar cómodamente contra GCP desde cualquier navegador web y cualquier S.O.
+
+En cualquier caso, en general evita usar el usuario `root` salvo que sea estrictamente necesario, para no generar problemas de permisos sobre los archivos y carpetas cuando uses un usuario distinto de `root`. Por tanto, utiliza `sudo` delante de los comandos cuando requieras permisos de administrador, pero evita hacerlo de forma predeterminada (evita `sudo su`).
+====
+
 // Entrar en modo numerado de apartados
 :numbered:
 
@@ -298,7 +308,14 @@ La imagen pública del contenedor de Jenkins está disponible en https://hub.doc
 Por tanto, vamos a crear una imagen personalizada del contenedor de Jenkins basándonos en la imagen pública e instalándo Docker dentro del contenedor.
 Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia máquina donde lo vamos a ejecutar, es decir en la instancia de jenkins. 
 
-Conecta por ssh a la instancia. Crea una carpeta `jenkins-docker` y crea el archivo `Dockerfile`. Usa el siguiente Dockerfile (descrito en esta entrada de __medium.com__:  https://medium.com/@gustavo.guss/jenkins-building-docker-image-and-sending-to-registry-64b84ea45ee9[Jenkins Building Docker Image and Sending to Registry].
+Conecta por ssh a la instancia de jenkins. Recuerda que el usuario de la instancia es `ubuntu`. Por tanto, la conexión a la misma  consistiría en ejecutar desde el terminal el comando `ssh ubuntu@MAQUINA_JENKINS`, sustituyendo MAQUINA_JENKINS por la IP o el nombre DNS de la misma.
+
+[IMPORTANT]
+====
+Realiza las actividades conectado con el usuario `ubuntu` de la máquina. Se *DESACONSEJA* ejecutar los comandos como `root` mediante `sudo su`. Solamente en caso de que sea absolutamente necesario, ejecuta los comandos con `sudo` delante para tener permisos de `root` puntualmente. Si haces las actividades como `root`, tendrás problemas de permisos de acceso los archivos y carpetas, como por ejemplo a las claves SSH.
+====
+
+Crea una carpeta `jenkins-docker` y crea el archivo `Dockerfile`. Usa el siguiente Dockerfile (descrito en esta entrada de __medium.com__:  https://medium.com/@gustavo.guss/jenkins-building-docker-image-and-sending-to-registry-64b84ea45ee9[Jenkins Building Docker Image and Sending to Registry].
 
 .Dockerfile
 [source, docker]
@@ -573,6 +590,11 @@ image::jenkins-ls-deploy-keys.png[role="thumb", align="center"]
 
 .Copia el contenido de __id_rsa_deploy.pub__
 image::jenkins-cat-public-key.png[role="thumb", align="center"]
+
+[WARNING]
+====
+Debido a que algunos terminales añaden saltos delinea al copiar texto desde el terminal, como ocurre con cloud shell de GCP, es _recomendable_ copiar el contenido de la clave pública en cualquier editor de texto "plano" (Notepad++, Sublime, VS Code, etc) y eliminar los saltos de línea.
+====
 
 [start=8]
 . Ahora pégalo en tu PC, lo necesitaremos más adelante.
