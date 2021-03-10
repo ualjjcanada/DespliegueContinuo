@@ -1041,6 +1041,20 @@ Lo más adecuado es que construyas la imagen de Jenkins con Docker en la propia 
 </tr>
 </table>
 </div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Prueba que docker se ejecuta correctamente. Si la ejecución de <code>docker ps -a</code> te da error, prueba a ejecutarlo con <code>sudo</code>. Para evitar tener que escribir siempre <code>sudo</code> delante de cualquier comando <code>docker</code>, ejecuta: <code>sudo usermod -aG docker $USER</code>. Tras ello, reinicia la sesión. Prueba ahora sin <code>sudo</code>, a partir de ahora llama siempre a docker sin <code>sudo</code>. Más info <a href="https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user">aquí</a></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>Crea una carpeta <code>jenkins-docker</code> y crea el archivo <code>Dockerfile</code>. Usa el siguiente Dockerfile (descrito en esta entrada de <em>medium.com</em>:  <a href="https://medium.com/@gustavo.guss/jenkins-building-docker-image-and-sending-to-registry-64b84ea45ee9">Jenkins Building Docker Image and Sending to Registry</a>.</p>
 </div>
@@ -2452,7 +2466,7 @@ docker run <span class="nt">-d</span> <span class="nt">-p</span> 8080:8080 <span
 </td>
 <td class="content">
 <div class="paragraph">
-<p>Si la ejecución de <code>docker run</code> te da error, prueba a ejecutarlo con <code>sudo</code>. Para evitar tener que escribir siempre <code>sudo</code> delante de cualquier comando <code>docker</code>, ejecuta: <code>sudo usermod -aG docker $USER</code>. Tras ello, reinicia la sesión. Más info <a href="https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user">aquí</a></p>
+<p>Si la ejecución de <code>docker run</code> te da error, prueba a ejecutarlo con <code>sudo</code>. Para evitar tener que escribir siempre <code>sudo</code> delante de cualquier comando <code>docker</code>, ejecuta: <code>sudo usermod -aG docker $USER</code>. Tras ello, reinicia la sesión. Prueba ahora sin <code>sudo</code>, a partir de ahora llama siempre a docker sin <code>sudo</code>. Más info <a href="https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user">aquí</a></p>
 </div>
 </td>
 </tr>
@@ -4065,7 +4079,7 @@ docker run <span class="nt">-p</span> 8080:3000 <span class="nt">-t</span> <span
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-03-10 12:44:28 +0100
+Last updated 2021-03-10 13:42:29 +0100
 </div>
 </div>
 <style>

@@ -320,6 +320,11 @@ Si utilizas la shell de la consola web de Google Cloud para conectar por ssh a l
 Realiza las actividades conectando a las instancias bien con el usuario `ubuntu` de la máquina, o bien si usas la shell de la consola web de Google Cloud, con tu usuario de la UAL (del tipo `abc123`). *Se consistente*, es decir, hazlo siempre con el mismo usuario. Se *DESACONSEJA* ejecutar los comandos como `root` mediante `sudo su`. Solamente en caso de que sea absolutamente necesario, ejecuta los comandos con `sudo` delante para tener permisos de `root` puntualmente. Si haces las actividades como `root`, tendrás problemas de permisos de acceso los archivos y carpetas, como por ejemplo a las claves SSH.
 ====
 
+[WARNING]
+====
+Prueba que docker se ejecuta correctamente. Si la ejecución de `docker ps -a` te da error, prueba a ejecutarlo con `sudo`. Para evitar tener que escribir siempre `sudo` delante de cualquier comando `docker`, ejecuta: `sudo usermod -aG docker $USER`. Tras ello, reinicia la sesión. Prueba ahora sin `sudo`, a partir de ahora llama siempre a docker sin `sudo`. Más info https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user[aquí]
+====
+
 Crea una carpeta `jenkins-docker` y crea el archivo `Dockerfile`. Usa el siguiente Dockerfile (descrito en esta entrada de __medium.com__:  https://medium.com/@gustavo.guss/jenkins-building-docker-image-and-sending-to-registry-64b84ea45ee9[Jenkins Building Docker Image and Sending to Registry].
 
 .Dockerfile
@@ -1156,7 +1161,7 @@ docker run -d -p 8080:8080 -t --name petclinic gcr.io/$GOOGLE_CLOUD_PROJECT/petc
 
 [WARNING]
 ====
-Si la ejecución de `docker run` te da error, prueba a ejecutarlo con `sudo`. Para evitar tener que escribir siempre `sudo` delante de cualquier comando `docker`, ejecuta: `sudo usermod -aG docker $USER`. Tras ello, reinicia la sesión. Más info https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user[aquí]
+Si la ejecución de `docker run` te da error, prueba a ejecutarlo con `sudo`. Para evitar tener que escribir siempre `sudo` delante de cualquier comando `docker`, ejecuta: `sudo usermod -aG docker $USER`. Tras ello, reinicia la sesión. Prueba ahora sin `sudo`, a partir de ahora llama siempre a docker sin `sudo`. Más info https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user[aquí]
 ====
 
 Es posible que la ejecución del contenedor de un error, porque el puerto 8080 ya esté en uso:
