@@ -1,7 +1,7 @@
 name: despliegue-continuo
 title: Despliegue continuo con Jenkins
-version: 1.0
-
+version: master
+start_page: ROOT/index.adoc
 nav:
 - modules/ROOT/nav.adoc
 - modules/prerrequisitos/nav.adoc
