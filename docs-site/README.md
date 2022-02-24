@@ -26,6 +26,9 @@ Verify the antora command is now available by running:
 ```
 npx antora -v
 ```
+- Install extensions
+  - Install search powered: `npm i @antora/lunr-extension`
+  - Install http server: 
 
 - Run Antora: 
 ```
